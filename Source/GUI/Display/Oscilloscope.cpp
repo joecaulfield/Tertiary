@@ -1,0 +1,684 @@
+/*
+  ==============================================================================
+
+    Oscilloscope.cpp
+    Created: 30 Dec 2021 11:38:53am
+    Author:  Joe
+
+  ==============================================================================
+*/
+
+#include "Oscilloscope.h"
+
+Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
+	: audioProcessor(p), 
+	lowLFO(p.lowLFO), midLFO(p.midLFO), highLFO(p.highLFO),
+	globalControls(gc)
+{
+	// CONSTRUCTOR
+
+	using namespace Params;             // Create a Local Reference to Parameter Mapping
+	const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
+
+	auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)               // Bool Helper --> Part 8 Param Namespace
+	{
+		param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
+		jassert(param != nullptr);                                                                      // Error Checking
+	};
+
+	boolHelper(showLowBand, Names::Show_Low_Scope);
+	boolHelper(showMidBand, Names::Show_Mid_Scope);
+	boolHelper(showHighBand, Names::Show_High_Scope);
+	boolHelper(stackBands, Names::Stack_Bands_Scope);
+
+	auto floatHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)              // Float Helper --> Part 8 Param Namespace
+	{
+		param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));     // Attach Value to Parameter
+		jassert(param != nullptr);                                                                      // Error Checking
+	};
+
+	floatHelper(scopeScrollParam, Names::Cursor_Position);
+
+	dragX = scopeScrollParam->get();
+
+	sliderScroll.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+	sliderScroll.setLookAndFeel(&scrollLookAndFeel);
+	addAndMakeVisible(sliderScroll);
+
+	addMouseListener(this, true);
+
+	sampleRate = audioProcessor.getSampleRate();
+	makeAttachments();
+
+	updatePreferences();
+
+	startTimerHz(30);
+}
+
+Oscilloscope::~Oscilloscope()
+{
+	sliderScroll.setLookAndFeel(nullptr);
+}
+
+
+void Oscilloscope::paint(juce::Graphics& g)
+{
+	using namespace juce;
+
+	using namespace AllColors::OscilloscopeColors;
+
+	g.fillAll(juce::Colours::black);
+
+	// DRAW AXIS IF NO BANDS SHOWN
+	if (!mShowLowBand && !mShowMidBand && !mShowHighBand)
+		drawAxis(g, scopeRegion, GRID_LINES_NONE);	// Grid when nothing shown
+
+	// DRAW GRIDS IF LOW-BAND SHOWN
+	if (mShowLowBand)
+		drawAxis(g, lowRegion, GRID_LINES_LOW);		// Low Grid
+
+	// DRAW GRIDS IF MID-BAND SHOWN
+	if (mShowMidBand)
+		drawAxis(g, midRegion, GRID_LINES_MID);		// Mid Grid
+
+	// DRAW GRIDS IF HIGH-BAND SHOWN
+	if (mShowHighBand)
+		drawAxis(g, highRegion, GRID_LINES_HIGH);	// High Grid
+
+	// DRAW & FILL LOW REGION
+	g.setGradientFill(mLowBypass ? WAVEFORM_BYPASS_GRADIENT(lowRegion.toFloat()) : WAVEFORM_LOW_GRADIENT(lowRegion.toFloat()));
+	g.setOpacity(mLowFocus ? 0.95 : 0.85);
+	g.fillPath(lowPathFill);
+
+	g.setColour(mLowBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_LOW());
+	g.setOpacity(mLowFocus ? 1.f : 0.85f);
+	g.strokePath(lowPath, mLowFocus?	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	// DRAW & FILL MID REGION
+	g.setGradientFill(mMidBypass ? WAVEFORM_BYPASS_GRADIENT(midRegion.toFloat()) : WAVEFORM_MID_GRADIENT(midRegion.toFloat()));
+	g.setOpacity(mMidFocus ? 0.95 : 0.85);
+	g.fillPath(midPathFill);
+
+	//g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
+	//g.setOpacity(mMidFocus ? 1.f : 0.85f);
+	//g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+	//									juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	//// DRAW & FILL HIGH REGION
+	//g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
+	//g.setOpacity(mHighFocus ? 0.95 : 0.85);
+	//g.fillPath(highPathFill);
+
+	//g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
+	//g.setOpacity(mHighFocus ? 1.f : 0.85f);
+	//g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+	//									juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	//// DRAW REGION OUTLINES
+	//g.setColour(BORDER_COLOR());
+
+	//if (!mShowLowBand && !mShowMidBand && !mShowHighBand)
+	//	g.drawRoundedRectangle(scopeRegion.toFloat(), 5.f, 1.5f);
+
+	//if (mShowLowBand)
+	//	g.drawRoundedRectangle(lowRegion.toFloat(),  5.f, 1.5f);
+
+	//if (mShowMidBand)
+	//	g.drawRoundedRectangle(midRegion.toFloat(),  5.f, 1.5f);
+
+	//if (mShowHighBand)
+	//	g.drawRoundedRectangle(highRegion.toFloat(), 5.f, 1.5f);
+
+	fadeInOutComponents(g);
+	//drawAndFadeCursor(g, getLocalBounds());
+
+	drawBorder(g);
+}
+
+void Oscilloscope::paintOverChildren(juce::Graphics& g)
+{
+	using namespace juce;
+
+	using namespace AllColors::OscilloscopeColors;
+
+	g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
+	g.setOpacity(mMidFocus ? 1.f : 0.85f);
+	g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	// DRAW & FILL HIGH REGION
+	g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
+	g.setOpacity(mHighFocus ? 0.95 : 0.85);
+	g.fillPath(highPathFill);
+
+	g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
+	g.setOpacity(mHighFocus ? 1.f : 0.85f);
+	g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	// DRAW REGION OUTLINES
+	g.setColour(BORDER_COLOR());
+
+	if (!mShowLowBand && !mShowMidBand && !mShowHighBand)
+		g.drawRoundedRectangle(scopeRegion.toFloat(), 5.f, 1.5f);
+
+	if (mShowLowBand)
+		g.drawRoundedRectangle(lowRegion.toFloat(),  5.f, 1.5f);
+
+	if (mShowMidBand)
+		g.drawRoundedRectangle(midRegion.toFloat(),  5.f, 1.5f);
+
+	if (mShowHighBand)
+		g.drawRoundedRectangle(highRegion.toFloat(), 5.f, 1.5f);
+
+	//fadeInOutComponents(g);
+	drawAndFadeCursor(g, getLocalBounds());
+}
+
+void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color)
+{
+	using namespace AllColors::OscilloscopeColors;
+
+	// DRAW VERTICAL LINES =============================
+	juce::Line<float> verticalAxis;
+	auto numLines = 2;
+	g.setColour(color);
+	g.setOpacity(0.5f);
+
+	for (int i = 1; i <= numLines; i++)
+	{
+		verticalAxis.setStart(bounds.getX() + bounds.getWidth() * (float)i/(numLines+1) , bounds.getY());
+		verticalAxis.setEnd(bounds.getX() + bounds.getWidth() * (float) i/(numLines + 1), bounds.getY() + bounds.getHeight());
+		g.drawLine(verticalAxis, 1.f);
+	}
+
+	// DRAW HORIZONTAL LINES =============================
+	g.setColour(juce::Colours::lightgrey);
+
+	for (int i = 1; i < numDepthLines; i++)
+	{
+		auto y = bounds.getY() + i * (bounds.getHeight() / numDepthLines);
+		g.drawHorizontalLine(y, bounds.getX(), bounds.getRight());
+	}
+
+	//juce::Line<float> horizontalAxis;
+	//g.setColour(color);
+	//g.drawLine(horizontalAxis, 1.f);
+
+	//g.setColour(BORDER_COLOR());
+	//g.drawRoundedRectangle(bounds.toFloat(), 5.f, 1.f);
+}
+
+void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bounds)
+{
+	using namespace AllColors::OscilloscopeColors;
+
+	// FADE FUNCTIONS FOR MOUSE-ENTER -> TOGGLES AND SLIDERS
+	if (fadeInCursor) // If mouse entered... fade Toggles Alpha up
+	{
+		if (fadeAlphaCursor < fadeMaxCursor)
+			fadeAlphaCursor += fadeStepUpCursor;
+	}
+	else // If mouse exit... fade Toggles Alpha down
+	{
+		if (fadeAlphaCursor > fadeMinCursor)
+			fadeAlphaCursor -= fadeStepDownCursor;
+	}
+
+	if (fadeAlphaCursor > fadeMaxCursor)
+		fadeAlphaCursor = fadeMaxCursor;
+
+	if (fadeAlphaCursor < fadeMinCursor)
+		fadeAlphaCursor = fadeMinCursor;
+
+	cursor.setStart(bounds.getX() + dragX*getWidth(), scopeRegion.getY()+1);
+	cursor.setEnd(bounds.getX() + dragX * getWidth(), scopeRegion.getBottom()-1);
+
+	g.setColour(CURSOR_LINE);
+	g.setOpacity(fadeAlphaCursor);
+	g.drawLine(cursor, 3.f);
+}
+
+void Oscilloscope::drawBorder(juce::Graphics& g)
+{
+	auto bounds = getLocalBounds();
+
+	// DRAW BORDER ====================
+	juce::Rectangle<float> border;
+	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+		bounds.getWidth(), bounds.getHeight());
+
+	g.setColour(juce::Colours::white);
+	g.drawRoundedRectangle(border, 1.f, 2.f);
+	// =====
+
+	bounds.reduce(1, 1);
+	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+
+	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+		bounds.getWidth(), bounds.getHeight());
+
+	g.setColour(juce::Colours::lightgrey);
+	g.drawRoundedRectangle(border, 2.f, 2.f);
+	// =====
+
+	bounds.reduce(1, 1);
+	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+
+	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+		bounds.getWidth(), bounds.getHeight());
+
+	g.setColour(juce::Colours::grey);
+	g.drawRoundedRectangle(border, 2.f, 2.f);
+	// =====
+
+	bounds.reduce(1, 1);
+	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+
+	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+		bounds.getWidth(), bounds.getHeight());
+
+	g.setColour(juce::Colours::darkgrey);
+	g.drawRoundedRectangle(border, 2.f, 2.f);
+	// =====
+
+}
+
+void Oscilloscope::drawLowLFO(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);
+
+	bounds.reduce(0, 3);
+
+	lowPath.clear();
+	lowPathFill.clear();
+
+	if (mShowLowBand)
+	{
+		for (int i = 0; i <= bounds.getWidth(); i++)
+		{
+			auto increment = lowLFO.waveTableDisplay.size() / bounds.getWidth();
+			float y = midY + (float)lowLFO.waveTableDisplay[i * increment] * (float)bounds.getHeight();
+
+			if (i == 0)
+			{
+				lowPath.startNewSubPath(bounds.getX() + i, y);
+				lowPathFill.startNewSubPath(bounds.getX() + i, midY);
+			}
+			else
+			{
+				lowPath.lineTo(bounds.getX() + i, y);
+				lowPathFill.lineTo(bounds.getX() + i, y);
+			}	
+		}
+		lowPathFill.lineTo(bounds.getRight(), midY);
+	}
+}
+
+void Oscilloscope::drawMidLFO(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);
+
+	bounds.reduce(0, 3);
+
+	midPath.clear();
+	midPathFill.clear();
+
+	if (mShowMidBand)
+	{
+		for (int i = 0; i <= bounds.getWidth(); i++)
+		{
+			auto increment = midLFO.waveTableDisplay.size() / bounds.getWidth();
+			float y = midY + (float)midLFO.waveTableDisplay[i * increment] * (float)bounds.getHeight();
+
+			if (i == 0)
+			{
+				midPath.startNewSubPath(bounds.getX(), y);
+				midPathFill.startNewSubPath(bounds.getX(), midY);
+			}
+			else
+			{
+				midPath.lineTo(bounds.getX() + i, y);
+				midPathFill.lineTo(bounds.getX() + i, y);
+			}
+		}
+		midPathFill.lineTo(bounds.getRight(), midY);
+	}
+}
+
+void Oscilloscope::drawHighLFO(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);
+
+	bounds.reduce(0, 3);
+
+	highPath.clear();
+	highPathFill.clear();
+
+	if (mShowHighBand)
+	{
+		for (int i = 0; i <= bounds.getWidth(); i++)
+		{
+			auto increment = highLFO.waveTableDisplay.size() / bounds.getWidth();
+			float y = midY + (float)highLFO.waveTableDisplay[i * increment] * (float)bounds.getHeight();
+
+			if (i == 0)
+			{
+				highPath.startNewSubPath(bounds.getX() + i, y);
+				highPathFill.startNewSubPath(bounds.getX() + i, midY);
+			}
+			else
+			{
+				highPath.lineTo(bounds.getX() + i, y);
+				highPathFill.lineTo(bounds.getX() + i, y);
+			}
+		}
+		highPathFill.lineTo(bounds.getRight(), midY);
+	}
+}
+
+void Oscilloscope::resized()
+{
+	//updateRegions();
+	drawToggles();
+
+	auto bounds = getLocalBounds();
+	bounds.reduce(4, 0);
+	bounds.removeFromBottom(5);
+
+	sliderScroll.setSize(bounds.getWidth(), 20);
+	sliderScroll.setTopLeftPosition(bounds.getX(), bounds.getBottom() - sliderScroll.getHeight());
+}
+
+void Oscilloscope::timerCallback()
+{
+	checkMousePosition();
+	updateRegions();
+	updatePreferences();
+	checkFocus();
+	repaint();
+}
+
+void Oscilloscope::updateRegions()
+{
+	scopeRegion = getLocalBounds();
+	scopeRegion.reduce(7, 6);
+	scopeRegion.removeFromBottom(15);
+
+	lowRegion = scopeRegion;
+	midRegion = scopeRegion;
+	highRegion = scopeRegion;
+
+	if (mStackAllBands)
+		drawStackedScope();
+
+	drawLowLFO(lowRegion);
+	drawMidLFO(midRegion);
+	drawHighLFO(highRegion);
+}
+
+void Oscilloscope::drawStackedScope()
+{
+	int count = 1;
+
+	// Convert Show-Choices to Binary Counter
+	int x{ 0 }, y{ 0 }, z{ 0 };
+
+	if (mShowLowBand) x = 1;
+	if (mShowMidBand) y = 1;
+	if (mShowHighBand) z = 1;
+	int sum = x*100 + y*10 + z;
+
+	switch (sum)	// Determines the total number of bands to be displayed
+	{
+		case 0: count = 1; numDepthLines = 10; break;
+		case 1: count = 1; numDepthLines = 10; break;
+		case 10: count = 1; numDepthLines = 10; break;
+		case 11: count = 2; numDepthLines = 6; break;
+		case 100: count = 1; numDepthLines = 10; break;
+		case 101: count = 2; numDepthLines = 6; break;
+		case 110: count = 2; numDepthLines = 6; break;
+		case 111: count = 3; numDepthLines = 4; break;
+	}
+
+	auto width = scopeRegion.getWidth();
+	auto height = scopeRegion.getHeight() / count;
+
+	lowRegion.setBounds(scopeRegion.getX(), scopeRegion.getY(), width, height * x);
+	midRegion.setBounds(scopeRegion.getX(), scopeRegion.getY() + lowRegion.getHeight(), width, height * y);
+	highRegion.setBounds(scopeRegion.getX(), scopeRegion.getY() + lowRegion.getHeight() + midRegion.getHeight(), width, height * z);
+
+	scopeRegion.reduce(0, 2);
+	lowRegion.reduce(0, 2);
+	midRegion.reduce(0, 2);
+	highRegion.reduce(0, 2);
+}
+
+void Oscilloscope::checkFocus()
+{
+	mLowFocus = (	globalControls.mTimingControls.timingBarLow.hasFocus || 
+					globalControls.mGainControls.gainBarLow.hasFocus ||
+					globalControls.mWaveControls.waveBarLow.hasFocus );
+
+	mMidFocus = (	globalControls.mTimingControls.timingBarMid.hasFocus || 
+					globalControls.mGainControls.gainBarMid.hasFocus ||
+					globalControls.mWaveControls.waveBarMid.hasFocus );
+
+	mHighFocus = (	globalControls.mTimingControls.timingBarHigh.hasFocus || 
+					globalControls.mGainControls.gainBarHigh.hasFocus ||
+					globalControls.mWaveControls.waveBarHigh.hasFocus );
+}
+
+void Oscilloscope::updatePreferences()
+{
+	using namespace Params;
+	const auto& params = GetParams();
+
+	mShowLowBand = showLowBand->get();
+	mShowMidBand = showMidBand->get();
+	mShowHighBand = showHighBand->get();
+	mStackAllBands = stackBands->get();
+
+	mLowBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
+	mMidBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
+	mHighBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
+}
+
+void Oscilloscope::makeAttachments()
+{
+	using namespace Params;
+	const auto& params = GetParams();
+
+	showLowAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Show_Low_Scope),
+							toggleShowLow);
+
+	showMidAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Show_Mid_Scope),
+							toggleShowMid);
+
+	showHighAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Show_High_Scope),
+							toggleShowHigh);
+
+	stackBandsAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Stack_Bands_Scope),
+							toggleStackBands);
+
+	scrollAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Scope_Scroll),
+							sliderScroll);
+}
+
+void Oscilloscope::drawToggles()
+{
+	using namespace juce;
+
+	buttonBounds.setBounds(scopeRegion.getX()+5, scopeRegion.getY()+5, 65, 70);
+	buttonBounds.reduce(3, 3);
+
+	FlexBox flexBox;
+	flexBox.flexDirection = FlexBox::Direction::column;
+	flexBox.flexWrap = FlexBox::Wrap::noWrap;
+
+	auto spacer = FlexItem().withHeight(2.5);
+
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(toggleShowLow).withHeight(20));
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(toggleShowMid).withHeight(20));
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(toggleShowHigh).withHeight(20));
+	flexBox.items.add(spacer);
+	//flexBox.items.add(FlexItem(toggleStackBands).withFlex(1.f));
+
+	flexBox.performLayout(buttonBounds);
+	
+	toggleShowLow.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	toggleShowMid.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	toggleShowHigh.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	toggleStackBands.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+
+	toggleShowLow.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleShowMid.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleShowHigh.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleStackBands.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+
+	toggleShowLow.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	toggleShowMid.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	toggleShowHigh.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	toggleStackBands.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+
+	toggleShowLow.setButtonText("Low");
+	toggleShowMid.setButtonText("Mid");
+	toggleShowHigh.setButtonText("High");
+	toggleStackBands.setButtonText("Stack");
+
+	addAndMakeVisible(toggleShowLow);
+	addAndMakeVisible(toggleShowMid);
+	addAndMakeVisible(toggleShowHigh);
+	//addAndMakeVisible(toggleStackBands);
+}
+
+void Oscilloscope::drawSliders()
+{
+	//sliderScroll.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+	//sliderScroll.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+
+}
+
+void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
+{
+	using namespace juce;
+	using namespace AllColors::OscilloscopeColors;
+
+	// FADE FUNCTIONS FOR MOUSE-ENTER -> TOGGLES AND SLIDERS
+	if (fadeIn && !fadeInCursor) // If mouse entered... fade Toggles Alpha up
+	{
+		if (fadeAlpha < fadeMax)
+			fadeAlpha += fadeStepUp;
+
+		if (fadeAlpha > fadeMax)
+			fadeAlpha = fadeMax;
+	}
+	else // If mouse exit... fade Toggles Alpha down
+	{
+		if (fadeAlpha > fadeMin)
+			fadeAlpha -= fadeStepDown;
+
+		if (fadeAlpha < fadeMin)
+			fadeAlpha = fadeMin;
+	}
+
+	g.setColour(BUTTON_BACKGROUND_FILL);
+	g.setOpacity(fadeAlpha*0.55f);
+	g.fillRoundedRectangle(buttonBounds, 5.f);
+
+	toggleShowLow.setAlpha(fadeAlpha);
+	toggleShowMid.setAlpha(fadeAlpha);
+	toggleShowHigh.setAlpha(fadeAlpha);
+	toggleStackBands.setAlpha(fadeAlpha);
+	//sliderScroll.setAlpha(fadeAlpha);
+}
+
+void Oscilloscope::mouseEnter(const juce::MouseEvent& event)
+{
+	if (!sliderScroll.isMouseOverOrDragging())
+		fadeIn = true;
+	else
+		fadeIn = false;
+}
+
+void Oscilloscope::mouseExit(const juce::MouseEvent& event)
+{
+	fadeIn = false;
+}
+
+void Oscilloscope::mouseDown(const juce::MouseEvent& event)
+{
+	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10 && !sliderScroll.isMouseOverOrDragging())
+		cursorDrag = true;
+}
+
+void Oscilloscope::mouseUp(const juce::MouseEvent& event)
+{
+	cursorDrag = false;
+	scopeScrollParam->setValueNotifyingHost(dragX);
+}
+
+void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
+{
+	auto margin = 7;
+
+	if (cursorDrag)
+	{
+		dragX = event.getPosition().getX() / (float)getWidth();
+
+		if (event.getPosition().getX() < margin)
+			dragX = margin / (float)getWidth();
+
+		if (event.getPosition().getX() > (float)getWidth() - margin)
+			dragX = ((float)getWidth() - margin) / getWidth();
+	}
+
+}
+
+void Oscilloscope::mouseMove(const juce::MouseEvent& event)
+{
+	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10 && !sliderScroll.isMouseOverOrDragging())
+	{
+		fadeInCursor = true;
+	}
+	else fadeInCursor = false;
+}
+
+void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
+{
+	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
+	{
+		dragX = 0.5f;
+		cursorDrag = false;
+		scopeScrollParam->setValueNotifyingHost(dragX);
+	}
+}
+
+void Oscilloscope::checkMousePosition()
+{
+	if (!isMouseOverOrDragging(true))
+	{
+		fadeInCursor = false;
+		fadeIn = false;
+	}
+}

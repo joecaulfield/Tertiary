@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="UXnuug" name="Tertiary" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              cppLanguageStandard="17" companyName="Joe Caulfield Engineering"
+              companyWebsite="JoeCaulfieldEngineering.com" companyEmail="JPC.FOH@gmail.com"
+              pluginDesc="Multiband Tremolo">
+  <MAINGROUP id="gAXMC9" name="Tertiary">
+    <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
+      <FILE id="VGNRlz" name="Params.cpp" compile="1" resource="0" file="Source/DSP/Params.cpp"/>
+      <FILE id="guk95Z" name="Params.h" compile="0" resource="0" file="Source/DSP/Params.h"/>
+    </GROUP>
+    <GROUP id="{015ED6FA-482B-8BDD-1A0A-39876D18454B}" name="GUI">
+      <GROUP id="{B219FD33-719E-79FC-6A47-8ADA4F45032C}" name="Controls">
+        <GROUP id="{04B858A4-6D43-C310-4E55-D2B8E30299DB}" name="Gain">
+          <FILE id="axsBZ5" name="GainBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Gain/GainBar.cpp"/>
+          <FILE id="pcFFJ9" name="GainBar.h" compile="0" resource="0" file="Source/GUI/Controls/Gain/GainBar.h"/>
+          <FILE id="l9nl9Y" name="GainControls.cpp" compile="1" resource="0"
+                file="Source/GUI/Controls/Gain/GainControls.cpp"/>
+          <FILE id="QgDPxC" name="GainControls.h" compile="0" resource="0" file="Source/GUI/Controls/Gain/GainControls.h"/>
+          <FILE id="ckfEIc" name="InputOutputGain.cpp" compile="1" resource="0"
+                file="Source/GUI/Controls/Gain/InputOutputGain.cpp"/>
+          <FILE id="CaOiTL" name="InputOutputGain.h" compile="0" resource="0"
+                file="Source/GUI/Controls/Gain/InputOutputGain.h"/>
+        </GROUP>
+        <GROUP id="{E301EA59-8A89-645A-D42B-F3255C5110C9}" name="Timing">
+          <FILE id="Qw6gCc" name="TimingBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Timing/TimingBar.cpp"/>
+          <FILE id="X5tyLb" name="TimingBar.h" compile="0" resource="0" file="Source/GUI/Controls/Timing/TimingBar.h"/>
+          <FILE id="QxEjOI" name="TimingControls.cpp" compile="1" resource="0"
+                file="Source/GUI/Controls/Timing/TimingControls.cpp"/>
+          <FILE id="sBMcpA" name="TimingControls.h" compile="0" resource="0"
+                file="Source/GUI/Controls/Timing/TimingControls.h"/>
+        </GROUP>
+        <GROUP id="{137AD4B3-BF8C-7B00-ACF2-8F787E81543A}" name="Wave">
+          <FILE id="Z1cFMQ" name="WaveBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Wave/WaveBar.cpp"/>
+          <FILE id="AvOeH7" name="WaveBar.h" compile="0" resource="0" file="Source/GUI/Controls/Wave/WaveBar.h"/>
+          <FILE id="d1SRy4" name="WaveControls.cpp" compile="1" resource="0"
+                file="Source/GUI/Controls/Wave/WaveControls.cpp"/>
+          <FILE id="cynWn5" name="WaveControls.h" compile="0" resource="0" file="Source/GUI/Controls/Wave/WaveControls.h"/>
+        </GROUP>
+        <FILE id="rryP2o" name="GlobalControls.cpp" compile="1" resource="0"
+              file="Source/GUI/Controls/GlobalControls.cpp"/>
+        <FILE id="NtKC37" name="GlobalControls.h" compile="0" resource="0"
+              file="Source/GUI/Controls/GlobalControls.h"/>
+        <FILE id="HiGJ5W" name="CrossoverControls.cpp" compile="1" resource="0"
+              file="Source/GUI/Controls/CrossoverControls.cpp"/>
+        <FILE id="BGZ14E" name="CrossoverControls.h" compile="0" resource="0"
+              file="Source/GUI/Controls/CrossoverControls.h"/>
+      </GROUP>
+      <GROUP id="{76A8763A-6712-BF7B-D604-A362203AC5EF}" name="Display">
+        <FILE id="XLCa2P" name="FrequencyResponse.cpp" compile="1" resource="0"
+              file="Source/GUI/Display/FrequencyResponse.cpp"/>
+        <FILE id="f7Lt67" name="FrequencyResponse.h" compile="0" resource="0"
+              file="Source/GUI/Display/FrequencyResponse.h"/>
+        <FILE id="Q6guJE" name="Oscilloscope.cpp" compile="1" resource="0"
+              file="Source/GUI/Display/Oscilloscope.cpp"/>
+        <FILE id="OyT0HK" name="Oscilloscope.h" compile="0" resource="0" file="Source/GUI/Display/Oscilloscope.h"/>
+      </GROUP>
+      <FILE id="DyfkBW" name="AllColors.cpp" compile="1" resource="0" file="Source/GUI/AllColors.cpp"/>
+      <FILE id="pfgg05" name="AllColors.h" compile="0" resource="0" file="Source/GUI/AllColors.h"/>
+      <FILE id="QoJAzC" name="MyLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/GUI/MyLookAndFeel.cpp"/>
+      <FILE id="lIWSL6" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/GUI/MyLookAndFeel.h"/>
+      <FILE id="Vd4hvz" name="UtilityFunctions.cpp" compile="1" resource="0"
+            file="Source/GUI/UtilityFunctions.cpp"/>
+      <FILE id="O7hnQT" name="UtilityFunctions.h" compile="0" resource="0"
+            file="Source/GUI/UtilityFunctions.h"/>
+    </GROUP>
+    <GROUP id="{2998FF50-7A04-CF09-34EE-98E94AB511BB}" name="Source">
+      <FILE id="cRi3XZ" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="Ta0Y4C" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="t0Q3yy" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="zz2gtf" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+    </GROUP>
+    <GROUP id="{6A9E6FF9-C77A-EE0E-09B4-9203C36E7583}" name="Assets">
+      <FILE id="IXfQ10" name="Mult0.png" compile="0" resource="1" file="Assets/Mult0.png"/>
+      <FILE id="To1spF" name="Mult1.png" compile="0" resource="1" file="Assets/Mult1.png"/>
+      <FILE id="IvraBg" name="Mult2.png" compile="0" resource="1" file="Assets/Mult2.png"/>
+      <FILE id="pM4vta" name="Mult3.png" compile="0" resource="1" file="Assets/Mult3.png"/>
+      <FILE id="Oh8xDR" name="Mult4.png" compile="0" resource="1" file="Assets/Mult4.png"/>
+      <FILE id="SSdKFM" name="Mult5.png" compile="0" resource="1" file="Assets/Mult5.png"/>
+    </GROUP>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <VS2019 targetFolder="Builds/VisualStudio2019">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Tertiary2022" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="TertiaryRelease2022" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Program Files\Common Files\VST3\Build"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../&#96;JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../&#96;JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2019>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+</JUCERPROJECT>
