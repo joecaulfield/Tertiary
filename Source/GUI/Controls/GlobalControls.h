@@ -21,7 +21,6 @@
 
 struct GlobalControls : juce::Component
 {
-	//GlobalControls(juce::AudioProcessorValueTreeState& apv);
 	GlobalControls(TertiaryAudioProcessor& p);
 
 	void paint(juce::Graphics& g) override;
@@ -49,6 +48,4 @@ private:
 	std::unique_ptr<sliderAttachment>	inputGainAttachment, outputGainAttachment;
 
 	juce::Rectangle<float> border1, border2, border3, border4;
-
-	//juce::ColourGradient fillGradient{};
 };

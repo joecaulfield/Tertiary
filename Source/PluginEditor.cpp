@@ -13,13 +13,19 @@
 TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-
-	addAndMakeVisible(globalControls);		// Make GC Visible
-	addAndMakeVisible(frequencyResponse);	// Make FR Visible
-	addAndMakeVisible(oscilloscope);		// Make O-Scope Visible
+	addAndMakeVisible(globalControls);		// Container Class For All Parameter Controls
+	addAndMakeVisible(frequencyResponse);	// Frequency-Domain Response Display
+	addAndMakeVisible(oscilloscope);		// Time-Domain LFO Display
 
 	addMouseListener(this, true);
     setSize (800, 580);
+
+	// BAND LABEL =============================================================
+	pluginTitle.setJustificationType(juce::Justification::centred);
+	pluginTitle.setFont(juce::Font(24.f, juce::Font::bold));
+	pluginTitle.setColour(juce::Label::textColourId, juce::Colours::white);
+	pluginTitle.setText("TERTIARY v1.0", juce::NotificationType::dontSendNotification);
+	addAndMakeVisible(pluginTitle);
 }
 
 TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
@@ -43,11 +49,14 @@ void TertiaryAudioProcessorEditor::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(35);			// Title Area
-	bounds.removeFromLeft(5);			// Left Padding
-	bounds.removeFromRight(5);			// Right Padding
+	bounds.removeFromTop(35);	// Title Area
+	bounds.removeFromLeft(5);	// Left Padding
+	bounds.removeFromRight(5);	// Right Padding
 
-	// Flexbox to Wrap O-Scope and FrequencyResponse
+	pluginTitle.setSize(250, 35);
+	pluginTitle.setCentrePosition(bounds.getCentreX(), bounds.getY() / 2.f);
+
+	// Flexbox to Wrap Oscilloscope and FrequencyResponse
 	juce::FlexBox flexBox;	
 	flexBox.flexDirection = FlexBox::Direction::row;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
@@ -55,9 +64,9 @@ void TertiaryAudioProcessorEditor::resized()
 	auto spacer = FlexItem().withWidth(5);	// Gap between O-Scope and Freq Resp
 	 
 	flexBox.items.add(FlexItem(oscilloscope).withFlex(1.f));		// Insert O-Scope
-	flexBox.items.add(spacer);										// Insert Gap
-	flexBox.items.add(FlexItem(frequencyResponse).withFlex(1.f));	// Insert Freq Resp
-	flexBox.performLayout(bounds.removeFromTop(getHeight() * 0.4));	// Do the Layout
+	flexBox.items.add(spacer);										// Insert Spacer
+	flexBox.items.add(FlexItem(frequencyResponse).withFlex(1.f));	// Insert Freq Response
+	flexBox.performLayout(bounds.removeFromTop(getHeight() * 0.4));	// Do The Layout
 
 	bounds.removeFromTop(5);			// Gap
 	bounds.removeFromBottom(5);			// Bottom Padding

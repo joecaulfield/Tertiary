@@ -5,6 +5,8 @@
     Created: 5 Jan 2022 1:37:47pm
     Author:  Joe
 
+	CLASS WRAPPED BY GAIN-CONTROLS.  ONE INSTANCE OF HORIZONTAL GAIN-CONTROL BAR
+
   ==============================================================================
 */
 
@@ -67,52 +69,20 @@ void GainBar::resized()
 	flexBox.performLayout(bounds);
 }
 
-void GainBar::timerCallback()
-{
-	//fadeInOut();
-	//repaint();
-}
-
 void GainBar::mouseEnter(const juce::MouseEvent& event)
 {
-	fadeIn = true;
 	hasFocus = true;
 }
 
 void GainBar::mouseExit(const juce::MouseEvent& event)
 {
-	fadeIn = false;
 	hasFocus = false;
-}
-
-void GainBar::fadeInOut()
-{
-	if (fadeIn) // If mouse entered... fade Toggles Alpha up
-	{
-		if (fadeAlpha < fadeMax)
-		{
-			fadeAlpha += fadeStepUp;
-
-			if (fadeAlpha > fadeMax)
-				fadeAlpha = fadeMax;
-		}
-	}
-	else // If mouse exit... fade Toggles Alpha down
-	{
-		if (fadeAlpha > fadeMin)
-		{
-			fadeAlpha -= fadeStepDown;
-
-			if (fadeAlpha < fadeMin)
-				fadeAlpha = fadeMin;
-		}
-	}
-
-	setAlpha(fadeAlpha);
 }
 
 void GainBar::buttonClicked(juce::Button* button)
 {
+	// Prevent both 'Mute' and 'Solo' from being engaged simultaneously
+
 	if (button == &toggleSolo)
 	{
 		if (button->getToggleState())

@@ -3,7 +3,9 @@
 
     GainControls.h
     Created: 1 Jan 2022 9:49:55pm
-    Author:  Joe
+    Author:  Joe Caulfield
+
+	CLASS CONTAINING QUADRANT OF CONTROLS WHICH ADJUST INDIVIDUAL BAND GAIN
 
   ==============================================================================
 */
@@ -20,7 +22,6 @@ struct GainControls : juce::Component
 
 	void paint(juce::Graphics& g) override;
 	void drawBorder(juce::Graphics& g);
-	void drawLabels();
 
 	void resized() override;
 

@@ -5,6 +5,8 @@
     Created: 5 Jan 2022 1:37:40pm
     Author:  Joe
 
+	CLASS WRAPPED BY TIMING-CONTROLS.  ONE INSTANCE OF HORIZONTAL TIMING-CONTROL BAR
+
   ==============================================================================
 */
 
@@ -50,7 +52,6 @@ TimingBar::~TimingBar()
 
 void TimingBar::paint(juce::Graphics& g)
 {	
-
 }
 
 void TimingBar::resized()
@@ -69,15 +70,6 @@ void TimingBar::resized()
 	flexBox.items.add(FlexItem(bandLabel).withWidth(25));
 	flexBox.items.add(FlexItem().withWidth(5));	// SPACER
 
-	//flexBox.items.add(FlexItem(toggleSync).withWidth(25));
-	//flexBox.items.add(FlexItem().withWidth(5));	// SPACER
-	//flexBox.items.add(FlexItem(sliderRate).withWidth(100.f));
-	//flexBox.items.add(FlexItem().withWidth(10));	// SPACER
-	//flexBox.items.add(FlexItem(sliderMultuplier).withFlex(1.5f));
-	//flexBox.items.add(spacer);
-	//flexBox.items.add(FlexItem(sliderPhase).withWidth(100.f));
-	//flexBox.items.add(spacer);
-
 	flexBox.items.add(FlexItem(toggleSync).withWidth(25));
 	flexBox.items.add(FlexItem().withWidth(10));	// SPACER
 
@@ -92,32 +84,23 @@ void TimingBar::resized()
 
 
 	flexBox.performLayout(bounds);
-
-	//drawMultBounds();
-	//drawMult0();
-	//drawMult1();
-	//drawMult2();
-	//drawMult3();
-	//drawMult4();
-	//drawMult5();
-
-	//updateMultSelection();
 }
 
 void TimingBar::mouseEnter(const juce::MouseEvent& event)
 {
-	//fadeIn = true;
 	hasFocus = true;
 }
 
 void TimingBar::mouseExit(const juce::MouseEvent& event)
 {
-	//fadeIn = false;
 	hasFocus = false;
 }
 
 void TimingBar::buttonClicked(juce::Button* button)
 {
+	// When 'Sync-To-Host' enabled, disable 'Rate' param.
+	// When 'Sync-To-Host' disabled, disable 'Multiplier' param.
+
 	if (toggleSync.getToggleState())
 	{
 		sliderMultuplier.setEnabled(true);

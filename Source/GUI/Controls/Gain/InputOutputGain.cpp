@@ -78,6 +78,8 @@ void InputOutputGain::timerCallback()
 
 void InputOutputGain::getLevels()
 {
+	// Pull current audio-level values from processor
+
 	if (pickOffPoint == "INPUT")
 	{
 		leftLevel = audioProcessor.getRmsValue(0, 0);
@@ -133,7 +135,6 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 	using namespace AllColors::InputOutputMeterColors;
 
 	ledThresholds.clear();
-	//ledThresholds.resize(50);
 
 	grill = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
 	Graphics g(grill);
@@ -141,15 +142,15 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 	g.setGradientFill(GRILL_GRADIENT(bounds));
 	g.fillRect(bounds);
 
-	for (int x = 0; x < 2; x++)	// Left, Right
+	for (int x = 0; x < 2; x++)	// Iterate Loop Twice for Left/Right Grills
 	{
 
 		float xPos;
 
-		if (x == 0) xPos = -0.25f;
-		if (x == 1) xPos = 0.25f;
+		if (x == 0) xPos = -0.25f;	// Left-LED Positioning
+		if (x == 1) xPos = 0.25f;	// Right-LED Positioning
 
-		for (int y = 0; y < 2; y++)
+		for (int y = 0; y < 2; y++)	// Iterate Loop Twice.  Begin LED's at center and move Up, Down
 		{
 			float dir;
 
@@ -158,17 +159,22 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 
 			for (int z = 0; z < bounds.getCentreY() - margin; z += spacing)
 			{
+				// Define LED bound to draw
 				juce::Rectangle<float> ledArea = {  bounds.getCentreX() + bounds.getWidth() * xPos - ledWidth / 2.f,
 													bounds.getCentreY() + dir * z - ledHeight / 2,
 													ledWidth, ledHeight };
 
+				// Store LED's Y value in an array, as to quantize (discretize) the meter levels later on
 				ledThresholds.add(ledArea.getBottom());
 
+				// Provide transparency in the image
 				grill.clear(ledArea.toNearestInt(), juce::Colours::hotpink.withAlpha(0.f));
 
+				// Draw bound around the grill
 				g.setColour(juce::Colours::darkgrey);
 				g.drawRect(ledArea, 1);
 
+				// Draw bound around the grill
 				ledArea.expand(1, 1);
 				g.setColour(juce::Colours::grey);
 				g.drawRect(ledArea, 1);
@@ -178,7 +184,7 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 		}
 	}
 
-	// Sort Ascending
+	// Sort LED Y values in Ascending Fashion
 	ledThresholds.sort();
 
 	// Remove Duplicates

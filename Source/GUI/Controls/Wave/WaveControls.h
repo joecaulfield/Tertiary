@@ -5,6 +5,8 @@
     Created: 1 Jan 2022 9:08:03pm
     Author:  Joe
 
+	CLASS CONTAINING QUADRANT OF CONTROLS WHICH ADJUST INDIVIDUAL WAVESHAPE PARAMETERS
+
   ==============================================================================
 */
 
@@ -20,7 +22,6 @@ struct WaveControls : juce::Component
 
 	void paint(juce::Graphics& g) override;
 	void drawBorder(juce::Graphics& g);
-	void drawLabels() {};
 
 	void resized() override;
 

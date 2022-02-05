@@ -5,6 +5,8 @@
     Created: 1 Jan 2022 9:50:07pm
     Author:  Joe
 
+	CLASS CONTAINING QUADRANT OF CONTROLS WHICH ADJUST CROSSOVER PARAMETERS
+
   ==============================================================================
 */
 
@@ -13,20 +15,21 @@
 CrossoverControls::CrossoverControls(juce::AudioProcessorValueTreeState& apv)
 	: apvts(apv)
 {
-	//drawLabels();
 	makeAttachments();
 
+	// Initialize Low-Mid Cutoff Slider =======
 	sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 	sliderLowMidCutoff.setLookAndFeel(&crossoverLookAndFeel);
 	sliderLowMidCutoff.addListener(this);
+	addAndMakeVisible(sliderLowMidCutoff);
 
+	// Initialize Mid-High Cutoff Slider =======
 	sliderMidHighCutoff.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 	sliderMidHighCutoff.setLookAndFeel(&crossoverLookAndFeel);
 	sliderMidHighCutoff.addListener(this);
-
-	addAndMakeVisible(sliderLowMidCutoff);
 	addAndMakeVisible(sliderMidHighCutoff);
 
+	// Initialize Low-Mid Cutoff Label =======
 	sliderValueLM.setEditable(false, true);
 	sliderValueLM.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white);
 	sliderValueLM.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
@@ -35,6 +38,7 @@ CrossoverControls::CrossoverControls(juce::AudioProcessorValueTreeState& apv)
 	sliderValueLM.addListener(this);
 	addAndMakeVisible(sliderValueLM);
 
+	// Initialize Mid-High Cutoff Label =======
 	sliderValueMH.setEditable(false, true);
 	sliderValueMH.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white);
 	sliderValueMH.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
@@ -68,6 +72,7 @@ void CrossoverControls::paint(juce::Graphics& g)
 	g.setOpacity(0.40f);
 	g.fillRect(titleBounds);
 
+	// Draw the Title
 	g.setColour(juce::Colours::black);
 	g.drawFittedText("CROSSOVER", titleBounds, juce::Justification::centred, 1);
 
@@ -77,10 +82,10 @@ void CrossoverControls::paint(juce::Graphics& g)
 	g.setOpacity(0.25f);
 	g.fillRect(labelBounds);
 
-	// SET LABEL FONT
+	// Set Label Fond
 	g.setColour(juce::Colours::white);
 
-	// LOW-MID LABEL ===========================================================
+	// Low-Mid Label ============================
 	juce::Rectangle<int> lmLabelBounds{	sliderLowMidCutoff.getX(),
 										labelBounds.getY(),
 										sliderLowMidCutoff.getWidth(),
@@ -88,7 +93,7 @@ void CrossoverControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("LOW-MID", lmLabelBounds, juce::Justification::centred, 1);
 
-	// LOW-MID LABEL ===========================================================
+	// Mid-High Label ============================
 	juce::Rectangle<int> mhLabelBounds{	sliderMidHighCutoff.getX(),
 										labelBounds.getY(),
 										sliderMidHighCutoff.getWidth(),
@@ -108,16 +113,6 @@ void CrossoverControls::drawBorder(juce::Graphics& g)
 
 	g.setColour(BORDER_OUTLINE_COLOR());
 	g.drawRoundedRectangle(border.toFloat(), 5.f, BORDER_OUTLINE_THICKNESS());
-
-	//// DRAW TITLE BACKGROUND ====================
-	//juce::Rectangle<float> titleBounds;
-	//titleBounds.setBounds(labelTitle.getX(), labelTitle.getY(), labelTitle.getWidth(), labelTitle.getHeight());
-
-	//g.setColour(TEXT_BACKGROUND_FILL());
-	//g.fillRoundedRectangle(titleBounds, 5.f);
-
-	//g.setColour(BORDER_OUTLINE_COLOR());
-	//g.drawRoundedRectangle(titleBounds, 5.f, BORDER_OUTLINE_THICKNESS());
 }
 
 void CrossoverControls::resized()
@@ -136,7 +131,6 @@ void CrossoverControls::resized()
 	column1.flexDirection = FlexBox::Direction::column;
 	column1.flexWrap = FlexBox::Wrap::noWrap;
 
-	//column1.items.add(FlexItem().withHeight(1));
 	column1.items.add(FlexItem(sliderLowMidCutoff).withFlex(1.f));
 	column1.items.add(FlexItem(sliderValueLM).withHeight(20));
 	column1.items.add(FlexItem().withHeight(5));
@@ -151,6 +145,7 @@ void CrossoverControls::resized()
 	column2.items.add(FlexItem(sliderValueMH).withHeight(20));
 	column2.items.add(spacerV);
 
+	// ROW CONTAINING COLUMN 1 AND COLUMN 2 ===========================
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::row;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
@@ -162,6 +157,7 @@ void CrossoverControls::resized()
 
 	flexBox.performLayout(bounds);
 
+	//
 	sliderValueLM.setBounds(sliderValueLM.getBounds().reduced(15, 0));
 	sliderValueMH.setBounds(sliderValueMH.getBounds().reduced(15, 0));
 
@@ -253,6 +249,9 @@ void CrossoverControls::timerCallback()
 
 void CrossoverControls::labelTextChanged(juce::Label* labelThatHasChanged)
 {
+	// Means of handling invalid input entries,
+	// while allowing some flexibility and auto-interpretation of user-entered values
+
 	juce::String original = labelThatHasChanged->getText();
 
 	juce::String entryString = labelThatHasChanged->getText();
@@ -276,9 +275,9 @@ void CrossoverControls::labelTextChanged(juce::Label* labelThatHasChanged)
 			containsNum = true;
 	}
 
-	if (!containsText) // Handle entry as pure numerical ==================================================
+	if (!containsText) // Handle entry as pure numerical
 		entryFloat = entryString.getFloatValue();
-	else // Handle entry as alphanumeric combination ==================================================
+	else // Handle entry as alphanumeric combination
 	{
 		if (entryString.containsChar('k'))
 		{
@@ -311,9 +310,5 @@ void CrossoverControls::labelTextChanged(juce::Label* labelThatHasChanged)
 		else
 			sliderMidHighCutoff.setValue(entryFloat);
 	}
-
-
-	// If It Only Contains Letters ===========================
-
 
 }

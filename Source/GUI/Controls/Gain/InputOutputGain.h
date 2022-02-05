@@ -24,15 +24,12 @@ struct InputOutputGain : juce::Component, juce::Timer
 
 	void setPickOffPoint(juce::String pickoff);
 
-	//juce::AudioProcessorValueTreeState& apvts;
 	TertiaryAudioProcessor& audioProcessor;
 	juce::Slider sliderGain;
 
 	InOutLookAndFeel inOutLookAndFeel;
 
 	void drawGrill(juce::Rectangle<float> bounds);
-
-	//void InputOutputGain::paintGrill(juce::Graphics& g, juce::Rectangle<float> bounds);
 
 	void getLevels();
 
@@ -46,8 +43,8 @@ private:
 	// Grill Drawing Parameters
 	int margin = 10;			// Amount of Pixels removed from Top/Bottom before grill
 	int spacing = 10;			// Vertical Distance between LEDs
-	float ledWidth = 17;		// LED Width
-	float ledHeight = 6;		// LED Height
+	float ledWidth = 17;
+	float ledHeight = 6;
 	juce::Array<float> ledThresholds;
 
 	juce::Rectangle<float> leftBounds, rightBounds;

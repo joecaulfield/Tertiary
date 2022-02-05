@@ -4,6 +4,8 @@
     Created: 1 Jan 2022 10:17:22pm
     Author:  Joe
 
+	CLASS WRAPPED BY WAVE-CONTROLS.  ONE INSTANCE OF HORIZONTAL WAVE-CONTROL BAR
+
   ==============================================================================
 */
 
@@ -38,19 +40,9 @@ struct WaveBar : juce::Component, juce::Timer, juce::MouseListener, juce::Slider
 
 	WaveLookAndFeel waveLookAndFeel;
 
-	//StandardSliderLookAndFeel depthSliderLookAndFeel;
-	//CenterSliderLookAndFeel symmetrySliderLookAndFeel;
-
 	void setMode(juce::String bandMode); // "low", "mid", "high"
 	int mode{ 0 };
 
 private:
 
-	bool fadeIn{ true };
-	float fadeAlpha{ 1.f };
-
-	float fadeMax = 1.f;
-	float fadeMin = 0.45;
-	float fadeStepUp = 0.05f;
-	float fadeStepDown = 0.05f;
 };

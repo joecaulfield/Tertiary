@@ -5,6 +5,8 @@
     Created: 1 Jan 2022 9:49:47pm
     Author:  Joe
 
+	CLASS CONTAINING QUADRANT OF CONTROLS WHICH ADJUST INDIVIDUAL WAVE TIMING PARAMETERS
+
   ==============================================================================
 */
 
@@ -20,16 +22,10 @@ struct TimingControls : juce::Component/*, juce::Timer, juce::MouseListener*/
 
 	void paint(juce::Graphics& g) override;
 	void drawBorder(juce::Graphics& g);
-	void drawLabels() {};
 
 	void resized() override;
 
 	void makeAttachments();
-
-	//void timerCallback() override;
-	//void mouseEnter(const juce::MouseEvent& event) override;
-	//void mouseExit(const juce::MouseEvent& event) override;
-	//void fadeInOut(juce::Graphics& g);
 
 	TimingBar	timingBarLow,
 				timingBarMid,

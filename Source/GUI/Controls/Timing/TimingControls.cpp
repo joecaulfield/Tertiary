@@ -13,6 +13,8 @@
 TimingControls::TimingControls(juce::AudioProcessorValueTreeState& apv)
 	: apvts(apv)
 {
+
+	// Color-Coding and Defining Label-Text of Each Bar Class
 	timingBarLow.setMode("low");
 	timingBarMid.setMode("mid");
 	timingBarHigh.setMode("high");
@@ -20,8 +22,6 @@ TimingControls::TimingControls(juce::AudioProcessorValueTreeState& apv)
 	addAndMakeVisible(timingBarLow);
 	addAndMakeVisible(timingBarMid);
 	addAndMakeVisible(timingBarHigh);
-
-	drawLabels();
 
 	makeAttachments();
 
@@ -49,10 +49,9 @@ void TimingControls::paint(juce::Graphics& g)
 	g.setOpacity(0.25f);
 	g.fillRect(labelBounds);
 
-	// SET LABEL FONT
 	g.setColour(juce::Colours::white);
 
-	// SYNC LABEL ===========================================================
+	// Draw Parameter Labels: Sync ======================
 	juce::Rectangle<int> syncLabelBounds {	timingBarHigh.toggleSync.getX(),
 											labelBounds.getY(),
 											timingBarHigh.toggleSync.getWidth(),
@@ -60,7 +59,7 @@ void TimingControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("SYNC", syncLabelBounds, juce::Justification::centred, 1);
 
-	// MUTIPLIER LABEL ===========================================================
+	// Draw Parameter Labels: Multiplier AKA Rhythm ======================
 	juce::Rectangle<int> multLabelBounds{	timingBarHigh.sliderMultuplier.getX(),
 											labelBounds.getY(),
 											timingBarHigh.sliderMultuplier.getWidth(),
@@ -80,7 +79,6 @@ void TimingControls::paint(juce::Graphics& g)
 	g.drawFittedText("RHYTHM", multLabelBounds, juce::Justification::centred, 1);
 
 	// HORIZONTAL LINE
-		// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) + 25,
 							timingBarLow.sliderMultuplier.getRight());
@@ -91,7 +89,7 @@ void TimingControls::paint(juce::Graphics& g)
 						labelBounds.getCentreY());
 
 
-	// RATE LABEL ===========================================================
+	// Draw Parameter Labels: Rate ======================
 	juce::Rectangle<int> rateLabelBounds{	timingBarHigh.sliderRate.getX(),
 											labelBounds.getY(),
 											timingBarHigh.sliderRate.getWidth(),
@@ -99,7 +97,7 @@ void TimingControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("RATE", rateLabelBounds, juce::Justification::centred, 1);
 
-	// PHASE LABEL ===========================================================
+	// Draw Parameter Labels: Phase ======================
 	juce::Rectangle<int> phaseLabelBounds{	timingBarHigh.sliderPhase.getX(),
 											labelBounds.getY(),
 											timingBarHigh.sliderPhase.getWidth(),
@@ -123,8 +121,6 @@ void TimingControls::drawBorder(juce::Graphics& g)
 
 void TimingControls::resized()
 {
-	drawLabels();
-
 	using namespace juce;
 
 	auto bounds = getLocalBounds();
@@ -146,7 +142,6 @@ void TimingControls::resized()
 	flexBox.items.add(spacer);
 
 	flexBox.performLayout(bounds);
-
 }
 
 void TimingControls::makeAttachments()
@@ -156,7 +151,6 @@ void TimingControls::makeAttachments()
 	const auto& params = GetParams();
 
 	// SYNC TO HOST ================
-
 	syncLowAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 							apvts,
 							params.at(Names::Sync_Low_LFO),
@@ -173,7 +167,6 @@ void TimingControls::makeAttachments()
 							timingBarHigh.toggleSync);
 
 	// RATE ================================
-
 	rateLowAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Rate_Low_LFO),
@@ -189,8 +182,7 @@ void TimingControls::makeAttachments()
 							params.at(Names::Rate_High_LFO),
 							timingBarHigh.sliderRate.slider);
 
-	// MULTIPLIER ================================
-
+	// MULTIPLIER AKA RHYTHM ================================
 	multLowAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Multiplier_Low_LFO),
@@ -206,8 +198,7 @@ void TimingControls::makeAttachments()
 							params.at(Names::Multiplier_High_LFO),
 							timingBarHigh.sliderMultuplier);
 
-	// RELATIVE PHASE ================================
-
+	// PHASE ================================
 	phaseLowAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Relative_Phase_Low_LFO),

@@ -5,6 +5,8 @@
     Created: 1 Jan 2022 9:08:03pm
     Author:  Joe
 
+	CLASS CONTAINING QUADRANT OF CONTROLS WHICH ADJUST INDIVIDUAL WAVE TIMING PARAMETERS
+
   ==============================================================================
 */
 
@@ -13,6 +15,8 @@
 WaveControls::WaveControls(juce::AudioProcessorValueTreeState& apv)
 	: apvts(apv)
 {
+
+	// Color-Coding and Defining Label-Text of Each Bar Class
 	waveBarLow.setMode("low");
 	waveBarMid.setMode("mid");
 	waveBarHigh.setMode("high");
@@ -20,8 +24,6 @@ WaveControls::WaveControls(juce::AudioProcessorValueTreeState& apv)
 	addAndMakeVisible(waveBarLow);
 	addAndMakeVisible(waveBarMid);
 	addAndMakeVisible(waveBarHigh);
-
-	drawLabels();
 
 	makeAttachments();
 
@@ -34,25 +36,25 @@ void WaveControls::paint(juce::Graphics& g)
 
 	auto bounds = getLocalBounds();
 
-	// Draw the Title Bounds ===========================================================
+	// Draw the Title Bounds
 	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
 	g.setColour(juce::Colours::white);
 	g.setOpacity(0.40f);
 	g.fillRect(titleBounds);
 
+	// Draw the Title
 	g.setColour(juce::Colours::black);
 	g.drawFittedText("WAVE SHAPE", titleBounds, juce::Justification::centred, 1);
 
-	// Draw the Label Bounds ===========================================================
+	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
 	g.setColour(juce::Colours::darkgrey);
 	g.setOpacity(0.25f);
 	g.fillRect(labelBounds);
 
-	// SET LABEL FONT
 	g.setColour(juce::Colours::white);
 
-	// INVERT LABEL ===========================================================
+	// Draw Parameter Labels: Invert ======================
 	juce::Rectangle<int> invertLabelBounds{ waveBarHigh.toggleInvert.getX(),
 												labelBounds.getY(),
 												waveBarHigh.toggleInvert.getWidth(),
@@ -60,7 +62,7 @@ void WaveControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("INV", invertLabelBounds, juce::Justification::centred, 1);
 
-	// WAVESHAPE LABEL ===========================================================
+	// Draw Parameter Labels: Waveshape ======================
 	juce::Rectangle<int> waveLabelBounds {	waveBarHigh.sliderWave.getX(),
 											labelBounds.getY(),
 											waveBarHigh.sliderWave.getWidth(),
@@ -88,7 +90,7 @@ void WaveControls::paint(juce::Graphics& g)
 						labelBounds.getY(),
 						labelBounds.getCentreY());
 
-	// SYMMETRY LABEL ===========================================================
+	// Draw Parameter Labels: Symmetry AKA Skew ======================
 	juce::Rectangle<int> symLabelBounds{ waveBarHigh.sliderSymmetry.getX(),
 											labelBounds.getY(),
 											waveBarHigh.sliderSymmetry.getWidth(),
@@ -96,7 +98,7 @@ void WaveControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("SKEW", symLabelBounds, juce::Justification::centred, 1);
 
-	// DEPTH LABEL ===========================================================
+	// Draw Parameter Labels: Depth ======================
 	juce::Rectangle<int> depthLabelBounds {	waveBarHigh.sliderDepth.getX(),
 											labelBounds.getY(),
 											waveBarHigh.sliderDepth.getWidth(),
@@ -118,22 +120,10 @@ void WaveControls::drawBorder(juce::Graphics& g)
 
 	g.setColour(BORDER_OUTLINE_COLOR());
 	g.drawRoundedRectangle(border.toFloat(), 5.f, BORDER_OUTLINE_THICKNESS());
-
-	//// DRAW TITLE BACKGROUND ====================
-	//juce::Rectangle<float> titleBounds;
-	//titleBounds.setBounds(labelTitle.getX(), labelTitle.getY(), labelTitle.getWidth(), labelTitle.getHeight());
-
-	//g.setColour(TEXT_BACKGROUND_FILL());
-	//g.fillRoundedRectangle(titleBounds, 5.f);
-
-	//g.setColour(BORDER_OUTLINE_COLOR());
-	//g.drawRoundedRectangle(titleBounds, 5.f, BORDER_OUTLINE_THICKNESS());
 }
 
 void WaveControls::resized()
 {
-	drawLabels();
-
 	using namespace juce;
 
 	auto bounds = getLocalBounds();
@@ -162,6 +152,7 @@ void WaveControls::makeAttachments()
 	using namespace Params;
 	const auto& params = GetParams();
 
+	// WAVESHAPE ===================
 	waveLowAttachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Wave_Low_LFO),
@@ -177,7 +168,7 @@ void WaveControls::makeAttachments()
 							params.at(Names::Wave_High_LFO),
 							waveBarHigh.sliderWave);
 
-
+	// DEPTH ===================
 	depthLowAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Depth_Low_LFO),
@@ -198,6 +189,7 @@ void WaveControls::makeAttachments()
 							params.at(Names::Depth_High_LFO),
 							waveBarHigh.sliderDepth.slider);
 
+	// SYMMETRY AKA SKEW ===================
 	symmetryLowAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
 							apvts,
 							params.at(Names::Symmetry_Low_LFO),
@@ -213,6 +205,7 @@ void WaveControls::makeAttachments()
 							params.at(Names::Symmetry_High_LFO),
 							waveBarHigh.sliderSymmetry.slider);
 
+	// INVERT ===================
 	invertLowAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 							apvts,
 							params.at(Names::Invert_Low_LFO),

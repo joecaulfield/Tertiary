@@ -5,6 +5,8 @@
     Created: 5 Jan 2022 1:37:40pm
     Author:  Joe
 
+	CLASS WRAPPED BY TIMING-CONTROLS.  ONE INSTANCE OF HORIZONTAL TIMING-CONTROL BAR
+
   ==============================================================================
 */
 

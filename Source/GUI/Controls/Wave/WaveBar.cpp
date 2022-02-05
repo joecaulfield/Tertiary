@@ -5,6 +5,8 @@
 	Created: 1 Jan 2022 10:17:22pm
 	Author:  Joe
 
+	CLASS WRAPPED BY WAVE-CONTROLS.  ONE INSTANCE OF HORIZONTAL WAVE-CONTROL BAR
+
   ==============================================================================
 */
 
@@ -47,7 +49,6 @@ WaveBar::~WaveBar()
 
 void WaveBar::paint(juce::Graphics& g)
 {
-
 }
 
 void WaveBar::resized()
@@ -81,13 +82,11 @@ void WaveBar::resized()
 
 void WaveBar::mouseEnter(const juce::MouseEvent& event)
 {
-	//fadeIn = true;
 	hasFocus = true;
 }
 
 void WaveBar::mouseExit(const juce::MouseEvent& event)
 {
-	//fadeIn = false;
 	hasFocus = false;
 }
 

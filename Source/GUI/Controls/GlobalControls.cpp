@@ -22,6 +22,7 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
 	addAndMakeVisible(inputGain);
 	addAndMakeVisible(outputGain);
 
+	// Determine the Label-Meters' Pickoff Point
 	inputGain.setPickOffPoint("INPUT");
 	outputGain.setPickOffPoint("OUTPUT");
 
@@ -46,14 +47,12 @@ void GlobalControls::paintOverChildren(juce::Graphics& g)
 {
 	paintBorder(g, border1);
 	paintBorder(g, border4);
-
 }
 
 void GlobalControls::resized()
 {
 	using namespace juce;
 
-	// DRAW FLEXBOX WITH SECTIONS =======================================================================
 	auto bounds = getLocalBounds();
 
 	auto meterWidth = 40;
@@ -108,12 +107,6 @@ void GlobalControls::resized()
 	column4.items.add(FlexItem(outputGain).withFlex(1.f));
 
 	column4.performLayout(border4);
-
-	// SET UP FILL GRADIENT ================================================================
-	//fillGradient = juce::ColourGradient{ juce::Colours::darkgrey,	bounds.getBottomLeft().toFloat(),
-	//									 juce::Colours::grey,		bounds.getTopRight().toFloat(),		true };
-
-	//fillGradient.addColour(0.5f, juce::Colours::slategrey);
 }
 
 void GlobalControls::makeAttachments()
@@ -135,7 +128,6 @@ void GlobalControls::makeAttachments()
 void GlobalControls::paintBorder(juce::Graphics& g, juce::Rectangle<float> bounds)
 {
 	// DRAW BORDER 1 ====================
-	//auto bounds = getLocalBounds();
 	juce::Rectangle<float> border;
 	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y, bounds.getWidth(), bounds.getHeight());
 	g.setColour(juce::Colours::white);
