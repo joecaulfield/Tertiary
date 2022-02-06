@@ -22,27 +22,29 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
                        )
 #endif
 {
-    // CONSTRUCTOR
 
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
-    auto floatHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)              // Float Helper --> Part 8 Param Namespace
+	// Float Helper To Attach Float to Parameter ========
+    auto floatHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName) 
     {
-        param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));     // Attach Value to Parameter
-        jassert(param != nullptr);                                                                      // Error Checking
+        param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);              
     };
 
-    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)             // Choice Helper --> Part 8 Param Namespace
+	// Choice Helper To Attach Choice to Parameter ========
+    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
     {
-        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));    // Attach Value to Parameter
-        jassert(param != nullptr);                                                                      // Error Checking
+        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
     };
 
-    auto boolHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)               // Bool Helper --> Part 8 Param Namespace
+	// Bool Helper To Attach Bool to Parameter ========
+    auto boolHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
     {
-        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-        jassert(param != nullptr);                                                                      // Error Checking
+        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
     };
 
     // Initialize Input & Output Gain
@@ -108,7 +110,7 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
 	floatHelper(midLFO.displayPhase,		Names::Scope_Scroll);
 	floatHelper(highLFO.displayPhase,		Names::Scope_Scroll);
 
-	// Optimize into a for loop
+	// Refactor - Optimize into a For Loop
 	apvts.addParameterListener(params.at(Names::Input_Gain), this);
 	apvts.addParameterListener(params.at(Names::Output_Gain), this);
 	apvts.addParameterListener(params.at(Names::Low_Mid_Crossover_Freq), this);
@@ -260,6 +262,7 @@ void TertiaryAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
         buffer.setSize(spec.numChannels, samplesPerBlock);
     }
 
+	// RMS Level Smoothing for Meters
 	rmsLevelInputLeft.reset(sampleRate, 0.5);	rmsLevelInputLeft.setCurrentAndTargetValue(-100.f);
 	rmsLevelInputRight.reset(sampleRate, 0.5);	rmsLevelInputRight.setCurrentAndTargetValue(-100.f);
 	rmsLevelOutputLeft.reset(sampleRate, 0.5);	rmsLevelOutputLeft.setCurrentAndTargetValue(-100.f);
@@ -303,15 +306,19 @@ void TertiaryAudioProcessor::updateState()
 {
     auto sampleRate = getSampleRate();
 	
+	// Update Input Gain Params
     inputGain.setGainDecibels(inputGainParam->get());
     outputGain.setGainDecibels(outputGainParam->get());
 
+	// Update Tremolo Params
     for (auto& trem : tremolos)                         // Update Tremolo Settings In One Pass
         trem.updateTremoloSettings();
 
     lowLFO.updateLFO(sampleRate, hostInfo.bpm);
     midLFO.updateLFO(sampleRate, hostInfo.bpm);
     highLFO.updateLFO(sampleRate, hostInfo.bpm);
+
+	// Update Crossover Params
 
     auto lowMidCutoffFreq = lowMidCrossover->get();     // Cutoff Frequency
     LP1.setCutoffFrequency(lowMidCutoffFreq);           // Set Cutoff Frequency of LPF
@@ -325,10 +332,10 @@ void TertiaryAudioProcessor::updateState()
 
 void TertiaryAudioProcessor::splitBands(const juce::AudioBuffer<float>& inputBuffer)
 {
-    for (auto& fb : filterBuffers)  // Copy incoming audio into all filter buffers
-    {
+
+	// Copy incoming audio into all filter buffers
+    for (auto& fb : filterBuffers)
         fb = inputBuffer;
-    }
 
     auto fb0Block = juce::dsp::AudioBlock<float>(filterBuffers[0]);     // Create audio block for the buffer containing LOWS
     auto fb1Block = juce::dsp::AudioBlock<float>(filterBuffers[1]);     // Create audio block for the buffer containing MIDS
@@ -366,6 +373,7 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     }
 
+	// Clear Input Buffers
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -373,12 +381,14 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     applyGain(buffer, inputGain);   // Apply Input Gain
 
-	// Get Input Gains for Meters ===================================================================
+	// Get Input Gains for Meters =========
 	rmsLevelInputLeft.skip(buffer.getNumSamples());
 	rmsLevelInputRight.skip(buffer.getNumSamples());
 	{
 		const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
 
+		// If value is ascending, we use instantatneous value.
+		// If value is descending, we smooth value on its way down.
 		if (newValueLeft < rmsLevelInputLeft.getCurrentValue())
 			rmsLevelInputLeft.setTargetValue(newValueLeft);
 		else rmsLevelInputLeft.setCurrentAndTargetValue(newValueLeft);
@@ -387,12 +397,15 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 	{
 		const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
 
+		// If value is ascending, we use instantatneous value.
+		// If value is descending, we smooth value on its way down.
+
 		if (newValueRight < rmsLevelInputRight.getCurrentValue())
 			rmsLevelInputRight.setTargetValue(newValueRight);
 		else rmsLevelInputRight.setCurrentAndTargetValue(newValueRight);
 	}
 
-	// APPLY CROSSOVER ================================================================================
+	// APPLY CROSSOVER =====
     splitBands(buffer);
 
     // Apply Low Band Tremolo =======================================================================
@@ -478,12 +491,12 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         }
     }
 
-    if (bandsAreSoloed)                                     // If bands are soloed
+    if (bandsAreSoloed)										// If bands are soloed
     {
-        for (size_t i = 0; i < tremolos.size(); ++i)     // Loop through all bands
+        for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
         {
-            auto& comp = tremolos[i];
-            if (comp.solo->get())                           // If that band is soloed
+            auto& trem = tremolos[i];
+            if (trem.solo->get())                           // If that band is soloed
             {
                 addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
             }
@@ -491,10 +504,10 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     }
     else
     {
-        for (size_t i = 0; i < tremolos.size(); ++i)     // Loop through all bands
+        for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
         {
-            auto& comp = tremolos[i];
-            if (!comp.mute->get())                          // If the comp is NOT muted
+            auto& trem = tremolos[i];
+            if (!trem.mute->get())                          // If the trem is NOT muted
             {
                 addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
             }
@@ -509,6 +522,9 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 	{
 		const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
 
+		// If value is ascending, we use instantatneous value.
+		// If value is descending, we smooth value on its way down.
+
 		if (newValueLeft < rmsLevelOutputLeft.getCurrentValue())
 			rmsLevelOutputLeft.setTargetValue(newValueLeft);
 		else rmsLevelOutputLeft.setCurrentAndTargetValue(newValueLeft);
@@ -516,6 +532,9 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
 	{
 		const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+
+		// If value is ascending, we use instantatneous value.
+		// If value is descending, we smooth value on its way down.
 
 		if (newValueRight < rmsLevelOutputRight.getCurrentValue())
 			rmsLevelOutputRight.setTargetValue(newValueRight);
@@ -875,6 +894,8 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
     using namespace Params;
     const auto& params = GetParams();
 
+	// If we update 'Sync To Host', reset the phase of all
+	// LFOs so they remain in phase with each other.
     if (parameterID == params.at(Names::Sync_Low_LFO) || 
         parameterID == params.at(Names::Sync_Mid_LFO) ||
         parameterID == params.at(Names::Sync_High_LFO))
@@ -884,7 +905,7 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
         highLFO.phase = 0;
     }
 
-	paramChangedForScope.set(true);
+	//paramChangedForScope.set(true);
 }
 
 //==============================================================================
