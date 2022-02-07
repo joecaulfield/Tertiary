@@ -1,9 +1,11 @@
 /*
   ==============================================================================
 
-	FrequencyResponse.h
+	FrequencyResponse.cpp
 	Created: 30 Dec 2021 11:38:20am
-	Author:  Joe
+	Author:  Joe Caulfield
+
+	Class to display and control the frequency response of the crossover
 
   ==============================================================================
 */

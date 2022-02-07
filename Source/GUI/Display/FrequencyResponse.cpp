@@ -3,17 +3,20 @@
 
 	FrequencyResponse.cpp
 	Created: 30 Dec 2021 11:38:20am
-	Author:  Joe
+	Author:  Joe Caulfield
+
+	Class to display and control the frequency response of the crossover
 
   ==============================================================================
 */
 
 #include "FrequencyResponse.h"
 
+// Constructor
 FrequencyResponse::FrequencyResponse(juce::AudioProcessorValueTreeState& apv, GlobalControls& gc)
 	: apvts(apv), globalControls(gc)
 {
-	// ==========================
+	// Linear Slider from 0 to 1
 	sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 	sliderLowMidInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
 	sliderLowMidInterface.addListener(this);
@@ -21,7 +24,7 @@ FrequencyResponse::FrequencyResponse(juce::AudioProcessorValueTreeState& apv, Gl
 	sliderLowMidInterface.setAlpha(0.f);
 	addAndMakeVisible(sliderLowMidInterface);
 
-	// ==========================
+	// Linear Slider from 0 to 1
 	sliderMidHighInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 	sliderMidHighInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
 	sliderMidHighInterface.addListener(this);
@@ -29,12 +32,12 @@ FrequencyResponse::FrequencyResponse(juce::AudioProcessorValueTreeState& apv, Gl
 	sliderMidHighInterface.setAlpha(0.f);
 	addAndMakeVisible(sliderMidHighInterface);
 
-	// ==========================
+	// Linear Slider from 20 to 20k
 	sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 	sliderLowMidCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
 	sliderLowMidCutoff.addListener(this);
 
-	// ==========================
+	// Linear Slider from 20 to 20k
 	sliderMidHighCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 	sliderMidHighCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
 	sliderMidHighCutoff.addListener(this);
@@ -70,6 +73,7 @@ FrequencyResponse::FrequencyResponse(juce::AudioProcessorValueTreeState& apv, Gl
 	addMouseListener(this, false);
 }
 
+// Make component->parameter attachments
 void FrequencyResponse::makeAttachments()
 {
 	using namespace Params;
@@ -106,6 +110,7 @@ void FrequencyResponse::makeAttachments()
 						sliderHighGain);
 }
 
+// Graphics class
 void FrequencyResponse::paint(juce::Graphics& g)
 {
 	using namespace juce;
@@ -114,8 +119,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 	drawGridVertical(g);
 	drawGridHorizontal(g);
 
-	// Get gain & frequency points in relative pixels
-
+	// If low-band is hovered, draw low-band on top with highlight
 	if (mLowFocus)
 	{
 		drawHighRegion(g,	responseArea, gainHighPixel,	freq2Pixel,				mHighFocus	? fadeMaxRegion : fadeAlphaRegionHG);
@@ -123,6 +127,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		drawLowRegion(g,	responseArea, gainLowPixel,		freq1Pixel,				mLowFocus	? fadeMaxRegion : fadeAlphaRegionLG);
 	}
 
+	// If mid-band is hovered, draw mid-band on top with highlight.  Doubles as default view.
 	if (mMidFocus || (!mLowFocus && !mMidFocus && !mHighFocus))
 	{
 		drawHighRegion(g,	responseArea, gainHighPixel,	freq2Pixel,				mHighFocus	? fadeMaxRegion : fadeAlphaRegionHG);
@@ -130,6 +135,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		drawMidRegion(g,	responseArea, gainMidPixel,		freq1Pixel, freq2Pixel, mMidFocus	? fadeMaxRegion : fadeAlphaRegionMG);
 	}
 
+	// If high-band is hovered, draw high-band on top with highlight.  
 	if (mHighFocus)
 	{
 		drawLowRegion(g,	responseArea, gainLowPixel,		freq1Pixel,				mLowFocus	? fadeMaxRegion : fadeAlphaRegionLG);
@@ -137,17 +143,17 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		drawHighRegion(g,	responseArea, gainHighPixel,	freq2Pixel,				mHighFocus	? fadeMaxRegion : fadeAlphaRegionHG);
 	}
 
-	// DRAW LOW-MID CURSOR
+	// Draw Low-Mid Cursor
 	g.setColour(juce::Colours::white);
 	g.setOpacity(mLowMidFocus ? 1.f : fadeAlphaCursorLM);
 	g.drawLine(cursorLM, 3.f);
 
-	// DRAW MID-HIGH CURSOR
+	// Draw Mid-High Cursor
 	g.setColour(juce::Colours::white);
 	g.setOpacity(mMidHighFocus ? 1.f : fadeAlphaCursorMH);
 	g.drawLine(cursorMH, 3.f);
 
-	// DRAW LOW BAND GAIN CURSOR
+	// Draw Low-Gain Cursor
 	if (!lowBandMute)
 	{
 		g.setColour(juce::Colours::white);
@@ -155,7 +161,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		g.drawLine(cursorLG, 3.f);
 	}
 
-	// DRAW MID BAND GAIN CURSOR
+	// Draw Mid-Gain Cursor
 	if (!midBandMute)
 	{
 		g.setColour(juce::Colours::white);
@@ -163,7 +169,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		g.drawLine(cursorMG, 3.f);
 	}
 
-	// DRAW HIGH BAND GAIN CURSOR
+	// Draw High-Gain Cursor
 	if (!highBandMute)
 	{
 		g.setColour(juce::Colours::white);
@@ -171,10 +177,10 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		g.drawLine(cursorHG, 3.f);
 	}
 
-
 	drawBorder(g);
 }
 
+// Draw vertical gridlines and vertical axis labels (gain)
 void FrequencyResponse::drawGridVertical(juce::Graphics& g)
 {
 	using namespace juce;
@@ -206,6 +212,7 @@ void FrequencyResponse::drawGridVertical(juce::Graphics& g)
 	}
 }
 
+// Draw horizontal gridlines and horizontal axis labels (frequency)
 void FrequencyResponse::drawGridHorizontal(juce::Graphics& g)
 {
 	using namespace juce;
@@ -239,6 +246,7 @@ void FrequencyResponse::drawGridHorizontal(juce::Graphics& g)
 	}
 }
 
+// Draw Low-Frequency Response Trapezoid
 void FrequencyResponse::drawLowRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float alpha)
 {
 	using namespace AllColors::FrequencyResponseColors;
@@ -275,6 +283,7 @@ void FrequencyResponse::drawLowRegion(juce::Graphics& g, juce::Rectangle<float> 
 
 }
 
+// Draw Mid-Frequency Response Trapezoid
 void FrequencyResponse::drawMidRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float freq2Pixel, float alpha)
 {
 	using namespace AllColors::FrequencyResponseColors;
@@ -314,6 +323,7 @@ void FrequencyResponse::drawMidRegion(juce::Graphics& g, juce::Rectangle<float> 
 
 }
 
+// Draw High-Frequency Response Trapezoid
 void FrequencyResponse::drawHighRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq2Pixel, float alpha)
 {
 	using namespace AllColors::FrequencyResponseColors;
@@ -348,6 +358,7 @@ void FrequencyResponse::drawHighRegion(juce::Graphics& g, juce::Rectangle<float>
 	}
 }
 
+// Draw master border around window
 void FrequencyResponse::drawBorder(juce::Graphics& g)
 {
 	// DRAW BORDER ====================
@@ -393,6 +404,7 @@ void FrequencyResponse::drawBorder(juce::Graphics& g)
 
 }
 
+// Called on Component Resize
 void FrequencyResponse::resized()
 {
 	// =============================
@@ -418,9 +430,9 @@ void FrequencyResponse::resized()
 	sliderHighGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
 }
 
+// Methods to call on a timed-basis
 void FrequencyResponse::timerCallback()
 {
-
 	checkMousePosition();
 
 	updateResponse();
@@ -431,6 +443,7 @@ void FrequencyResponse::timerCallback()
 	repaint();
 }
 
+// Check for external band hovering.  Refactor for encapsulation.
 void FrequencyResponse::checkExternalFocus()
 {
 	using namespace Params;
@@ -452,31 +465,38 @@ void FrequencyResponse::checkExternalFocus()
 	mMidHighFocus = globalControls.mXoverControls.midHighFocus;
 }
 
+// Update the response prior to painting.
 void FrequencyResponse::updateResponse()
 {
 	using namespace Params;
 	const auto& params = GetParams();
 
+	// Get cutoff frequency parameter values
 	mLowMidCutoff = *apvts.getRawParameterValue(params.at(Names::Low_Mid_Crossover_Freq));
 	mMidHighCutoff = *apvts.getRawParameterValue(params.at(Names::Mid_High_Crossover_Freq));
 
+	// Convert cutoff values to relative pixel values
 	freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
 	freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
+	// Use pixel values as path bounds
 	cursorLM.setStart(freq1Pixel, responseArea.getY() + 1);
 	cursorLM.setEnd(freq1Pixel, responseArea.getBottom() - 1);
 
 	cursorMH.setStart(freq2Pixel, responseArea.getY() + 1);
 	cursorMH.setEnd(freq2Pixel, responseArea.getBottom() - 1);
 
+	// Get band gain parameter values
 	mLowGain = *apvts.getRawParameterValue(params.at(Names::Gain_Low_Band));
 	mMidGain = *apvts.getRawParameterValue(params.at(Names::Gain_Mid_Band));
 	mHighGain = *apvts.getRawParameterValue(params.at(Names::Gain_High_Band));
 
+	// Convert band gain values to relative pixel values
 	gainLowPixel = responseArea.getY() + juce::jmap(mLowGain,	-30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
 	gainMidPixel = responseArea.getY() + juce::jmap(mMidGain,	-30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
 	gainHighPixel = responseArea.getY() + juce::jmap(mHighGain, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
 
+	// Use pixel values as path bounds
 	auto lowWidth = freq1Pixel * 0.25f;
 	auto midWidth = (freq2Pixel - freq1Pixel) * 0.25f;
 	auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.25f;
@@ -490,6 +510,7 @@ void FrequencyResponse::updateResponse()
 	cursorHG.setStart(freq2Pixel + highWidth, gainHighPixel);
 	cursorHG.setEnd(responseArea.getRight() - highWidth, gainHighPixel);
 
+	// Update band bypass/solo/mute states
 	lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
 	midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
 	highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
@@ -505,6 +526,7 @@ void FrequencyResponse::updateResponse()
 	checkSolos();
 }
 
+// Check if bands are soloed.  Negate mute if so.
 void FrequencyResponse::checkSolos()
 {
 	auto x = lowBandSolo * 100;
@@ -523,26 +545,29 @@ void FrequencyResponse::checkSolos()
 	}
 }
 
+// Map linear slider value to true octave-logarithmic value
 float FrequencyResponse::mapLog2(float freq)
 {
-	//bookmark
 	auto logMin = std::log2(20.f);
 	auto logMax = std::log2(20000.f);
 
 	return (std::log2(freq) - logMin) / (logMax - logMin);
 }
 
+// Called on Mouse Move
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
 	checkCursorFocus(event);
 }
 
+// Called on Mouse Enter
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
 	fadeIn = true;
 	checkCursorFocus(event);
 }
 
+// Called on Mouse Exit
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
 	fadeIn = false;
@@ -553,6 +578,7 @@ void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 	checkCursorFocus(event);
 }
 
+// Check to see if mouse is focusing on any cursor for parameter change
 void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 {
 	auto yM = event.getPosition().getY();
@@ -573,7 +599,7 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 	auto y0 = responseArea.getY();
 	auto y1 = responseArea.getBottom();
 
-	// CHECK IF MOUSE IS OUT OF BOUNDS AND KILL ALL FADES
+	// Mouse is out of window, kill all fades
 	if (xM < x0 || xM > x1 || yM < y0 || yM > y1)
 	{
 		fadeRegionLG = false;
@@ -583,28 +609,29 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 		fadeInCursorMH = false;
 	}
 
-
-	// LOW-MID CURSOR HIGHTLIGHT =====
+	// Mouse is on Low-Mid Cursor
 	if (abs(xM - xLM) < xMargin)
 		fadeInCursorLM = true;
 	else fadeInCursorLM = false;
 
-	// MID-HIGH CURSOR HIGHTLIGHT =====
+	// Mouse is on Mid-High Cursor
 	if (abs((xM - xMH)) < xMargin)
 		fadeInCursorMH = true;
 	else fadeInCursorMH = false;
 
-	// LOW-GAIN REGION/CURSOR HIGHTLIGHT =====
+	// Mouse is within Low Gain Region
 	if (xM < freq1Pixel - xMargin)
 	{
 		fadeRegionLG = true;
 
+		// Mouse is on Low Gain Cursor
 		if (abs(yM - yLG) < yMargin)
 		{
 			fadeInCursorLG = true;
 			fadeInCursorLM = false;
 			fadeInCursorMH = false;
-		} else fadeInCursorLG = false;
+		} 
+		else fadeInCursorLG = false;
 	}
 	else
 	{
@@ -612,26 +639,32 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 		fadeInCursorLG = false;
 	}
 
-	// MID-GAIN CURSOR HIGHTLIGHT =====
+	// Mouse is within Mid Gain Region
 	if (xM > freq1Pixel + xMargin && xM < freq2Pixel - xMargin)
 	{
 		fadeRegionMG = true;
+
+		// Mouse is on Mid Gain Cursor
 		if (abs(yM - yMG) < yMargin)
 		{
 			fadeInCursorMG = true;
 			fadeInCursorLM = false;
 			fadeInCursorMH = false;
-		} else fadeInCursorMG = false;
+		} 
+		else fadeInCursorMG = false;
 	}
 	else
 	{
 		fadeRegionMG = false;
 		fadeInCursorMG = false;
 	}
-	// HIGH-GAIN CURSOR HIGHTLIGHT =====
+
+	// Mouse is within High Gain Region
 	if (xM > freq2Pixel + xMargin)
 	{
 		fadeRegionHG = true;
+
+		// Mouse is on High Gain Cursor
 		if (abs(yM - yHG) < yMargin)
 		{
 			fadeInCursorHG = true;
@@ -645,27 +678,33 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 		fadeInCursorHG = false;
 	}
 	
+	// Establish top-bottom bounds of Dummy Sliders
 	auto sliderTop = responseArea.getY() + juce::jmap(24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())-5;
 	auto sliderBot = responseArea.getY() + juce::jmap(-24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())+5;
 
-	// SET SLIDER BOUNDS =====
+	// Mouse is on Low-Mid Cursor, place dummy slider underneath mouse
 	if (fadeInCursorLM)
 		sliderLowMidInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 1);
 
+	// Mouse is on Mid-High Cursor, place dummy slider underneath mouse
 	if (fadeInCursorMH)
 		sliderMidHighInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 1);
 
+	// Mouse is on Low Gain Cursor, place dummy slider underneath mouse
 	if (fadeInCursorLG)
 		sliderLowGain.setBounds(xM, sliderTop, 1, (sliderBot-sliderTop));
 
+	// Mouse is on Mid Gain Cursor, place dummy slider underneath mouse
 	if (fadeInCursorMG)
 		sliderMidGain.setBounds(xM, sliderTop, 1, (sliderBot - sliderTop));
 
+	// Mouse is on High Gain Cursor, place dummy slider underneath mouse
 	if (fadeInCursorHG)
 		sliderHighGain.setBounds(xM, sliderTop, 1, (sliderBot - sliderTop));
 
 }
 
+// Fade Components on Mouse Enter
 void FrequencyResponse::fadeInOutComponents()
 {
 	if (fadeIn) // If mouse entered... fade Toggles Alpha up
@@ -686,6 +725,7 @@ void FrequencyResponse::fadeInOutComponents()
 	}
 }
 
+// Fade Cursor when within bounds
 void FrequencyResponse::fadeCursor()
 {
 
@@ -781,6 +821,7 @@ void FrequencyResponse::fadeCursor()
 
 }
 
+// Fade Band regions when within bounds
 void FrequencyResponse::fadeRegions()
 {
 
@@ -839,35 +880,11 @@ void FrequencyResponse::fadeRegions()
 	}
 }
 
-void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
-{
-	if (slider == &sliderLowMidInterface || slider == &sliderMidHighInterface)
-	{
-		if (slider == &sliderLowMidInterface)
-		{
-			auto y = slider->getValue();
-			auto f = 20 * pow(2, std::log2(1000.f) * y);
-			sliderLowMidCutoff.setValue(f);
-		}
-
-		if (slider == &sliderMidHighInterface)
-		{
-			auto y = slider->getValue();
-			auto f = 20 * pow(2, std::log2(1000.f) * y);
-			sliderMidHighCutoff.setValue(f);
-		}
-
-	}
-
-	if (slider == &sliderLowMidCutoff || slider == &sliderMidHighCutoff)
-	{
-		sliderMidHighInterface.setValue(mapLog2(sliderMidHighCutoff.getValue()));
-		sliderLowMidInterface.setValue(mapLog2(sliderLowMidCutoff.getValue()));
-	}
-}
-
+// Check mouse position on timed-basis
 void FrequencyResponse::checkMousePosition()
 {
+	// If none apply, kill all fades
+
 	if (!isMouseOverOrDragging(true))
 	{
 		fadeInCursorLM = false;
@@ -876,6 +893,48 @@ void FrequencyResponse::checkMousePosition()
 		fadeRegionMG = false;
 		fadeRegionHG = false;
 		fadeIn = false;
-
 	}
 }
+
+// Called on slider value change
+void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
+{
+	// 'Interface' slider is linear from 0 to 1.  
+	// Changed by user by dragging Cutoff Cursors
+	// Slider is converted from [0 to 1] to [20 to 20k] to store frequency
+
+	if (slider == &sliderLowMidInterface || slider == &sliderMidHighInterface)
+	{
+		if (slider == &sliderLowMidInterface)
+		{
+			// Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
+			// Send to Cutoff slider to update params.
+
+			auto y = slider->getValue();
+			auto f = 20 * pow(2, std::log2(1000.f) * y);
+			sliderLowMidCutoff.setValue(f);
+		}
+
+		if (slider == &sliderMidHighInterface)
+		{
+			// Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
+			// Send to Cutoff slider to update params.
+
+			auto y = slider->getValue();
+			auto f = 20 * pow(2, std::log2(1000.f) * y);
+			sliderMidHighCutoff.setValue(f);
+		}
+
+	}
+
+	// 'Cutoff' slider is linear from 20 to 20k.
+	// Changed by user via attachment to external sliders.
+	// Slider is converted from [20 to 20k] to [0 to 1] for pixel representation
+
+	if (slider == &sliderLowMidCutoff || slider == &sliderMidHighCutoff)
+	{
+		sliderMidHighInterface.setValue(mapLog2(sliderMidHighCutoff.getValue()));
+		sliderLowMidInterface.setValue(mapLog2(sliderLowMidCutoff.getValue()));
+	}
+}
+
