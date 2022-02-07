@@ -3,10 +3,8 @@
 
     Oscilloscope.cpp
     Created: 30 Dec 2021 11:38:53am
-    Author:  Joe Caulfield
+    Author:  Joe
 
-	// Class containing the oscilloscope which shows 
-	// the individual LFO waveforms for viewing
   ==============================================================================
 */
 
@@ -61,19 +59,6 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 Oscilloscope::~Oscilloscope()
 {
 	sliderScroll.setLookAndFeel(nullptr);
-}
-
-// Called on component resize
-void Oscilloscope::resized()
-{
-	drawToggles();
-
-	auto bounds = getLocalBounds();
-	bounds.reduce(4, 0);
-	bounds.removeFromBottom(5);
-
-	sliderScroll.setSize(bounds.getWidth(), 20);
-	sliderScroll.setTopLeftPosition(bounds.getX(), bounds.getBottom() - sliderScroll.getHeight());
 }
 
 // Graphics class
@@ -159,6 +144,19 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 		g.drawRoundedRectangle(highRegion.toFloat(), 5.f, 1.5f);
 
 	drawAndFadeCursor(g, getLocalBounds());
+}
+
+// Called on component resize
+void Oscilloscope::resized()
+{
+	drawToggles();
+
+	auto bounds = getLocalBounds();
+	bounds.reduce(4, 0);
+	bounds.removeFromBottom(5);
+
+	sliderScroll.setSize(bounds.getWidth(), 20);
+	sliderScroll.setTopLeftPosition(bounds.getX(), bounds.getBottom() - sliderScroll.getHeight());
 }
 
 // Draw the gridlines within the corresponding region

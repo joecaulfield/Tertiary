@@ -1,12 +1,10 @@
 /*
   ==============================================================================
 
-	Oscilloscope.cpp
-	Created: 30 Dec 2021 11:38:53am
-	Author:  Joe Caulfield
+    Oscilloscope.h
+    Created: 30 Dec 2021 11:38:53am
+    Author:  Joe
 
-	// Class containing the oscilloscope which shows
-	// the individual LFO waveforms for viewing
   ==============================================================================
 */
 
@@ -15,6 +13,8 @@
 #include "../../PluginProcessor.h"
 #include "../../GUI/Controls/GlobalControls.h"
 #include "../../GUI/AllColors.h"
+
+// Create own 'Cursor' class??
 
 struct Oscilloscope :	juce::Component,
 						juce::Timer, 
