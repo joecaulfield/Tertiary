@@ -20,11 +20,11 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 	addMouseListener(this, true);
     setSize (800, 580);
 
-	// BAND LABEL =============================================================
+	// TITLE LABEL =============================================================
 	pluginTitle.setJustificationType(juce::Justification::centred);
 	pluginTitle.setFont(juce::Font(24.f, juce::Font::bold));
 	pluginTitle.setColour(juce::Label::textColourId, juce::Colours::white);
-	pluginTitle.setText("TERTIARY v1.0", juce::NotificationType::dontSendNotification);
+	pluginTitle.setText("TERTIARY v0.1", juce::NotificationType::dontSendNotification);
 	addAndMakeVisible(pluginTitle);
 }
 

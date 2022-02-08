@@ -29,24 +29,24 @@ struct FrequencyResponse : juce::Component,
 
 	void sliderValueChanged(juce::Slider* slider) override;
 
-	void drawLowRegion(juce::Graphics& g,
-		juce::Rectangle<float> bounds,
-		float gainPixel,
-		float freq1Pixel,
-		float alpha);
+	void drawLowRegion(	juce::Graphics& g,
+						juce::Rectangle<float> bounds,
+						float gainPixel,
+						float freq1Pixel,
+						float alpha);
 
-	void drawMidRegion(juce::Graphics& g,
-		juce::Rectangle<float> bounds,
-		float gainPixel,
-		float freq1Pixel,
-		float freq2Pixel,
-		float alpha);
+	void drawMidRegion(	juce::Graphics& g,
+						juce::Rectangle<float> bounds,
+						float gainPixel,
+						float freq1Pixel,
+						float freq2Pixel,
+						float alpha);
 
-	void drawHighRegion(juce::Graphics& g,
-		juce::Rectangle<float> bounds,
-		float gainPixel,
-		float freq2Pixel,
-		float alpha);
+	void drawHighRegion(	juce::Graphics& g,
+							juce::Rectangle<float> bounds,
+							float gainPixel,
+							float freq2Pixel,
+							float alpha);
 
 	void drawGridVertical(juce::Graphics& g);
 
@@ -81,25 +81,22 @@ struct FrequencyResponse : juce::Component,
 
 	void checkSolos();
 
-	//TertiaryAudioProcessor& audioProcessor;
 	GlobalControls& globalControls;
 
 	// Frequency Response Parameters
-	juce::AudioParameterFloat* lowMidCutoff{ nullptr };         // Pointer to the APVTS
-	juce::AudioParameterFloat* midHighCutoff{ nullptr };         // Pointer to the APVTS
-	juce::AudioParameterFloat* lowGain{ nullptr };         // Pointer to the APVTS
-	juce::AudioParameterFloat* midGain{ nullptr };         // Pointer to the APVTS
+	juce::AudioParameterFloat* lowMidCutoff{ nullptr };     // Pointer to the APVTS
+	juce::AudioParameterFloat* midHighCutoff{ nullptr };    // Pointer to the APVTS
+	juce::AudioParameterFloat* lowGain{ nullptr };			// Pointer to the APVTS
+	juce::AudioParameterFloat* midGain{ nullptr };			// Pointer to the APVTS
 	juce::AudioParameterFloat* highGain{ nullptr };         // Pointer to the APVTS
 
 	// Solo Params
-	bool lowBandSolo{ false }, midBandSolo{ false }, highBandSolo{ false };
-	bool lowBandMute{ false }, midBandMute{ false }, highBandMute{ false };
-	bool lowBandBypass{ false }, midBandBypass{ false }, highBandBypass{ false };
+	bool lowBandSolo{ false },		midBandSolo{ false },	highBandSolo{ false };
+	bool lowBandMute{ false },		midBandMute{ false },	highBandMute{ false };
+	bool lowBandBypass{ false },	midBandBypass{ false }, highBandBypass{ false };
 
 private:
 	juce::AudioProcessorValueTreeState& apvts;
-
-	//juce::Atomic<bool> paramsChanged{ false };
 
 	float mLowMidCutoff, mMidHighCutoff, mLowGain, mMidGain, mHighGain;
 	bool mLowFocus{ false }, mMidFocus{ false }, mHighFocus{ false }, mLowMidFocus, mMidHighFocus;
@@ -128,16 +125,11 @@ private:
 
 	juce::Rectangle<float> responseArea;
 
-	juce::Array<float> freqs
-	{
-		20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000
-	};
+	juce::Array<float> freqs {
+		20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000 };
 
-	// DRAW THE HORIZONTAL AXIS ===============
-	juce::Array<float> gain
-	{
-		-30, -24, -18, -12, -6, 0, 6, 12, 18, 24, 30
-	};
+	juce::Array<float> gain {
+		-30, -24, -18, -12, -6, 0, 6, 12, 18, 24, 30 };
 
 	juce::Slider	sliderLowMidCutoff,
 					sliderMidHighCutoff,
