@@ -21,7 +21,6 @@ struct TimingControls : juce::Component/*, juce::Timer, juce::MouseListener*/
 	TimingControls(juce::AudioProcessorValueTreeState& apv);
 
 	void paint(juce::Graphics& g) override;
-	void drawBorder(juce::Graphics& g);
 
 	void resized() override;
 
@@ -53,5 +52,5 @@ private:
 										syncHighAttachment;
 	
 	int topBarHeight{ 25 };
-	int bottomBarHeight{ 17 };
+	int bottomBarHeight{ 25 };
 };

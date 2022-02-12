@@ -15,6 +15,7 @@
 #include "../../PluginProcessor.h"
 #include "../../GUI/Controls/GlobalControls.h"
 #include "../../GUI/AllColors.h"
+#include "../UtilityFunctions.h"
 
 struct Oscilloscope :	juce::Component,
 						juce::Timer, 
@@ -26,7 +27,7 @@ struct Oscilloscope :	juce::Component,
 	void paint(juce::Graphics& g) override;
 	void paintOverChildren(juce::Graphics& g) override;
 
-	void drawBorder(juce::Graphics& g);
+	//void drawBorder(juce::Graphics& g);
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color);
 
 	void drawLowLFO (juce::Rectangle<int> bounds);

@@ -114,8 +114,14 @@ void FrequencyResponse::makeAttachments()
 void FrequencyResponse::paint(juce::Graphics& g)
 {
 	using namespace juce;
-	
-	g.fillAll(juce::Colours::black);
+	using namespace AllColors::FrequencyResponseColors;
+
+	auto bounds = getLocalBounds().toFloat();
+
+	g.setGradientFill(BACKGROUND_GRADIENT(bounds));
+	g.fillAll();
+
+
 	drawGridVertical(g);
 	drawGridHorizontal(g);
 
@@ -177,7 +183,9 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		g.drawLine(cursorHG, 3.f);
 	}
 
-	drawBorder(g);
+	paintBorder(g, juce::Colours::purple, bounds);
+
+	//drawBorder(g);
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -359,50 +367,50 @@ void FrequencyResponse::drawHighRegion(juce::Graphics& g, juce::Rectangle<float>
 }
 
 // Draw master border around window
-void FrequencyResponse::drawBorder(juce::Graphics& g)
-{
-	// DRAW BORDER ====================
-	auto bounds = getLocalBounds();
-
-	juce::Rectangle<float> border;
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-				bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::white);
-	g.drawRoundedRectangle(border, 3.f, 3.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::lightgrey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::grey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::darkgrey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
-}
+//void FrequencyResponse::drawBorder(juce::Graphics& g)
+//{
+//	// DRAW BORDER ====================
+//	auto bounds = getLocalBounds();
+//
+//	juce::Rectangle<float> border;
+//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+//				bounds.getWidth(), bounds.getHeight());
+//
+//	g.setColour(juce::Colours::white);
+//	g.drawRoundedRectangle(border, 3.f, 3.f);
+//	// =====
+//
+//	bounds.reduce(1, 1);
+//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+//
+//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+//		bounds.getWidth(), bounds.getHeight());
+//
+//	g.setColour(juce::Colours::lightgrey);
+//	g.drawRoundedRectangle(border, 2.f, 2.f);
+//	// =====
+//
+//	bounds.reduce(1, 1);
+//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+//
+//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+//		bounds.getWidth(), bounds.getHeight());
+//
+//	g.setColour(juce::Colours::grey);
+//	g.drawRoundedRectangle(border, 2.f, 2.f);
+//	// =====
+//
+//	bounds.reduce(1, 1);
+//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
+//
+//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
+//		bounds.getWidth(), bounds.getHeight());
+//
+//	g.setColour(juce::Colours::darkgrey);
+//	g.drawRoundedRectangle(border, 2.f, 2.f);
+//	// =====
+//
+//}
 
 // Called on Component Resize
 void FrequencyResponse::resized()

@@ -32,27 +32,29 @@ WaveControls::WaveControls(juce::AudioProcessorValueTreeState& apv)
 
 void WaveControls::paint(juce::Graphics& g)
 {
-	drawBorder(g);
-
 	auto bounds = getLocalBounds();
 
 	// Draw the Title Bounds
 	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
-	g.setColour(juce::Colours::white);
-	g.setOpacity(0.40f);
-	g.fillRect(titleBounds);
 
 	// Draw the Title
-	g.setColour(juce::Colours::black);
+	g.setColour(juce::Colours::white);
+
+	auto myTypeface = "Helvetica";
+	auto titleFont = juce::Font(myTypeface, topBarHeight*0.75f, juce::Font::FontStyleFlags::bold);
+
+	g.setFont(titleFont);
+
+	g.setColour(juce::Colours::white);
 	g.drawFittedText("WAVE SHAPE", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
-	g.setColour(juce::Colours::darkgrey);
-	g.setOpacity(0.25f);
-	g.fillRect(labelBounds);
 
-	g.setColour(juce::Colours::white);
+	// Set Font Height For Sub-Labels
+	g.setFont(16);
+
+	//g.setColour(juce::Colours::white);
 
 	// Draw Parameter Labels: Invert ======================
 	juce::Rectangle<int> invertLabelBounds{ waveBarHigh.toggleInvert.getX(),
@@ -75,14 +77,14 @@ void WaveControls::paint(juce::Graphics& g)
 	// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							waveBarLow.sliderWave.getX(),
-							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) - 25);
+							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) - 35);
 	
 	// LABEL
 	g.drawFittedText("SHAPE", waveLabelBounds, juce::Justification::centred, 1);
 
 	// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
-							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) + 25,
+							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) + 35,
 							waveBarLow.sliderWave.getRight());
 
 	// VERTICAL LINE
@@ -108,20 +110,6 @@ void WaveControls::paint(juce::Graphics& g)
 					
 }
 
-void WaveControls::drawBorder(juce::Graphics& g)
-{
-	using namespace AllColors::WaveControlsColors;
-
-	auto border = getLocalBounds();
-
-	g.setGradientFill(BACKGROUND_GRADIENT(border.toFloat()));
-	g.setOpacity(BACKGROUND_OPACITY());
-	g.fillRoundedRectangle(border.toFloat(), 5.f);
-
-	g.setColour(BORDER_OUTLINE_COLOR());
-	g.drawRoundedRectangle(border.toFloat(), 5.f, BORDER_OUTLINE_THICKNESS());
-}
-
 void WaveControls::resized()
 {
 	using namespace juce;
@@ -129,6 +117,7 @@ void WaveControls::resized()
 	auto bounds = getLocalBounds();
 
 	bounds.removeFromTop(topBarHeight);
+	bounds.removeFromBottom(bottomBarHeight);
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;

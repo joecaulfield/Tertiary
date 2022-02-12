@@ -62,30 +62,33 @@ CrossoverControls::~CrossoverControls()
 
 void CrossoverControls::paint(juce::Graphics& g)
 {
-	drawBorder(g);
+	//drawBorder(g);
 
 	auto bounds = getLocalBounds();
 
 	// Draw the Title Bounds
 	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
-	g.setColour(juce::Colours::white);
-	g.setOpacity(0.40f);
-	g.fillRect(titleBounds);
 
 	// Draw the Title
-	g.setColour(juce::Colours::black);
+	g.setColour(juce::Colours::white);
+
+	auto myTypeface = "Helvetica";
+	auto titleFont = juce::Font(myTypeface, topBarHeight * 0.75f, juce::Font::FontStyleFlags::bold);
+
+	g.setFont(titleFont);
+
+	g.setColour(juce::Colours::white);
 	g.drawFittedText("CROSSOVER", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
-	g.setColour(juce::Colours::darkgrey);
-	g.setOpacity(0.25f);
-	g.fillRect(labelBounds);
 
-	// Set Label Fond
-	g.setColour(juce::Colours::white);
+	// Set Font Height For Sub-Labels
+	g.setFont(16);
 
-	// Low-Mid Label ============================
+	//g.setColour(juce::Colours::white);
+
+	// Draw Parameter Labels: Low-Mid Label ============================
 	juce::Rectangle<int> lmLabelBounds{	sliderLowMidCutoff.getX(),
 										labelBounds.getY(),
 										sliderLowMidCutoff.getWidth(),
@@ -93,26 +96,13 @@ void CrossoverControls::paint(juce::Graphics& g)
 
 	g.drawFittedText("LOW-MID", lmLabelBounds, juce::Justification::centred, 1);
 
-	// Mid-High Label ============================
+	// Draw Parameter Labels: Mid-High Label ============================
 	juce::Rectangle<int> mhLabelBounds{	sliderMidHighCutoff.getX(),
 										labelBounds.getY(),
 										sliderMidHighCutoff.getWidth(),
 										labelBounds.getHeight() };
 
 	g.drawFittedText("MID-HIGH", mhLabelBounds, juce::Justification::centred, 1);
-}
-
-void CrossoverControls::drawBorder(juce::Graphics& g)
-{
-	using namespace AllColors::CrossoverControlsColors;
-
-	auto border = getLocalBounds();
-
-	g.setGradientFill(BACKGROUND_GRADIENT(border.toFloat()));
-	g.fillRoundedRectangle(border.toFloat(), 5.f);
-
-	g.setColour(BORDER_OUTLINE_COLOR());
-	g.drawRoundedRectangle(border.toFloat(), 5.f, BORDER_OUTLINE_THICKNESS());
 }
 
 void CrossoverControls::resized()
@@ -131,9 +121,10 @@ void CrossoverControls::resized()
 	column1.flexDirection = FlexBox::Direction::column;
 	column1.flexWrap = FlexBox::Wrap::noWrap;
 
+	column1.items.add(spacerV);
 	column1.items.add(FlexItem(sliderLowMidCutoff).withFlex(1.f));
 	column1.items.add(FlexItem(sliderValueLM).withHeight(20));
-	column1.items.add(FlexItem().withHeight(5));
+	column1.items.add(spacerV);
 
 	// COLUMN 2 =======================================================
 	FlexBox column2;

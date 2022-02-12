@@ -83,7 +83,11 @@ void Oscilloscope::paint(juce::Graphics& g)
 
 	using namespace AllColors::OscilloscopeColors;
 
-	g.fillAll(juce::Colours::black);
+	auto bounds = getLocalBounds().toFloat();
+
+	// Set Gradient Fill
+	g.setGradientFill(BACKGROUND_GRADIENT(bounds));
+	g.fillAll();
 
 	// DRAW AXIS IF NO BANDS SHOWN
 	if (!mShowLowBand && !mShowMidBand && !mShowHighBand)
@@ -118,7 +122,7 @@ void Oscilloscope::paint(juce::Graphics& g)
 
 	fadeInOutComponents(g);
 
-	drawBorder(g);
+	paintBorder(g, juce::Colours::purple, bounds);
 }
 
 // Graphics class which covers components
@@ -218,52 +222,6 @@ void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bou
 	g.setColour(CURSOR_LINE);
 	g.setOpacity(fadeAlphaCursor);
 	g.drawLine(cursor, 3.f);
-}
-
-// Draw the master-border around entire window
-void Oscilloscope::drawBorder(juce::Graphics& g)
-{
-	auto bounds = getLocalBounds();
-
-	// DRAW BORDER ====================
-	juce::Rectangle<float> border;
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::white);
-	g.drawRoundedRectangle(border, 1.f, 2.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::lightgrey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::grey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
-	bounds.reduce(1, 1);
-	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-
-	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-		bounds.getWidth(), bounds.getHeight());
-
-	g.setColour(juce::Colours::darkgrey);
-	g.drawRoundedRectangle(border, 2.f, 2.f);
-	// =====
-
 }
 
 // Methods to call on a timed-basis

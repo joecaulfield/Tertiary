@@ -21,7 +21,6 @@ struct WaveControls : juce::Component
 	WaveControls(juce::AudioProcessorValueTreeState& apv);
 
 	void paint(juce::Graphics& g) override;
-	void drawBorder(juce::Graphics& g);
 
 	void resized() override;
 
@@ -53,5 +52,5 @@ private:
 										invertHighAttachment;
 
 	int topBarHeight{ 25 };
-	int bottomBarHeight{ 17 };
+	int bottomBarHeight{ 25 };
 };

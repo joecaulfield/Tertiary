@@ -15,19 +15,19 @@
 GainBar::GainBar()
 {
 	// BYPASS TOGGLE ===================================================================================
-	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
+	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
 	addAndMakeVisible(toggleBypass);
 
 	// SOLO TOGGLE ===================================================================================
-	toggleSolo.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	toggleSolo.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleSolo.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
+	toggleSolo.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
 	toggleSolo.addListener(this);
 	addAndMakeVisible(toggleSolo);
 
 	// MUTE TOGGLE ===================================================================================
-	toggleMute.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	toggleMute.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleMute.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
+	toggleMute.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
 	toggleMute.addListener(this);
 	addAndMakeVisible(toggleMute);
 

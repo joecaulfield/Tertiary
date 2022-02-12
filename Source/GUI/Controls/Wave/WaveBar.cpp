@@ -29,14 +29,14 @@ WaveBar::WaveBar()
 	addAndMakeVisible(sliderDepth);
 
 	// INVERT TOGGLE ========================================================
-	toggleInvert.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	toggleInvert.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleInvert.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
+	toggleInvert.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
 	addAndMakeVisible(toggleInvert);
 
 	// BAND LABEL =============================================================
 	bandLabel.setJustificationType(juce::Justification::centred);
 	bandLabel.setFont(juce::Font(20.f, juce::Font::bold));
-	bandLabel.setColour(juce::Label::textColourId, juce::Colours::black);	
+	bandLabel.setColour(juce::Label::textColourId, juce::Colours::white);	
 	addAndMakeVisible(bandLabel);
 
 	addMouseListener(this, true);

@@ -29,14 +29,14 @@ TimingBar::TimingBar()
 	addAndMakeVisible(sliderPhase);
 
 	// SYNC TOGGLE ===========================================================
-	toggleSync.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	toggleSync.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleSync.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
+	toggleSync.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
 	addAndMakeVisible(toggleSync);
 
 	// BAND LABEL ===========================================================
 	bandLabel.setJustificationType(juce::Justification::centred);
 	bandLabel.setFont(juce::Font(20.f, juce::Font::bold));
-	bandLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+	bandLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 	addAndMakeVisible(bandLabel);
 
 	addMouseListener(this, true);

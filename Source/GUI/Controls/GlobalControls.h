@@ -17,7 +17,7 @@
 #include "CrossoverControls.h"
 #include "../../../Source/PluginProcessor.h"
 #include "../../GUI/AllColors.h"
-
+#include "../UtilityFunctions.h"
 
 struct GlobalControls : juce::Component
 {
@@ -25,7 +25,6 @@ struct GlobalControls : juce::Component
 
 	void paint(juce::Graphics& g) override;
 	void paintOverChildren(juce::Graphics& g);
-	void paintBorder(juce::Graphics& g, juce::Rectangle<float> bounds);
 	void resized() override;
 
 	void makeAttachments();

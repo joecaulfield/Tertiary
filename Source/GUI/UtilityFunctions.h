@@ -9,3 +9,6 @@
 */
 
 #pragma once
+#include <JuceHeader.h>
+
+void paintBorder(juce::Graphics& g, juce::Colour baseColor, juce::Rectangle<float> bounds);

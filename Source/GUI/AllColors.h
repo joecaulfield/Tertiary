@@ -23,35 +23,50 @@ namespace AllColors
 {
 	using namespace juce;
 
+	// Color-Scheme for All Universally Band-Color-Coded Items
 	namespace BandColors
 	{
-		// REGION BORDERS  ==========================================================
-		inline Colour REGION_BORDER_LOW() { return  juce::Colours::red; }
-		inline Colour REGION_BORDER_MID() { return  juce::Colours::yellow; }
-		inline Colour REGION_BORDER_HIGH() { return juce::Colours::blue; }
-		inline Colour REGION_BORDER_BYPASS() { return juce::Colours::lightgrey; }
 
-		inline Colour GRADIENT_LOW_1() { return Colour(0xffff0000); }
-		inline Colour GRADIENT_LOW_2() { return Colour(0xffdf0101); }
-		inline Colour GRADIENT_LOW_3() { return Colour(0xffb00505); }
-		inline Colour GRADIENT_LOW_4() { return Colour(0xff610202); }
+		// Brightness-Steps For Gradient
+		inline float gStep1 = 0.3f;
+		inline float gStep2 = 0.5f;
+		inline float gStep3 = 0.75f;
+		inline float gStep4 = 0.9f;
 
-		inline Colour GRADIENT_MID_1() { return juce::Colour(0xffedff00); }
-		inline Colour GRADIENT_MID_2() { return juce::Colour(0xffd6e10b); }
-		inline Colour GRADIENT_MID_3() { return juce::Colour(0xffb7cf01); }
-		inline Colour GRADIENT_MID_4() { return juce::Colour(0xffb1ad05); }
+		// Gradient Color-Scheme For "Low" Color-Coding
+			//inline Colour GRADIENT_LOW_1()		{ return	colorHelper(juce::Colours::green); }
+		inline Colour GRADIENT_LOW_1()		{ return	Colour(0xff1fcd1f); }
+		inline Colour GRADIENT_LOW_2()		{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep1);  }
+		inline Colour GRADIENT_LOW_3()		{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep2);  }
+		inline Colour GRADIENT_LOW_4()		{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep3);	}
+		inline Colour REGION_BORDER_LOW()	{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep4);  }
 
-		inline Colour GRADIENT_HIGH_1() { return juce::Colour(0xff0037ff); }
-		inline Colour GRADIENT_HIGH_2() { return juce::Colour(0xff0904db); }
-		inline Colour GRADIENT_HIGH_3() { return juce::Colour(0xff020777); }
-		inline Colour GRADIENT_HIGH_4() { return juce::Colour(0xff555cf2); }
+		// Gradient Color-Scheme For "Mid" Color-Coding ========
+			//inline Colour GRADIENT_MID_1()		{ return	colorHelper(juce::Colours::purple); }
+		inline Colour GRADIENT_MID_1()		{ return	Colour(0xffc420c4); }
+		inline Colour GRADIENT_MID_2()		{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep1);  }
+		inline Colour GRADIENT_MID_3()		{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep2);  }
+		inline Colour GRADIENT_MID_4()		{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep3);	}
+		inline Colour REGION_BORDER_MID()	{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep4);  }
 
-		inline Colour GRADIENT_BYPASS_1() { return juce::Colour(0xffaca8a8); }
-		inline Colour GRADIENT_BYPASS_2() { return juce::Colour(0xfff5eeee); }
-		inline Colour GRADIENT_BYPASS_3() { return juce::Colour(0xff8a8a8d); }
-		inline Colour GRADIENT_BYPASS_4() { return juce::Colour(0xff444442); }
+		// Gradient Color-Scheme For "High" Color-Coding ========
+			//inline Colour GRADIENT_HIGH_1()		{ return	colorHelper(juce::Colours::blue); }
+		inline Colour GRADIENT_HIGH_1()		{ return	Colour(0xff4871f4); }
+		inline Colour GRADIENT_HIGH_2()		{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep1); }
+		inline Colour GRADIENT_HIGH_3()		{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep2); }
+		inline Colour GRADIENT_HIGH_4()		{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep3); }
+		inline Colour REGION_BORDER_HIGH()	{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep4); }
+
+		// Gradient Color-Scheme For "Bypass" Color-Coding ========
+			//inline Colour GRADIENT_BYPASS_1()		{ return	colorHelper(juce::Colours::grey); }
+		inline Colour GRADIENT_BYPASS_1()		{ return	Colour(0xff808080); }
+		inline Colour GRADIENT_BYPASS_2()		{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep1); }
+		inline Colour GRADIENT_BYPASS_3()		{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep2); }
+		inline Colour GRADIENT_BYPASS_4()		{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep3); }
+		inline Colour REGION_BORDER_BYPASS()	{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep4); }
 
 	}
+
 
 	namespace SliderColors
 	{
@@ -195,7 +210,7 @@ namespace AllColors
 			return gradient;
 		}
 
-		// Multi-Select Sliders
+		// Multi-Select Sliders =================================================================
 
 		// LOW
 		inline ColourGradient OPTION_SLIDER_GRADIENT_LOW(Rectangle<float> bounds)
@@ -267,19 +282,14 @@ namespace AllColors
 
 	}
 
+
 	namespace PluginEditorColors
 	{
-		// GRADIENT COLORS ==============================================================
-			//inline Colour GRADIENT1() { return colorHelper(Colours::red); }
-			//inline Colour GRADIENT2() { return colorHelper(Colours::green); }
-			//inline Colour GRADIENT3() { return colorHelper(Colours::blue); }
-			//inline Colour GRADIENT4() { return colorHelper(Colours::yellow); }
-
+		// GRADIENT ITEMS FOR MAIN BACKGROUND ==============================================================
 		inline Colour GRADIENT1() { return Colour(0xff000000); }
 		inline Colour GRADIENT2() { return Colour(0xff000000); }
 		inline Colour GRADIENT3() { return Colour(0xff221313); }
 		inline Colour GRADIENT4() { return Colour(0xd71e2038); }
-
 
 		// BACKGROUND GRADIENT ==========================================================
 		inline ColourGradient BACKGROUND_GRADIENT(juce::Rectangle<float> bounds)
@@ -301,11 +311,15 @@ namespace AllColors
 
 	namespace GlobalControlsColors
 	{
-		inline Colour GRADIENT1() { return Colour(0xff000000); }
-		inline Colour GRADIENT2() { return Colour(0xff000000); }
-		inline Colour GRADIENT3() { return Colour(0xff33333a); }
-		inline Colour GRADIENT4() { return Colour(0xff070706); }
 
+		// Brightness-Steps For Gradient
+		inline float gStep1 = 0.3f;
+		inline float gStep2 = 0.5f;
+		inline float gStep3 = 0.75f;
+		inline float gStep4 = 0.9f;
+
+		inline Colour BASE_COLOR() { return Colour(0xff03010d); }
+		//inline Colour BASE_COLOR() { return colorHelper(Colours::red); }
 
 		// BACKGROUND GRADIENT ==========================================================
 		inline ColourGradient BACKGROUND_GRADIENT(Rectangle<float> bounds)
@@ -313,50 +327,49 @@ namespace AllColors
 			float p1 = 0.25f;
 			float p2 = 0.5f;
 
-			auto gradient = ColourGradient(	GRADIENT1(),
+			auto gradient = ColourGradient(	BASE_COLOR(),
 											bounds.getCentre(),
-											GRADIENT2(),
+											BASE_COLOR().withMultipliedAlpha(gStep1),
 											bounds.getTopLeft(), true);
 
-			gradient.addColour(p1, GRADIENT3());
-			gradient.addColour(p2, GRADIENT4());
+			gradient.addColour( p1, BASE_COLOR().withMultipliedAlpha(gStep3));
+			gradient.addColour( p2, BASE_COLOR().withMultipliedAlpha(gStep4));
 
 			return gradient;
 		}
 	};
 
+
 	namespace WaveControlsColors
 	{
-		// WINDOW BACKGROUND GRADIENT COLORS ==============================================================
-			//inline Colour GRADIENT1() { return colorHelper(Colours::red); }
-			//inline Colour GRADIENT2() { return colorHelper(Colours::green); }
-			//inline Colour GRADIENT3() { return colorHelper(Colours::blue); }
-			//inline Colour GRADIENT4() { return colorHelper(Colours::yellow); }
+		// Brightness-Steps For Gradient
+		inline float gStep1 = 0.3f;
+		inline float gStep2 = 0.5f;
+		inline float gStep3 = 0.75f;
+		inline float gStep4 = 0.9f;
 
-		inline Colour GRADIENT1() { return Colour(0xff4f544f); }
-		inline Colour GRADIENT2() { return Colour(0xffd9d6d6); }
-		inline Colour GRADIENT3() { return Colour(0xff919990); }
-		inline Colour GRADIENT4() { return Colour(0xff95958c); }
+		inline Colour BASE_COLOR() { return Colour(0xff20021d); }
+		//inline Colour BASE_COLOR() { return colorHelper(Colours::red); }
 
-		// WINDOW BACKGROUND GRADIENT ==========================================================
+		// BACKGROUND GRADIENT ==========================================================
 		inline ColourGradient BACKGROUND_GRADIENT(Rectangle<float> bounds)
 		{
-			float p1 = 0.3;
-			float p2 = 0.7f;
+			float p1 = 0.25f;
+			float p2 = 0.5f;
 
-			auto gradient = ColourGradient(	GRADIENT1(),
-											bounds.getTopLeft(),
-											GRADIENT2(),
-											bounds.getBottomRight(), false);
+			auto gradient = ColourGradient(	BASE_COLOR(),
+											bounds.getCentre(),
+											BASE_COLOR().withMultipliedAlpha(gStep1),
+											bounds.getTopLeft(), true);
 
-			gradient.addColour(p1, GRADIENT3());
-			gradient.addColour(p2, GRADIENT4());
+			gradient.addColour( p1, BASE_COLOR().withMultipliedAlpha(gStep3));
+			gradient.addColour( p2, BASE_COLOR().withMultipliedAlpha(gStep4));
 
 			return gradient;
 		}
 
 		// WINDOW BACKGROUND OPACITY ===========================================================================
-		inline float BACKGROUND_OPACITY() { return 0.75f; }
+		inline float BACKGROUND_OPACITY() { return 1.f; }
 
 		// WINDOW BORDER COLOR =======================================================================
 		inline Colour BORDER_OUTLINE_COLOR() { return Colour(0x00000000); }		// Border Color
@@ -365,12 +378,8 @@ namespace AllColors
 		inline float BORDER_OUTLINE_THICKNESS() { return 3.f; }
 
 		inline Colour TEXT_BACKGROUND_FILL() {return Colour(0xffffffff); }	// Text Background Fill
+};
 
-		//// DEPTH SLIDER GRADIENT LOW
-		//inline ColourGradient DEPTH_SLIDER_LOW(Rectangle<float> bounds) { return SliderColors::BASIC_SLIDER_GRADIENT_LOW(bounds); }
-		//inline ColourGradient DEPTH_SLIDER_MID(Rectangle<float> bounds) { return SliderColors::BASIC_SLIDER_GRADIENT_MID(bounds); }
-		//inline ColourGradient DEPTH_SLIDER_HIGH(Rectangle<float> bounds) { return SliderColors::BASIC_SLIDER_GRADIENT_HIGH(bounds); }
-	};
 
 	namespace TimingControlsColors
 	{
@@ -414,6 +423,7 @@ namespace AllColors
 		inline Colour TEXT_BACKGROUND_FILL() {return Colour(0xffffffff); }	// Text Background Fill
 	};
 
+
 	namespace GainControlsColors
 	{
 		// WINDOW BACKGROUND GRADIENT COLORS ==============================================================
@@ -456,6 +466,7 @@ namespace AllColors
 		inline Colour TEXT_BACKGROUND_FILL() { return Colour(0xffffffff); }	// Text Background Fill
 	};
 
+
 	namespace CrossoverControlsColors
 	{
 		// BACKGROUND GRADIENT COLORS
@@ -493,6 +504,7 @@ namespace AllColors
 		inline Colour TEXT_BACKGROUND_FILL() { return Colour(0xffffffff); }	// Text Background Fill
 	};
 
+
 	namespace InputOutputMeterColors
 	{
 		// GRILL BACKGROUND GRADIENT ==========================================================
@@ -518,26 +530,31 @@ namespace AllColors
 		}
 	};
 
+
 	namespace OscilloscopeColors
 	{
-		// WINDOW BACKGROUND GRADIENT ==========================================================
-		inline Colour GRADIENT1() { return juce::Colour(0xff040404); }
-		inline Colour GRADIENT2() { return juce::Colour(0xff1b1919); }
-		inline Colour GRADIENT3() { return juce::Colour(0xff373738); }
-		inline Colour GRADIENT4() { return juce::Colour(0xff403f3f); }
+		// BACKGROUND FILL ==========================================================
+
+		// Brightness-Steps For Gradient
+		inline float gStep1 = 0.3f;
+		inline float gStep2 = 0.5f;
+		inline float gStep3 = 0.75f;
+		inline float gStep4 = 0.9f;
+
+		inline Colour BASE_COLOR() { return Colour(0xff03010d); }
 
 		inline ColourGradient BACKGROUND_GRADIENT(Rectangle<float> bounds)
 		{
 			float p1 = 0.25f;
-			float p2 = 0.75f;
+			float p2 = 0.5f;
 
-			auto gradient =	ColourGradient(GRADIENT1(),
-							bounds.getTopLeft(),
-							GRADIENT2(),
-							bounds.getBottomRight(), true);
+			auto gradient = ColourGradient(	BASE_COLOR(),
+											bounds.getCentre(),
+											BASE_COLOR().withMultipliedAlpha(gStep1),
+											bounds.getTopLeft(), true);
 
-			gradient.addColour(p1, GRADIENT3());
-			gradient.addColour(p2, GRADIENT4());
+			gradient.addColour( p1, BASE_COLOR().withMultipliedAlpha(gStep3));
+			gradient.addColour( p2, BASE_COLOR().withMultipliedAlpha(gStep4));
 
 			return gradient;
 		}
@@ -662,6 +679,7 @@ namespace AllColors
 		const Colour BUTTON_TEXT_COLOR(0, 0, 0);
 	};
 
+
 	namespace FrequencyResponseColors
 	{
 		// LOW REGION GRADIENT  ==========================================================
@@ -737,6 +755,32 @@ namespace AllColors
 		inline Colour REGION_BORDER_COLOR_MID() { return BandColors::REGION_BORDER_MID(); }
 		inline Colour REGION_BORDER_COLOR_HIGH() { return BandColors::REGION_BORDER_HIGH(); }
 		inline Colour REGION_BORDER_COLOR_BYPASS() { return BandColors::REGION_BORDER_BYPASS(); }
+
+		// BACKGROUND FILL ==========================================================
+
+		// Brightness-Steps For Gradient
+		inline float gStep1 = 0.3f;
+		inline float gStep2 = 0.5f;
+		inline float gStep3 = 0.75f;
+		inline float gStep4 = 0.9f;
+
+		inline Colour BASE_COLOR() { return Colour(0xff03010d); }
+
+		inline ColourGradient BACKGROUND_GRADIENT(Rectangle<float> bounds)
+		{
+			float p1 = 0.25f;
+			float p2 = 0.5f;
+
+			auto gradient = ColourGradient(	BASE_COLOR(),
+											bounds.getCentre(),
+											BASE_COLOR().withMultipliedAlpha(gStep1),
+											bounds.getTopLeft(), true);
+
+			gradient.addColour( p1, BASE_COLOR().withMultipliedAlpha(gStep3));
+			gradient.addColour( p2, BASE_COLOR().withMultipliedAlpha(gStep4));
+
+			return gradient;
+		}
 
 	};
 }

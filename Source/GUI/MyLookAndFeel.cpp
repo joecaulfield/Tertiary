@@ -21,7 +21,7 @@ CustomSlider::CustomSlider()
 	// LABEL ======================================================
 	label.setEditable(false, true);
 	label.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white.withAlpha(0.f));
-	label.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
+	label.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
 	label.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::darkblue);
 	label.setJustificationType(juce::Justification::centred);
 	label.addListener(this);
@@ -380,7 +380,7 @@ void WaveLookAndFeel::drawWaveButton(juce::Graphics& g, juce::Rectangle<int> bou
 
 	if (selected) 
 		g.setOpacity(1.f); 
-	else g.setOpacity(0.5f);
+	else g.setOpacity(0.85f);
 
 	g.fillRect(bounds);
 
@@ -608,9 +608,9 @@ void MultLookAndFeel::drawWaveButton(juce::Graphics& g, juce::Rectangle<int> bou
 	else
 		g.setGradientFill(OPTION_SLIDER_GRADIENT_BYPASS(sliderBounds.toFloat()));
 
-	if (selected) 
-		g.setOpacity(1.f); 
-	else g.setOpacity(0.5f);
+	if (selected)
+		g.setOpacity(1.f);
+	else g.setOpacity(0.85f);
 
 	g.fillRect(bounds);
 
@@ -674,7 +674,7 @@ void StandardSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int 
 	g.fillRect(valueBar);
 
 	// Draw Bar Outline
-	g.setColour(juce::Colours::black);
+	g.setColour(juce::Colours::white);
 	g.drawRect(valueBounds);
 
 	// Draw Value Label
@@ -686,11 +686,6 @@ void StandardSliderLookAndFeel::setBandMode(int bandMode)
 {
 	mode = bandMode;
 }
-
-//void StandardSliderLookAndFeel::setSuffix(juce::String unitSuffix)
-//{
-//	suffix = unitSuffix;
-//}
 
 // CENTER SLIDER ==================================================================
 

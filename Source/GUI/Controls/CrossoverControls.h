@@ -33,7 +33,6 @@ struct CrossoverControls :	juce::Component,
 	void timerCallback() override;
 	
 	void updateStringText();
-	void drawBorder(juce::Graphics& g);
 
 	bool lowMidFocus{ false };
 	bool midHighFocus{ false };
@@ -54,5 +53,5 @@ private:
 	juce::Label sliderValueLM, sliderValueMH;
 
 	int topBarHeight{ 25 };
-	int bottomBarHeight{ 17 };
+	int bottomBarHeight{ 25 };
 };

@@ -30,26 +30,30 @@ TimingControls::TimingControls(juce::AudioProcessorValueTreeState& apv)
 
 void TimingControls::paint(juce::Graphics& g)
 {
-	drawBorder(g);
-
 	auto bounds = getLocalBounds();
 
 	// Draw the Title Bounds
 	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
-	g.setColour(juce::Colours::white);
-	g.setOpacity(0.40f);
-	g.fillRect(titleBounds);
 
-	g.setColour(juce::Colours::black);
+	// Draw the Title
+	g.setColour(juce::Colours::white);
+
+	auto myTypeface = "Helvetica";
+	auto titleFont = juce::Font(myTypeface, topBarHeight * 0.75f, juce::Font::FontStyleFlags::bold);
+
+	g.setFont(titleFont);
+
+	g.setColour(juce::Colours::white);
 	g.drawFittedText("WAVE TIMING", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
-	g.setColour(juce::Colours::darkgrey);
-	g.setOpacity(0.25f);
-	g.fillRect(labelBounds);
 
-	g.setColour(juce::Colours::white);
+	// Set Font Height For Sub-Labels
+	g.setFont(16);
+
+	//g.setColour(juce::Colours::white);
+
 
 	// Draw Parameter Labels: Sync ======================
 	juce::Rectangle<int> syncLabelBounds {	timingBarHigh.toggleSync.getX(),
@@ -57,7 +61,8 @@ void TimingControls::paint(juce::Graphics& g)
 											timingBarHigh.toggleSync.getWidth(),
 											labelBounds.getHeight()};
 
-	g.drawFittedText("SYNC", syncLabelBounds, juce::Justification::centred, 1);
+
+	g.drawFittedText("STH", syncLabelBounds, juce::Justification::centred, 1);
 
 	// Draw Parameter Labels: Multiplier AKA Rhythm ======================
 	juce::Rectangle<int> multLabelBounds{	timingBarHigh.sliderMultuplier.getX(),
@@ -73,14 +78,14 @@ void TimingControls::paint(juce::Graphics& g)
 	// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							timingBarLow.sliderMultuplier.getX(),
-							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) - 25);
+							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) - 40);
 	
 	// LABEL
 	g.drawFittedText("RHYTHM", multLabelBounds, juce::Justification::centred, 1);
 
 	// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
-							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) + 25,
+							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) + 40,
 							timingBarLow.sliderMultuplier.getRight());
 
 	// VERTICAL LINE
@@ -106,19 +111,6 @@ void TimingControls::paint(juce::Graphics& g)
 	g.drawFittedText("PHASE", phaseLabelBounds, juce::Justification::centred, 1);
 }
 
-void TimingControls::drawBorder(juce::Graphics& g)
-{
-	using namespace AllColors::TimingControlsColors;
-
-	auto border = getLocalBounds();
-
-	g.setGradientFill(BACKGROUND_GRADIENT(border.toFloat()));
-	g.fillRoundedRectangle(border.toFloat(), 5.f);
-
-	g.setColour(BORDER_OUTLINE_COLOR());
-	g.drawRoundedRectangle(border.toFloat(), 5.f, BORDER_OUTLINE_THICKNESS());
-}
-
 void TimingControls::resized()
 {
 	using namespace juce;
@@ -126,6 +118,7 @@ void TimingControls::resized()
 	auto bounds = getLocalBounds();
 
 	bounds.removeFromTop(topBarHeight);
+	bounds.removeFromBottom(bottomBarHeight);
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
