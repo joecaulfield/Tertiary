@@ -54,15 +54,14 @@ void TimingControls::paint(juce::Graphics& g)
 
 	//g.setColour(juce::Colours::white);
 
-
 	// Draw Parameter Labels: Sync ======================
-	juce::Rectangle<int> syncLabelBounds {	timingBarHigh.toggleSync.getX(),
+	juce::Rectangle<int> syncLabelBounds {	timingBarHigh.toggleSync.getX()-3,
 											labelBounds.getY(),
-											timingBarHigh.toggleSync.getWidth(),
+											timingBarHigh.toggleSync.getWidth()+6,
 											labelBounds.getHeight()};
 
 
-	g.drawFittedText("STH", syncLabelBounds, juce::Justification::centred, 1);
+	g.drawFittedText("SYNC", syncLabelBounds, juce::Justification::centred, 1);
 
 	// Draw Parameter Labels: Multiplier AKA Rhythm ======================
 	juce::Rectangle<int> multLabelBounds{	timingBarHigh.sliderMultuplier.getX(),

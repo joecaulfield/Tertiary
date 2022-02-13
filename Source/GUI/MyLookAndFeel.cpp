@@ -21,9 +21,20 @@ CustomSlider::CustomSlider()
 	// LABEL ======================================================
 	label.setEditable(false, true);
 	label.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white.withAlpha(0.f));
+	label.setColour(juce::Label::ColourIds::outlineWhenEditingColourId, juce::Colours::white.withAlpha(0.f));
+	label.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white.withAlpha(0.f));
+
 	label.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
 	label.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::darkblue);
+	label.setColour(juce::Label::ColourIds::outlineWhenEditingColourId, juce::Colours::darkblue.withAlpha(0.f));
+	label.setColour(juce::Label::ColourIds::backgroundWhenEditingColourId, juce::Colours::purple);
+
+	auto myTypeface = "Helvetica";
+	auto labelFont = juce::Font(myTypeface, 16, juce::Font::FontStyleFlags::bold);
+
+	label.setFont(labelFont);
 	label.setJustificationType(juce::Justification::centred);
+
 	label.addListener(this);
 	addAndMakeVisible(label);
 
@@ -39,11 +50,13 @@ void CustomSlider::resized()
 {
 	auto bounds = getLocalBounds();
 
+	label.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), 15);
+
 	bounds.reduce(0, 2);
 
 	slider.setBounds(bounds);
 
-	label.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), 15);
+
 }
 
 void CustomSlider::setStyleStandard(juce::String suffix)
@@ -55,7 +68,7 @@ void CustomSlider::setStyleStandard(juce::String suffix)
 
 void CustomSlider::setStyleCenter(juce::String suffix)
 {
-	slider.setLookAndFeel(&standardSliderLookAndFeel);
+	slider.setLookAndFeel(&centerSliderLookAndFeel);
 	valueSuffix = suffix;
 	updateStringText();
 }
@@ -676,10 +689,6 @@ void StandardSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int 
 	// Draw Bar Outline
 	g.setColour(juce::Colours::white);
 	g.drawRect(valueBounds);
-
-	// Draw Value Label
-	//juce::String val = juce::String(slider.getValue());
-	//g.drawFittedText(val << suffix, bounds.toNearestInt(), juce::Justification::centred, 1);
 }
 
 void StandardSliderLookAndFeel::setBandMode(int bandMode)
@@ -724,26 +733,17 @@ void CenterSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y,
 	g.fillPath(valueBar);
 
 	// Draw Value Line
-	g.setColour(juce::Colours::black);
+	g.setColour(juce::Colours::white);
 	g.drawVerticalLine(valuePosition, valueBounds.getY(), valueBounds.getBottom());
 
 	// Draw Bar Outline
 	g.drawRect(valueBounds);
-
-	// Draw Value Label
-	//juce::String val = juce::String(slider.getValue());
-	//g.drawFittedText(val << suffix, bounds.toNearestInt(), juce::Justification::centred, 1);
 }
 
 void CenterSliderLookAndFeel::setBandMode(int bandMode)
 {
 	mode = bandMode;
 }
-
-//void CenterSliderLookAndFeel::setSuffix(juce::String unitSuffix)
-//{
-//	suffix = unitSuffix;
-//}
 
 // SCROLL SLIDER =================================================================
 

@@ -24,8 +24,8 @@ TimingBar::TimingBar()
 	addAndMakeVisible(sliderMultuplier);
 	sliderMultuplier.addListener(this);
 
-	// RATE SLIDER ===========================================================
-	sliderPhase.setStyleStandard(juce::CharPointer_UTF8("\xc2\xb0"));
+	// PHASE SLIDER ===========================================================
+	sliderPhase.setStyleCenter(juce::CharPointer_UTF8("\xc2\xb0"));
 	addAndMakeVisible(sliderPhase);
 
 	// SYNC TOGGLE ===========================================================
@@ -46,8 +46,6 @@ TimingBar::TimingBar()
 TimingBar::~TimingBar()
 {
 	sliderMultuplier.setLookAndFeel(nullptr);
-	sliderRate.setLookAndFeel(nullptr);
-	sliderPhase.setLookAndFeel(nullptr);
 }
 
 void TimingBar::paint(juce::Graphics& g)
