@@ -30,7 +30,7 @@ CustomSlider::CustomSlider()
 	label.setColour(juce::Label::ColourIds::backgroundWhenEditingColourId, juce::Colours::purple);
 
 	auto myTypeface = "Helvetica";
-	auto labelFont = juce::Font(myTypeface, 16, juce::Font::FontStyleFlags::bold);
+	auto labelFont = juce::Font(myTypeface, 16, juce::Font::FontStyleFlags::plain);
 
 	label.setFont(labelFont);
 	label.setJustificationType(juce::Justification::centred);

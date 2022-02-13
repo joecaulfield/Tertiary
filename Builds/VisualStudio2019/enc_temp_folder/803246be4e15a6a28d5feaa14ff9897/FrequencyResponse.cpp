@@ -509,19 +509,19 @@ void FrequencyResponse::updateResponse()
 	auto midWidth = (freq2Pixel - freq1Pixel) * 0.75f;
 	auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.75f;
 
-	// Set Low Cursor Bounds
+	// Set Low Cursor Bounds, +/- Margins
 	auto center = (responseArea.getX() + freq1Pixel) / 2.f;
 
 	cursorLG.setStart	(center - lowWidth / 2.f, gainLowPixel);
 	cursorLG.setEnd		(center + lowWidth / 2.f, gainLowPixel);
 
-	// Set Mid Cursor Bounds
+	// Set Mid Cursor Bounds, +/- Margins
 	center = (freq1Pixel + freq2Pixel) / 2.f;
 	
 	cursorMG.setStart	(center - midWidth / 2.f, gainMidPixel);
 	cursorMG.setEnd		(center + midWidth / 2.f, gainMidPixel);
 
-	// Set High Cursor Bounds
+	// Set High Cursor Bounds, +/- Margins
 	center = (freq2Pixel + responseArea.getRight()) / 2.f;
 
 	cursorHG.setStart	(center - highWidth / 2.f, gainHighPixel);
