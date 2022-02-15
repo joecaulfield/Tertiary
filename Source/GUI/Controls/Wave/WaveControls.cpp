@@ -34,14 +34,29 @@ void WaveControls::paint(juce::Graphics& g)
 {
 	auto bounds = getLocalBounds();
 
+	g.drawImage(background, bounds.toFloat());
+}
+
+void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	background = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
+	Graphics g(background);
+
 	// Draw the Title Bounds
-	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
+	juce::Rectangle<int> titleBounds{	bounds.getX(), 
+										bounds.getY(),
+										bounds.getWidth(), 
+										25};
 
 	// Draw the Title
 	g.setColour(juce::Colours::white);
 
 	auto myTypeface = "Helvetica";
-	auto titleFont = juce::Font(myTypeface, topBarHeight*0.75f, juce::Font::FontStyleFlags::bold);
+	auto titleFont = juce::Font(	myTypeface, 
+									titleBounds.getHeight() * 0.85f, 
+									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
 
@@ -49,7 +64,10 @@ void WaveControls::paint(juce::Graphics& g)
 	g.drawFittedText("WAVE SHAPE", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
-	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
+	juce::Rectangle<int> labelBounds{	bounds.getX(), 
+										waveBarHigh.getBottom() + 3, 
+										bounds.getWidth(), 
+										bounds.getBottom() - waveBarHigh.getBottom()};
 
 	// Set Font Height For Sub-Labels
 	g.setFont(16);
@@ -57,7 +75,7 @@ void WaveControls::paint(juce::Graphics& g)
 	//g.setColour(juce::Colours::white);
 
 	// Draw Parameter Labels: Invert ======================
-	juce::Rectangle<int> invertLabelBounds{ waveBarHigh.toggleInvert.getX(),
+	juce::Rectangle<int> invertLabelBounds{		waveBarHigh.toggleInvert.getX(),
 												labelBounds.getY(),
 												waveBarHigh.toggleInvert.getWidth(),
 												labelBounds.getHeight() };
@@ -69,28 +87,23 @@ void WaveControls::paint(juce::Graphics& g)
 											labelBounds.getY(),
 											waveBarHigh.sliderWave.getWidth(),
 											labelBounds.getHeight()};
-	// VERTICAL LINE
-	g.drawVerticalLine(	waveBarLow.sliderWave.getX(),
-						labelBounds.getY(),
-						labelBounds.getCentreY());
 
-	// HORIZONTAL LINE
+	// LABEL
+	g.drawFittedText("SHAPE", waveLabelBounds, juce::Justification::centred, 1);
+
+	// HORIZONTAL LINES
+
+	g.setOpacity(0.25f);
+
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							waveBarLow.sliderWave.getX(),
 							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) - 35);
 	
-	// LABEL
-	g.drawFittedText("SHAPE", waveLabelBounds, juce::Justification::centred, 1);
-
-	// HORIZONTAL LINE
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) + 35,
 							waveBarLow.sliderWave.getRight());
 
-	// VERTICAL LINE
-	g.drawVerticalLine(	waveBarLow.sliderWave.getRight(),
-						labelBounds.getY(),
-						labelBounds.getCentreY());
+	g.setOpacity(1.f);
 
 	// Draw Parameter Labels: Symmetry AKA Skew ======================
 	juce::Rectangle<int> symLabelBounds{ waveBarHigh.sliderSymmetry.getX(),
@@ -107,7 +120,37 @@ void WaveControls::paint(juce::Graphics& g)
 											labelBounds.getHeight()};
 
 	g.drawFittedText("DEPTH", depthLabelBounds, juce::Justification::centred, 1);
-					
+
+	// Setup Gradient For Division Lines ======================
+	float p1 = 0.2f;
+	float p2 = 0.8f;
+
+	auto gradient = ColourGradient(	juce::Colours::black,
+									bounds.getBottomLeft().toFloat(),
+									juce::Colours::black,
+									bounds.getBottomRight().toFloat(), false);
+
+	gradient.addColour(p1, juce::Colours::white);
+	gradient.addColour(p2, juce::Colours::white);
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.5f);
+
+	// Draw Division Lines ======================
+
+	g.setOpacity(0.25f);
+
+	auto center = (titleBounds.getBottom() + waveBarLow.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (waveBarLow.getBottom() + waveBarMid.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (waveBarMid.getBottom() + waveBarHigh.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (waveBarHigh.getBottom() + labelBounds.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
 }
 
 void WaveControls::resized()
@@ -116,14 +159,20 @@ void WaveControls::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(topBarHeight);
-	bounds.removeFromBottom(bottomBarHeight);
+	// Margins For Labels
+	int topBarHeight = 25;
+	int bottomBarHeight = 20;
+
+	// Bounds In Which FlexBox is Performed
+	auto flexBounds = bounds;
+	flexBounds.removeFromTop(topBarHeight);
+	flexBounds.removeFromBottom(bottomBarHeight);
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-	auto spacer = FlexItem().withHeight(2);
+	auto spacer = FlexItem().withFlex(1.f);
 
 	flexBox.items.add(spacer);
 	flexBox.items.add(FlexItem(waveBarLow).withHeight(30));
@@ -133,7 +182,10 @@ void WaveControls::resized()
 	flexBox.items.add(FlexItem(waveBarHigh).withHeight(30));
 	flexBox.items.add(spacer);
 
-	flexBox.performLayout(bounds);
+	flexBox.performLayout(flexBounds);
+
+	// Draw Background Image, Control Labels
+	drawBackgroundImage(bounds);
 }
 
 void WaveControls::makeAttachments()

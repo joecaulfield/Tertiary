@@ -25,8 +25,7 @@ CustomSlider::CustomSlider()
 	label.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white.withAlpha(0.f));
 
 	label.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
-	label.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::darkblue);
-	label.setColour(juce::Label::ColourIds::outlineWhenEditingColourId, juce::Colours::darkblue.withAlpha(0.f));
+	label.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::white);
 	label.setColour(juce::Label::ColourIds::backgroundWhenEditingColourId, juce::Colours::purple);
 
 	auto myTypeface = "Helvetica";
@@ -37,8 +36,6 @@ CustomSlider::CustomSlider()
 
 	label.addListener(this);
 	addAndMakeVisible(label);
-
-	//updateStringText();
 }
 
 CustomSlider::~CustomSlider()
@@ -50,7 +47,9 @@ void CustomSlider::resized()
 {
 	auto bounds = getLocalBounds();
 
-	label.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), 15);
+	label.setBounds(bounds.getX(), 
+					bounds.getY()+1, 
+					bounds.getWidth(), 15);
 
 	bounds.reduce(0, 2);
 
@@ -120,8 +119,46 @@ void CustomSlider::updateStringText()
 	label.setText(sliderValue, juce::NotificationType::dontSendNotification);
 }
 
+// GLOBAL LOOK & FEEL FUNCTIONS =============================================================
 
+// Draw the Background Appearance of Option Buttons
+void drawOptionButtonBackground(	juce::Graphics& g, 
+									juce::Rectangle<int> bounds, 
+									bool selected, 
+									juce::Slider& slider, 
+									int bandMode )
+{
+	using namespace AllColors::SliderColors;
 
+	auto sliderBounds = slider.getLocalBounds().toFloat();
+
+	// Set Color-Coded Gradient
+	if (slider.isEnabled())
+	{
+		switch (bandMode)
+		{
+		case 0: {g.setGradientFill(OPTION_SLIDER_GRADIENT_LOW(sliderBounds.toFloat()));	break; }
+		case 1: {g.setGradientFill(OPTION_SLIDER_GRADIENT_MID(sliderBounds.toFloat()));	break; }
+		case 2: {g.setGradientFill(OPTION_SLIDER_GRADIENT_HIGH(sliderBounds.toFloat())); break; }
+		}
+	}
+	else
+		g.setGradientFill(OPTION_SLIDER_GRADIENT_BYPASS(sliderBounds.toFloat()));
+
+	// Fill Rectangle With Color-Coded Gradient
+	g.setOpacity(0.65f);
+	g.fillRoundedRectangle(bounds.toFloat(), 2);
+
+	// Highlight Icon If Selected
+	if (selected && slider.isEnabled())
+	{
+		g.setColour(juce::Colours::white);
+		g.setOpacity(0.65f);
+		g.fillRoundedRectangle(bounds.toFloat(), 2);
+	}
+
+	g.setOpacity(1.f);
+}
 
 // WAVE SLIDER ===================================================================
 
@@ -172,14 +209,15 @@ void WaveLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int wid
 
 void WaveLookAndFeel::drawWave0(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 0) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 0) 
+		selected = true;
 
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
+
+	// Draw Icon ===============================
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
 	auto width =	bounds.getWidth();
@@ -187,7 +225,7 @@ void WaveLookAndFeel::drawWave0(juce::Graphics& g, juce::Rectangle<int> bounds, 
 	auto xC =		bounds.getCentreX();
 	auto yC =		bounds.getCentreY();
 
-	// Draw Icon ===============================
+
 	juce::Line<float> arrow;
 	arrow.setEnd(xC, y + height-3);
 	arrow.setStart(xC, y+3);
@@ -198,14 +236,15 @@ void WaveLookAndFeel::drawWave0(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 void WaveLookAndFeel::drawWave1(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 1) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 1) 
+		selected = true;
 
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
+
+	// Draw Icon
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
 	auto width =	bounds.getWidth();
@@ -223,13 +262,13 @@ void WaveLookAndFeel::drawWave1(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 void WaveLookAndFeel::drawWave2(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 2) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 2) 
+		selected = true;
+
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
@@ -248,13 +287,13 @@ void WaveLookAndFeel::drawWave2(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 void WaveLookAndFeel::drawWave3(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 3) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 3) 
+		selected = true;
+
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
@@ -275,13 +314,13 @@ void WaveLookAndFeel::drawWave3(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 void WaveLookAndFeel::drawWave4(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 4) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 4) 
+		selected = true;
+
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
@@ -293,13 +332,15 @@ void WaveLookAndFeel::drawWave4(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	juce::Path p;
 
+	// Second Half Of Sine Wave
 	p.addArc(	0, 0, 
 				20, 20, 
 				-1.f * juce::MathConstants<float>::pi / 2.f,
 				juce::MathConstants<float>::pi / 2.f, true);
 
-	p.applyTransform(AffineTransform().rotated(juce::MathConstants<float>::pi, 20, 10));
+	p.applyTransform(juce::AffineTransform().rotated(juce::MathConstants<float>::pi, 20, 10));
 
+	// First Half Of Sine Wave
 	p.addArc(	0, 0, 
 				20, 20, 
 				-1.f * juce::MathConstants<float>::pi / 2.f, 
@@ -309,18 +350,17 @@ void WaveLookAndFeel::drawWave4(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	g.setColour(juce::Colours::black);
 	g.strokePath(p, juce::PathStrokeType(2.f));
-
 }
 
 void WaveLookAndFeel::drawWave5(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 5) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 5) 
+		selected = true;
+
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
@@ -331,6 +371,7 @@ void WaveLookAndFeel::drawWave5(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	g.setColour(juce::Colours::black);
 
+	// Add Arc
 	juce::Path p;
 	p.addCentredArc(	xC, 
 						y + height, 
@@ -347,13 +388,13 @@ void WaveLookAndFeel::drawWave5(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 void WaveLookAndFeel::drawWave6(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 6) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 6) 
+		selected = true;
+
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
 	auto x =		bounds.getX();
 	auto y =		bounds.getY();
@@ -364,6 +405,7 @@ void WaveLookAndFeel::drawWave6(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	g.setColour(juce::Colours::black);
 
+	// Add Arc
 	juce::Path p;
 	p.addCentredArc(	xC, 
 						y + height, 
@@ -376,40 +418,6 @@ void WaveLookAndFeel::drawWave6(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	p.scaleToFit(x+5, y+5, width-10, height- 10, false);
 	g.strokePath(p, juce::PathStrokeType(2.f));
-}
-
-void WaveLookAndFeel::drawWaveButton(juce::Graphics& g, juce::Rectangle<int> bounds, bool selected, juce::Slider& slider)
-{
-	using namespace AllColors::SliderColors;
-
-	auto sliderBounds = slider.getLocalBounds().toFloat();
-
-	switch (mode)
-	{
-	case 0: {g.setGradientFill(OPTION_SLIDER_GRADIENT_LOW(sliderBounds.toFloat()));	break; }
-	case 1: {g.setGradientFill(OPTION_SLIDER_GRADIENT_MID(sliderBounds.toFloat()));	break; }
-	case 2: {g.setGradientFill(OPTION_SLIDER_GRADIENT_HIGH(sliderBounds.toFloat()));break; }
-	}
-
-	if (selected) 
-		g.setOpacity(1.f); 
-	else g.setOpacity(0.85f);
-
-	g.fillRect(bounds);
-
-	// Draw Border ==============================
-	g.setColour(selected ? juce::Colours::lightgrey : juce::Colours::darkgrey);
-	g.drawRect(bounds, 1.f);
-
-	bounds.reduce(1, 1);
-
-	g.setColour(selected ? juce::Colours::grey : juce::Colours::grey);
-	g.drawRect(bounds, 1.f);
-
-	bounds.reduce(1, 1);
-
-	g.setColour(/*selected ? juce::Colours::darkgrey : */juce::Colours::lightgrey);
-	if (selected) g.drawRect(bounds, 1.f);
 }
 
 void WaveLookAndFeel::setBandMode(int bandMode)
@@ -442,204 +450,117 @@ void MultLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int wid
 	auto iconSize = abs((sliderBounds.getX() - bounds.getX()) * 2.f);
 
 	// SET ICON SIZE ================================================================
-	wave0.setSize(iconSize, iconSize);
-	wave1.setSize(iconSize, iconSize);
-	wave2.setSize(iconSize, iconSize);
-	wave3.setSize(iconSize, iconSize);
-	wave4.setSize(iconSize, iconSize);
-	wave5.setSize(iconSize, iconSize);
+	mult0.setSize(iconSize, iconSize);
+	mult1.setSize(iconSize, iconSize);
+	mult2.setSize(iconSize, iconSize);
+	mult3.setSize(iconSize, iconSize);
+	mult4.setSize(iconSize, iconSize);
+	mult5.setSize(iconSize, iconSize);
 
 	// SET ICON POSITIONS ============================================================
 	auto spacing = sliderBounds.getWidth() / 5.f;
 
-	wave0.setCentre(sliderBounds.getX() + 0 * spacing, sliderBounds.getCentreY());
-	wave1.setCentre(sliderBounds.getX() + 1 * spacing, sliderBounds.getCentreY());
-	wave2.setCentre(sliderBounds.getX() + 2 * spacing, sliderBounds.getCentreY());
-	wave3.setCentre(sliderBounds.getX() + 3 * spacing, sliderBounds.getCentreY());
-	wave4.setCentre(sliderBounds.getX() + 4 * spacing, sliderBounds.getCentreY());
-	wave5.setCentre(sliderBounds.getX() + 5 * spacing, sliderBounds.getCentreY());
+	mult0.setCentre(sliderBounds.getX() + 0 * spacing, sliderBounds.getCentreY());
+	mult1.setCentre(sliderBounds.getX() + 1 * spacing, sliderBounds.getCentreY());
+	mult2.setCentre(sliderBounds.getX() + 2 * spacing, sliderBounds.getCentreY());
+	mult3.setCentre(sliderBounds.getX() + 3 * spacing, sliderBounds.getCentreY());
+	mult4.setCentre(sliderBounds.getX() + 4 * spacing, sliderBounds.getCentreY());
+	mult5.setCentre(sliderBounds.getX() + 5 * spacing, sliderBounds.getCentreY());
 
 	// DRAW ICONS ====================================================================
 	int select = slider.getValue();
 	
-	drawWave0(g, wave0, select, slider);
-	drawWave1(g, wave1, select, slider);
-	drawWave2(g, wave2, select, slider);
-	drawWave3(g, wave3, select, slider);
-	drawWave4(g, wave4, select, slider);
-	drawWave5(g, wave5, select, slider);
+	g.setOpacity(1.f);
+	drawMult0(g, mult0, select, slider);
+	drawMult1(g, mult1, select, slider);
+	drawMult2(g, mult2, select, slider);
+	drawMult3(g, mult3, select, slider);
+	drawMult4(g, mult4, select, slider);
+	drawMult5(g, mult5, select, slider);
 }
 
-void MultLookAndFeel::drawWave0(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult0(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 0) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 0)
+		selected = true;
 
-	auto x =		bounds.getX();
-	auto y =		bounds.getY();
-	auto width =	bounds.getWidth();
-	auto height =	bounds.getHeight();
-	auto xC =		bounds.getCentreX();
-	auto yC =		bounds.getCentreY();
-	
-	// Draw Icon ===============================
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
-	bounds.reduce(1, 1);
+	// Draw Icon
 	g.drawImage(imageMultIcon0, bounds.toFloat());
 }
 
-void MultLookAndFeel::drawWave1(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult1(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 1) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 1)
+		selected = true;
 
-	auto x =		bounds.getX();
-	auto y =		bounds.getY();
-	auto width =	bounds.getWidth();
-	auto height =	bounds.getHeight();
-	auto xC =		bounds.getCentreX();
-	auto yC =		bounds.getCentreY();
-	
-	// Draw Icon ===============================
-	bounds.reduce(1, 1);
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
+
+	// Draw Icon
 	g.drawImage(imageMultIcon1, bounds.toFloat());
 }
 
-void MultLookAndFeel::drawWave2(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult2(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 2) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 2)
+		selected = true;
 
-	auto x =		bounds.getX();
-	auto y =		bounds.getY();
-	auto width =	bounds.getWidth();
-	auto height =	bounds.getHeight();
-	auto xC =		bounds.getCentreX();
-	auto yC =		bounds.getCentreY();
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
-	// Draw Icon ===============================
-	bounds.reduce(1, 1);
+	// Draw Icon
 	g.drawImage(imageMultIcon2, bounds.toFloat());
 }
 
-void MultLookAndFeel::drawWave3(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult3(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 3) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 3)
+		selected = true;
 
-	auto x =		bounds.getX();
-	auto y =		bounds.getY();
-	auto width =	bounds.getWidth();
-	auto height =	bounds.getHeight();
-	auto xC =		bounds.getCentreX();
-	auto yC =		bounds.getCentreY();
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
-	// Draw Icon ===============================
-	bounds.reduce(1, 1);
+	// Draw Icon
 	g.drawImage(imageMultIcon3, bounds.toFloat());
 }
 
-void MultLookAndFeel::drawWave4(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult4(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 4) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 4)
+		selected = true;
 
-	auto x = bounds.getX();
-	auto y = bounds.getY();
-	auto width = bounds.getWidth();
-	auto height = bounds.getHeight();
-	auto xC = bounds.getCentreX();
-	auto yC = bounds.getCentreY();
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
-	// Draw Icon ===============================
-	bounds.reduce(1, 1);
+	// Draw Icon
 	g.drawImage(imageMultIcon4, bounds.toFloat());
 }
 
-void MultLookAndFeel::drawWave5(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
+void MultLookAndFeel::drawMult5(juce::Graphics& g, juce::Rectangle<int> bounds, int selection, juce::Slider& slider)
 {
-	using namespace juce;
-
 	bool selected{ false };
-	if (selection == 5) selected = true;
-	drawWaveButton(g, bounds, selected, slider);
 
-	if (selected) bounds.reduce(2, 2);
+	if (selection == 5)
+		selected = true;
 
-	auto x = bounds.getX();
-	auto y = bounds.getY();
-	auto width = bounds.getWidth();
-	auto height = bounds.getHeight();
-	auto xC = bounds.getCentreX();
-	auto yC = bounds.getCentreY();
+	// Draw Icon Background
+	drawOptionButtonBackground(g, bounds, selected, slider, mode);
 
-	// Draw Icon ===============================
-	bounds.reduce(1, 1);
+	// Draw Icon
 	g.drawImage(imageMultIcon5, bounds.toFloat());
-}
-
-void MultLookAndFeel::drawWaveButton(juce::Graphics& g, juce::Rectangle<int> bounds, bool selected, juce::Slider& slider)
-{
-	using namespace AllColors::SliderColors;
-
-	auto sliderBounds = slider.getLocalBounds().toFloat();
-
-	if (slider.isEnabled())
-	{
-		switch (mode)
-		{
-		case 0: {g.setGradientFill(OPTION_SLIDER_GRADIENT_LOW(sliderBounds.toFloat()));	break; }
-		case 1: {g.setGradientFill(OPTION_SLIDER_GRADIENT_MID(sliderBounds.toFloat()));	break; }
-		case 2: {g.setGradientFill(OPTION_SLIDER_GRADIENT_HIGH(sliderBounds.toFloat())); break; }
-		}
-	}
-	else
-		g.setGradientFill(OPTION_SLIDER_GRADIENT_BYPASS(sliderBounds.toFloat()));
-
-	if (selected)
-		g.setOpacity(1.f);
-	else g.setOpacity(0.85f);
-
-	g.fillRect(bounds);
-
-	// Draw Border ==============================
-	g.setColour(selected ? juce::Colours::lightgrey : juce::Colours::darkgrey);
-	g.drawRect(bounds, 1.f);
-
-	bounds.reduce(1, 1);
-
-	g.setColour(selected ? juce::Colours::grey : juce::Colours::grey);
-	g.drawRect(bounds, 1.f);
-
-	bounds.reduce(1, 1);
-
-	g.setColour(/*selected ? juce::Colours::darkgrey : */juce::Colours::lightgrey);
-	if (selected) g.drawRect(bounds, 1.f);
 }
 
 void MultLookAndFeel::setBandMode(int bandMode)
@@ -659,14 +580,18 @@ void StandardSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int 
 	slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
 	slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
 
-	// Establish Bounds
+	// Establish Bounds Of Container (Slider & Label)
 	juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
-	//bounds.reduce(0, 2);
 
+	// Establish Bounds of Slider
 	juce::Rectangle<int> valueBounds = bounds.removeFromBottom(10).toNearestInt();
 
+	// Pixel Position of Parameter State
 	auto valuePosition = juce::jmap((sliderPos / bounds.getWidth()), bounds.getX(), bounds.getRight() - 1);
 
+	// Fill Background
+	g.setColour(juce::Colours::darkgrey);
+	g.fillRect(valueBounds);
 	// Draw Value Bar
 	juce::Rectangle<float> valueBar = { (float)valueBounds.getX(),
 										(float)valueBounds.getY(),
@@ -685,10 +610,6 @@ void StandardSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int 
 		g.setGradientFill(BASIC_SLIDER_GRADIENT_BYPASS(bounds));
 
 	g.fillRect(valueBar);
-
-	// Draw Bar Outline
-	g.setColour(juce::Colours::white);
-	g.drawRect(valueBounds);
 }
 
 void StandardSliderLookAndFeel::setBandMode(int bandMode)
@@ -708,15 +629,20 @@ void CenterSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y,
 	slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
 	slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
 
-	// Establish Bounds
+	// Establish Bounds Of Container (Slider & Label)
 	juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
-	//bounds.reduce(0, 2);
 
+	// Establish Bounds of Slider
 	juce::Rectangle<int> valueBounds = bounds.removeFromBottom(10).toNearestInt();
 
+	// Pixel Position of Parameter State
 	auto valuePosition = juce::jmap((sliderPos / bounds.getWidth()), bounds.getX(), bounds.getRight() - 1);
 
-	// Draw Value Bar
+	// Fill Background
+	g.setColour(juce::Colours::darkgrey);
+	g.fillRect(valueBounds);
+
+	// Establish Value Bar
 	juce::Path valueBar;
 	valueBar.startNewSubPath(valueBounds.getCentreX(), valueBounds.getY());
 	valueBar.lineTo(valueBounds.getCentreX(), valueBounds.getBottom());
@@ -724,20 +650,20 @@ void CenterSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y,
 	valueBar.lineTo(valuePosition, valueBounds.getY());
 	valueBar.closeSubPath();
 
+	// Fill Value Bar
 	switch (mode)
 	{
 	case 0: {g.setGradientFill(CENTER_SLIDER_GRADIENT_LOW(bounds));	break; }
 	case 1: {g.setGradientFill(CENTER_SLIDER_GRADIENT_MID(bounds));	break; }
 	case 2: {g.setGradientFill(CENTER_SLIDER_GRADIENT_HIGH(bounds)); break; }
 	}
-	g.fillPath(valueBar);
+
+	if (slider.isEnabled())
+		g.fillPath(valueBar);
 
 	// Draw Value Line
 	g.setColour(juce::Colours::white);
 	g.drawVerticalLine(valuePosition, valueBounds.getY(), valueBounds.getBottom());
-
-	// Draw Bar Outline
-	g.drawRect(valueBounds);
 }
 
 void CenterSliderLookAndFeel::setBandMode(int bandMode)
@@ -811,7 +737,7 @@ void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int w
 	g.drawLine(scrollRange, top, scrollRange, top + wheelHeight, 2.f);
 
 	// DRAW ROUNDED CORNER
-	g.setColour(juce::Colours::darkslategrey);
+	g.setColour(juce::Colours::darkgrey);
 	g.strokePath(getOutline(g, bounds, wheelHeight), juce::PathStrokeType(2.f));
 }
 

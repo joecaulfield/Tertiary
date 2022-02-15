@@ -34,14 +34,29 @@ void GainControls::paint(juce::Graphics& g)
 {
 	auto bounds = getLocalBounds();
 
+	g.drawImage(background, bounds.toFloat());
+}
+
+void GainControls::drawBackgroundImage(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	background = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
+	Graphics g(background);
+
 	// Draw the Title Bounds
-	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
+	juce::Rectangle<int> titleBounds{	bounds.getX(), 
+										bounds.getY(),
+										bounds.getWidth(), 
+										25};
 
 	// Draw the Title
 	g.setColour(juce::Colours::white);
 
 	auto myTypeface = "Helvetica";
-	auto titleFont = juce::Font(myTypeface, topBarHeight * 0.75f, juce::Font::FontStyleFlags::bold);
+	auto titleFont = juce::Font(	myTypeface, 
+									titleBounds.getHeight() * 0.85f, 
+									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
 
@@ -49,13 +64,14 @@ void GainControls::paint(juce::Graphics& g)
 	g.drawFittedText("GAIN CONTROL", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
-	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom()- bottomBarHeight, bounds.getWidth(), bottomBarHeight };
+	juce::Rectangle<int> labelBounds{	bounds.getX(), 
+										gainBarHigh.getBottom() + 3, 
+										bounds.getWidth(), 
+										bounds.getBottom() - gainBarHigh.getBottom()};
 
 	// Set Font Height For Sub-Labels
 	g.setFont(16);
 
-	//g.setColour(juce::Colours::white);
-	
 	// Draw Parameter Labels: Gain ======================
 	juce::Rectangle<int> gainLabelBounds{	gainBarHigh.sliderGain.getX(), 
 											labelBounds.getY(), 
@@ -87,6 +103,35 @@ void GainControls::paint(juce::Graphics& g)
 											labelBounds.getHeight() };
 
 	g.drawFittedText("S", soloLabelBounds, juce::Justification::centred, 1);
+
+	// Setup Gradient For Division Lines ======================
+	float p1 = 0.2f;
+	float p2 = 0.8f;
+
+	auto gradient = ColourGradient(	juce::Colours::black,
+									bounds.getBottomLeft().toFloat(),
+									juce::Colours::black,
+									bounds.getBottomRight().toFloat(), false);
+
+	gradient.addColour(p1, juce::Colours::white);
+	gradient.addColour(p2, juce::Colours::white);
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.5f);
+
+	// Draw Division Lines ======================
+
+	auto center = (titleBounds.getBottom() + gainBarLow.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (gainBarLow.getBottom() + gainBarMid.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (gainBarMid.getBottom() + gainBarHigh.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (gainBarHigh.getBottom() + labelBounds.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
 }
 
 void GainControls::resized()
@@ -95,14 +140,20 @@ void GainControls::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(topBarHeight);
-	bounds.removeFromBottom(bottomBarHeight);
+	// Margins For Labels
+	int topBarHeight = 25;
+	int bottomBarHeight = 20;
+
+	// Bounds In Which FlexBox is Performed
+	auto flexBounds = bounds;
+	flexBounds.removeFromTop(topBarHeight);
+	flexBounds.removeFromBottom(bottomBarHeight);
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-	auto spacer = FlexItem().withHeight(2);
+	auto spacer = FlexItem().withFlex(1.f);
 
 	flexBox.items.add(spacer);
 	flexBox.items.add(FlexItem(gainBarLow).withHeight(30));
@@ -112,7 +163,10 @@ void GainControls::resized()
 	flexBox.items.add(FlexItem(gainBarHigh).withHeight(30));
 	flexBox.items.add(spacer);
 
-	flexBox.performLayout(bounds);
+	flexBox.performLayout(flexBounds);
+
+	// Draw Background Image, Control Labels
+	drawBackgroundImage(bounds);
 }
 
 void GainControls::makeAttachments()

@@ -24,7 +24,6 @@ struct FrequencyResponse : juce::Component,
 	FrequencyResponse(juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
 
 	void paint(juce::Graphics& g) override;
-	//void drawBorder(juce::Graphics& g);
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color) {};
 
 	void sliderValueChanged(juce::Slider* slider) override;

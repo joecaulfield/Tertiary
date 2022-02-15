@@ -32,14 +32,29 @@ void TimingControls::paint(juce::Graphics& g)
 {
 	auto bounds = getLocalBounds();
 
+	g.drawImage(background, bounds.toFloat());
+}
+
+void TimingControls::drawBackgroundImage(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	background = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
+	Graphics g(background);
+
 	// Draw the Title Bounds
-	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
+	juce::Rectangle<int> titleBounds{	bounds.getX(), 
+										bounds.getY(),
+										bounds.getWidth(), 
+										25};
 
 	// Draw the Title
 	g.setColour(juce::Colours::white);
 
 	auto myTypeface = "Helvetica";
-	auto titleFont = juce::Font(myTypeface, topBarHeight * 0.75f, juce::Font::FontStyleFlags::bold);
+	auto titleFont = juce::Font(	myTypeface, 
+									titleBounds.getHeight() * 0.85f, 
+									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
 
@@ -47,7 +62,10 @@ void TimingControls::paint(juce::Graphics& g)
 	g.drawFittedText("WAVE TIMING", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
-	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
+	juce::Rectangle<int> labelBounds{	bounds.getX(), 
+										timingBarHigh.getBottom() + 3, 
+										bounds.getWidth(), 
+										bounds.getBottom() - timingBarHigh.getBottom()};
 
 	// Set Font Height For Sub-Labels
 	g.setFont(16);
@@ -69,29 +87,21 @@ void TimingControls::paint(juce::Graphics& g)
 											timingBarHigh.sliderMultuplier.getWidth(),
 											labelBounds.getHeight() };
 
-	// VERTICAL LINE
-	g.drawVerticalLine(	timingBarLow.sliderMultuplier.getX(),
-						labelBounds.getY(),
-						labelBounds.getCentreY());
-
-	// HORIZONTAL LINE
-	g.drawHorizontalLine(	labelBounds.getCentreY(),
-							timingBarLow.sliderMultuplier.getX(),
-							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) - 40);
-	
 	// LABEL
 	g.drawFittedText("RHYTHM", multLabelBounds, juce::Justification::centred, 1);
 
-	// HORIZONTAL LINE
+	// HORIZONTAL LINES
+	g.setOpacity(0.25f);
+
+	g.drawHorizontalLine(	labelBounds.getCentreY(),
+							timingBarLow.sliderMultuplier.getX(),
+							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) - 40);
+
 	g.drawHorizontalLine(	labelBounds.getCentreY(),
 							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) + 40,
 							timingBarLow.sliderMultuplier.getRight());
 
-	// VERTICAL LINE
-	g.drawVerticalLine(	timingBarLow.sliderMultuplier.getRight(),
-						labelBounds.getY(),
-						labelBounds.getCentreY());
-
+	g.setOpacity(1.0f);
 
 	// Draw Parameter Labels: Rate ======================
 	juce::Rectangle<int> rateLabelBounds{	timingBarHigh.sliderRate.getX(),
@@ -108,6 +118,35 @@ void TimingControls::paint(juce::Graphics& g)
 											labelBounds.getHeight() };
 
 	g.drawFittedText("PHASE", phaseLabelBounds, juce::Justification::centred, 1);
+
+	// Setup Gradient For Division Lines ======================
+	float p1 = 0.2f;
+	float p2 = 0.8f;
+
+	auto gradient = ColourGradient(	juce::Colours::black,
+									bounds.getBottomLeft().toFloat(),
+									juce::Colours::black,
+									bounds.getBottomRight().toFloat(), false);
+
+	gradient.addColour(p1, juce::Colours::white);
+	gradient.addColour(p2, juce::Colours::white);
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.5f);
+
+	// Draw Division Lines ======================
+
+	auto center = (titleBounds.getBottom() + timingBarLow.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (timingBarLow.getBottom() + timingBarMid.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (timingBarMid.getBottom() + timingBarHigh.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (timingBarHigh.getBottom() + labelBounds.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
 }
 
 void TimingControls::resized()
@@ -116,14 +155,20 @@ void TimingControls::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(topBarHeight);
-	bounds.removeFromBottom(bottomBarHeight);
+	// Margins For Labels
+	int topBarHeight = 25;
+	int bottomBarHeight = 20;
+
+	// Bounds In Which FlexBox is Performed
+	auto flexBounds = bounds;
+	flexBounds.removeFromTop(topBarHeight);
+	flexBounds.removeFromBottom(bottomBarHeight);
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-	auto spacer = FlexItem().withHeight(2);
+	auto spacer = FlexItem().withFlex(1.f);
 
 	flexBox.items.add(spacer);
 	flexBox.items.add(FlexItem(timingBarLow).withHeight(30));
@@ -133,7 +178,10 @@ void TimingControls::resized()
 	flexBox.items.add(FlexItem(timingBarHigh).withHeight(30));
 	flexBox.items.add(spacer);
 
-	flexBox.performLayout(bounds);
+	flexBox.performLayout(flexBounds);
+
+	// Draw Background Image, Control Labels
+	drawBackgroundImage(bounds);
 }
 
 void TimingControls::makeAttachments()

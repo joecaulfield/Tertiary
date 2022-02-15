@@ -26,6 +26,8 @@ struct WaveControls : juce::Component
 
 	void makeAttachments();
 
+	void drawBackgroundImage(juce::Rectangle<int> bounds);
+
 	WaveBar waveBarLow,
 			waveBarMid,
 			waveBarHigh;
@@ -51,6 +53,8 @@ private:
 										invertMidAttachment,
 										invertHighAttachment;
 
-	int topBarHeight{ 25 };
-	int bottomBarHeight{ 25 };
+	//int topBarHeight{ 25 };
+	//int bottomBarHeight{ 25 };
+
+	juce::Image background;
 };

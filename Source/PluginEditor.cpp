@@ -18,7 +18,8 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 	addAndMakeVisible(oscilloscope);		// Time-Domain LFO Display
 
 	addMouseListener(this, true);
-    setSize (800, 580);
+    //setSize (800, 580);
+	setSize(800, 625);
 
 	// TITLE LABEL =============================================================
 	pluginTitle.setJustificationType(juce::Justification::centred);
@@ -49,11 +50,11 @@ void TertiaryAudioProcessorEditor::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(35);	// Title Area
+	bounds.removeFromTop(50);	// Title Area
 	bounds.removeFromLeft(5);	// Left Padding
 	bounds.removeFromRight(5);	// Right Padding
 
-	pluginTitle.setSize(250, 35);
+	pluginTitle.setSize(250, 50);
 	pluginTitle.setCentrePosition(bounds.getCentreX(), bounds.getY() / 2.f);
 
 	// Flexbox to Wrap Oscilloscope and FrequencyResponse

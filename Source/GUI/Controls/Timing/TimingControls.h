@@ -22,6 +22,8 @@ struct TimingControls : juce::Component/*, juce::Timer, juce::MouseListener*/
 
 	void paint(juce::Graphics& g) override;
 
+	void drawBackgroundImage(juce::Rectangle<int> bounds);
+
 	void resized() override;
 
 	void makeAttachments();
@@ -51,6 +53,8 @@ private:
 										syncMidAttachment,
 										syncHighAttachment;
 	
-	int topBarHeight{ 25 };
-	int bottomBarHeight{ 25 };
+	//int topBarHeight{ 25 };
+	//int bottomBarHeight{ 25 };
+
+	juce::Image background;
 };

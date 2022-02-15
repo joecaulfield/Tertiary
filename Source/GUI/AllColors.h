@@ -34,7 +34,6 @@ namespace AllColors
 		inline float gStep4 = 0.9f;
 
 		// Gradient Color-Scheme For "Low" Color-Coding
-			//inline Colour GRADIENT_LOW_1()		{ return	colorHelper(juce::Colours::green); }
 		inline Colour GRADIENT_LOW_1()		{ return	Colour(0xff1fcd1f); }
 		inline Colour GRADIENT_LOW_2()		{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep1);  }
 		inline Colour GRADIENT_LOW_3()		{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep2);  }
@@ -42,7 +41,6 @@ namespace AllColors
 		inline Colour REGION_BORDER_LOW()	{ return	GRADIENT_LOW_1().withMultipliedBrightness(gStep4);  }
 
 		// Gradient Color-Scheme For "Mid" Color-Coding ========
-			//inline Colour GRADIENT_MID_1()		{ return	colorHelper(juce::Colours::purple); }
 		inline Colour GRADIENT_MID_1()		{ return	Colour(0xffc420c4); }
 		inline Colour GRADIENT_MID_2()		{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep1);  }
 		inline Colour GRADIENT_MID_3()		{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep2);  }
@@ -50,7 +48,6 @@ namespace AllColors
 		inline Colour REGION_BORDER_MID()	{ return	GRADIENT_MID_1().withMultipliedBrightness(gStep4);  }
 
 		// Gradient Color-Scheme For "High" Color-Coding ========
-			//inline Colour GRADIENT_HIGH_1()		{ return	colorHelper(juce::Colours::blue); }
 		inline Colour GRADIENT_HIGH_1()		{ return	Colour(0xff4871f4); }
 		inline Colour GRADIENT_HIGH_2()		{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep1); }
 		inline Colour GRADIENT_HIGH_3()		{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep2); }
@@ -58,7 +55,6 @@ namespace AllColors
 		inline Colour REGION_BORDER_HIGH()	{ return	GRADIENT_HIGH_1().withMultipliedBrightness(gStep4); }
 
 		// Gradient Color-Scheme For "Bypass" Color-Coding ========
-			//inline Colour GRADIENT_BYPASS_1()		{ return	colorHelper(juce::Colours::grey); }
 		inline Colour GRADIENT_BYPASS_1()		{ return	Colour(0xff808080); }
 		inline Colour GRADIENT_BYPASS_2()		{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep1); }
 		inline Colour GRADIENT_BYPASS_3()		{ return	GRADIENT_BYPASS_1().withMultipliedBrightness(gStep2); }
@@ -145,16 +141,18 @@ namespace AllColors
 		// LOW
 		inline ColourGradient CENTER_SLIDER_GRADIENT_LOW(Rectangle<float> bounds)
 		{
-			float p1 = 0.25f;
+			float p1 = 0.2f;
 			float p2 = 0.5f;
+			float p3 = 0.8f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_LOW_1(),
-											bounds.getBottomLeft(),
-											BandColors::GRADIENT_LOW_2(),
-											bounds.getTopRight(), false);
+											bounds.getTopLeft(),
+											BandColors::GRADIENT_LOW_1(),
+											bounds.getBottomRight(), false);
 
-			gradient.addColour(p1, BandColors::GRADIENT_LOW_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_LOW_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_LOW_4());
+			gradient.addColour(p2, BandColors::GRADIENT_LOW_3());
+			gradient.addColour(p3, BandColors::GRADIENT_LOW_4());
 
 			return gradient;
 		}
@@ -162,16 +160,18 @@ namespace AllColors
 		// MID
 		inline ColourGradient CENTER_SLIDER_GRADIENT_MID(Rectangle<float> bounds)
 		{
-			float p1 = 0.33f;
-			float p2 = 0.66;
+			float p1 = 0.2f;
+			float p2 = 0.5f;
+			float p3 = 0.8f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1(),
-											bounds.getCentreX(), bounds.getBottom(),
-											BandColors::GRADIENT_MID_2(),
-											bounds.getCentreX(), bounds.getY(), false);
+											bounds.getTopLeft(),
+											BandColors::GRADIENT_MID_1(),
+											bounds.getBottomRight(), false);
 
-			gradient.addColour(p1, BandColors::GRADIENT_MID_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_MID_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_MID_4());
+			gradient.addColour(p2, BandColors::GRADIENT_MID_3());
+			gradient.addColour(p3, BandColors::GRADIENT_MID_4());
 
 			return gradient;
 		}
@@ -179,16 +179,18 @@ namespace AllColors
 		// HIGH
 		inline ColourGradient CENTER_SLIDER_GRADIENT_HIGH(Rectangle<float> bounds)
 		{
-			float p1 = 0.25f;
+			float p1 = 0.2f;
 			float p2 = 0.5f;
+			float p3 = 0.8f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_HIGH_1(),
-											bounds.getBottomRight(),
-											BandColors::GRADIENT_HIGH_2(),
-											bounds.getTopLeft(), false);
+											bounds.getTopLeft(),
+											BandColors::GRADIENT_HIGH_1(),
+											bounds.getBottomRight(), false);
 
-			gradient.addColour(p1, BandColors::GRADIENT_HIGH_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_HIGH_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_HIGH_4());
+			gradient.addColour(p2, BandColors::GRADIENT_HIGH_3());
+			gradient.addColour(p3, BandColors::GRADIENT_HIGH_4());
 
 			return gradient;
 		}
@@ -196,35 +198,39 @@ namespace AllColors
 		// BYPASS
 		inline ColourGradient CENTER_SLIDER_GRADIENT_BYPASS(Rectangle<float> bounds)
 		{
-			float p1 = 0.25f;
+			float p1 = 0.2f;
 			float p2 = 0.5f;
+			float p3 = 0.8f;
 
-			auto gradient = ColourGradient(	BandColors::GRADIENT_BYPASS_3(),
-											bounds.getBottomRight(),
-											BandColors::GRADIENT_BYPASS_4(),
-											bounds.getTopLeft(), false);
+			auto gradient = ColourGradient(	BandColors::GRADIENT_BYPASS_1(),
+											bounds.getTopLeft(),
+											BandColors::GRADIENT_BYPASS_1(),
+											bounds.getBottomRight(), false);
 
-			gradient.addColour(p1, BandColors::GRADIENT_BYPASS_1());
-			gradient.addColour(p2, BandColors::GRADIENT_BYPASS_1());
+			gradient.addColour(p1, BandColors::GRADIENT_BYPASS_4());
+			gradient.addColour(p2, BandColors::GRADIENT_BYPASS_3());
+			gradient.addColour(p3, BandColors::GRADIENT_BYPASS_4());
 
 			return gradient;
 		}
 
-		// Multi-Select Sliders =================================================================
+		// Option-Select Sliders =================================================================
 
 		// LOW
 		inline ColourGradient OPTION_SLIDER_GRADIENT_LOW(Rectangle<float> bounds)
 		{
 			float p1 = 0.25f;
-			float p2 = 0.5f;
+			float p2 = 0.25f;
+			float p3 = 0.75f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_LOW_1(),
 											bounds.getBottomLeft(),
-											BandColors::GRADIENT_LOW_2(),
-											bounds.getTopRight(), false);
+											BandColors::GRADIENT_LOW_1(),
+											bounds.getTopRight(), true);
 
-			gradient.addColour(p1, BandColors::GRADIENT_LOW_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_LOW_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_LOW_4());
+			gradient.addColour(p2, BandColors::GRADIENT_LOW_3());
+			gradient.addColour(p1, BandColors::GRADIENT_LOW_4());
 
 			return gradient;
 		}
@@ -232,16 +238,17 @@ namespace AllColors
 		// MID
 		inline ColourGradient OPTION_SLIDER_GRADIENT_MID(Rectangle<float> bounds)
 		{
-			float p1 = 0.33f;
-			float p2 = 0.66;
+			float p1 = 0.25f;
+			float p2 = 0.5f;
 
-			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1(),
+			// Not A Typo (Gradient 1 Used Twice)
+			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1().withMultipliedBrightness(1.5f),
 											bounds.getCentreX(), bounds.getBottom(),
-											BandColors::GRADIENT_MID_2(),
-											bounds.getCentreX(), bounds.getY(), false);
+											BandColors::GRADIENT_MID_1().withMultipliedBrightness(1.5f),
+											bounds.getCentreX(), bounds.getY(), true);
 
-			gradient.addColour(p1, BandColors::GRADIENT_MID_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_MID_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_MID_3().withMultipliedBrightness(1.5f));
+			gradient.addColour(p2, BandColors::GRADIENT_MID_4().withMultipliedBrightness(1.5f));
 
 			return gradient;
 		}
@@ -252,13 +259,14 @@ namespace AllColors
 			float p1 = 0.25f;
 			float p2 = 0.5f;
 
-			auto gradient = ColourGradient(	BandColors::GRADIENT_HIGH_1(),
+			// Not A Typo (Gradient 1 Used Twice)
+			auto gradient = ColourGradient(	BandColors::GRADIENT_HIGH_1().withMultipliedBrightness(1.5f),
 											bounds.getBottomRight(),
-											BandColors::GRADIENT_HIGH_2(),
-											bounds.getTopLeft(), false);
+											BandColors::GRADIENT_HIGH_1().withMultipliedBrightness(1.5f),
+											bounds.getTopLeft(), true);
 
-			gradient.addColour(p1, BandColors::GRADIENT_HIGH_3().withBrightness(1.25f));
-			gradient.addColour(p2, BandColors::GRADIENT_HIGH_4().withBrightness(1.25f));
+			gradient.addColour(p1, BandColors::GRADIENT_HIGH_3().withMultipliedBrightness(1.5f));
+			gradient.addColour(p2, BandColors::GRADIENT_HIGH_4().withMultipliedBrightness(1.5f));
 
 			return gradient;
 		}
@@ -269,13 +277,14 @@ namespace AllColors
 			float p1 = 0.25f;
 			float p2 = 0.5f;
 
-			auto gradient = ColourGradient(	BandColors::GRADIENT_BYPASS_3(),
+			// Not A Typo (Gradient 1 Used Twice)
+			auto gradient = ColourGradient(	BandColors::GRADIENT_BYPASS_1().withMultipliedBrightness(1.5f),
 											bounds.getBottomRight(),
-											BandColors::GRADIENT_BYPASS_4(),
-											bounds.getTopLeft(), false);
+											BandColors::GRADIENT_BYPASS_1().withMultipliedBrightness(1.5f),
+											bounds.getTopLeft(), true);
 
-			gradient.addColour(p1, BandColors::GRADIENT_BYPASS_1());
-			gradient.addColour(p2, BandColors::GRADIENT_BYPASS_2());
+			gradient.addColour(p1, BandColors::GRADIENT_BYPASS_3().withMultipliedBrightness(1.5f));
+			gradient.addColour(p2, BandColors::GRADIENT_BYPASS_4().withMultipliedBrightness(1.5f));
 
 			return gradient;
 		}

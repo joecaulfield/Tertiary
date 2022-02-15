@@ -184,8 +184,6 @@ void FrequencyResponse::paint(juce::Graphics& g)
 	}
 
 	paintBorder(g, juce::Colours::purple, bounds);
-
-	//drawBorder(g);
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -201,6 +199,7 @@ void FrequencyResponse::drawGridVertical(juce::Graphics& g)
 		float x = responseArea.getX() + responseArea.getWidth() * mapLog2(freqs[i]);
 
 		g.setColour(Colours::lightgrey);
+		g.setOpacity(0.35f);
 		g.drawVerticalLine(x, responseArea.getY(), responseArea.getBottom());
 
 		String strFreq;
@@ -235,7 +234,8 @@ void FrequencyResponse::drawGridHorizontal(juce::Graphics& g)
 	{
 		auto y = responseArea.getY() + jmap(gain[i], gMin, gMax, float(responseArea.getBottom()), responseArea.getY());
 
-		g.setColour(gain[i] == 0.f ? Colours::green : Colours::lightgrey);
+		g.setColour(juce::Colours::lightgrey);
+		g.setOpacity(0.35f);
 		g.drawHorizontalLine(y, responseArea.getX(), responseArea.getRight());
 
 		String strGain;
@@ -366,52 +366,6 @@ void FrequencyResponse::drawHighRegion(juce::Graphics& g, juce::Rectangle<float>
 	}
 }
 
-// Draw master border around window
-//void FrequencyResponse::drawBorder(juce::Graphics& g)
-//{
-//	// DRAW BORDER ====================
-//	auto bounds = getLocalBounds();
-//
-//	juce::Rectangle<float> border;
-//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-//				bounds.getWidth(), bounds.getHeight());
-//
-//	g.setColour(juce::Colours::white);
-//	g.drawRoundedRectangle(border, 3.f, 3.f);
-//	// =====
-//
-//	bounds.reduce(1, 1);
-//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-//
-//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-//		bounds.getWidth(), bounds.getHeight());
-//
-//	g.setColour(juce::Colours::lightgrey);
-//	g.drawRoundedRectangle(border, 2.f, 2.f);
-//	// =====
-//
-//	bounds.reduce(1, 1);
-//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-//
-//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-//		bounds.getWidth(), bounds.getHeight());
-//
-//	g.setColour(juce::Colours::grey);
-//	g.drawRoundedRectangle(border, 2.f, 2.f);
-//	// =====
-//
-//	bounds.reduce(1, 1);
-//	bounds.setCentre(getWidth() / 2, getHeight() / 2);
-//
-//	border.setBounds(bounds.getTopLeft().x, bounds.getTopLeft().y,
-//		bounds.getWidth(), bounds.getHeight());
-//
-//	g.setColour(juce::Colours::darkgrey);
-//	g.drawRoundedRectangle(border, 2.f, 2.f);
-//	// =====
-//
-//}
-
 // Called on Component Resize
 void FrequencyResponse::resized()
 {
@@ -487,14 +441,14 @@ void FrequencyResponse::updateResponse()
 	freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
 	freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
-	// Use pixel values as path bounds
+	// Set Low-Mid Crossover Cursor Bounds
 	cursorLM.setStart(freq1Pixel, responseArea.getY() + 1);
 	cursorLM.setEnd(freq1Pixel, responseArea.getBottom() - 1);
 
 	cursorMH.setStart(freq2Pixel, responseArea.getY() + 1);
 	cursorMH.setEnd(freq2Pixel, responseArea.getBottom() - 1);
 
-	// Get band gain parameter values
+	// Set Mid-High Crossover Cursor Bounds
 	mLowGain = *apvts.getRawParameterValue(params.at(Names::Gain_Low_Band));
 	mMidGain = *apvts.getRawParameterValue(params.at(Names::Gain_Mid_Band));
 	mHighGain = *apvts.getRawParameterValue(params.at(Names::Gain_High_Band));
@@ -509,33 +463,35 @@ void FrequencyResponse::updateResponse()
 	auto midWidth = (freq2Pixel - freq1Pixel) * 0.75f;
 	auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.75f;
 
-	// Set Low Cursor Bounds
+	// Set Low-Gain Cursor Bounds
 	auto center = (responseArea.getX() + freq1Pixel) / 2.f;
 
 	cursorLG.setStart	(center - lowWidth / 2.f, gainLowPixel);
 	cursorLG.setEnd		(center + lowWidth / 2.f, gainLowPixel);
 
-	// Set Mid Cursor Bounds
+	// Set Mid-Gain Cursor Bounds
 	center = (freq1Pixel + freq2Pixel) / 2.f;
 	
 	cursorMG.setStart	(center - midWidth / 2.f, gainMidPixel);
 	cursorMG.setEnd		(center + midWidth / 2.f, gainMidPixel);
 
-	// Set High Cursor Bounds
+	// Set High-Gain Cursor Bounds
 	center = (freq2Pixel + responseArea.getRight()) / 2.f;
 
 	cursorHG.setStart	(center - highWidth / 2.f, gainHighPixel);
 	cursorHG.setEnd		(center + highWidth / 2.f, gainHighPixel);
 
-	// Update band bypass/solo/mute states
+	// Update Band Bypass States
 	lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
 	midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
 	highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
 
+	// Update Band Solo States
 	lowBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Low_Band));
 	midBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Mid_Band));
 	highBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_High_Band));
 
+	// Update Band Mute States
 	lowBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Low_Band));
 	midBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Mid_Band));
 	highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
