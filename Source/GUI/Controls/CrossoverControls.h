@@ -27,6 +27,8 @@ struct CrossoverControls :	juce::Component,
 	void paint(juce::Graphics& g) override;
 	void resized() override;
 
+	void drawBackgroundImage(juce::Rectangle<int> bounds);
+
 	void sliderValueChanged(juce::Slider* slider) override;
 	void labelTextChanged(juce::Label* labelThatHasChanged) override;
 	void makeAttachments();
@@ -52,6 +54,5 @@ private:
 
 	juce::Label sliderValueLM, sliderValueMH;
 
-	int topBarHeight{ 25 };
-	int bottomBarHeight{ 25 };
+	juce::Image background;
 };

@@ -17,6 +17,67 @@
 #include "../../GUI/AllColors.h"
 #include "../UtilityFunctions.h"
 
+struct ScrollPad : juce::Component, juce::MouseListener, juce::Slider::Listener
+{
+public:
+
+	ScrollPad();
+	~ScrollPad();
+
+	//void mouseUp(const juce::MouseEvent& event) override;
+	void mouseDown(const juce::MouseEvent& event) override;
+	//void mouseMove(const juce::MouseEvent& event) override;
+	void mouseDrag(const juce::MouseEvent& event) override;
+	void mouseDoubleClick(const juce::MouseEvent& event) override;
+	//void mouseDoubleClick(const juce::MouseEvent& event) override;
+
+	void paint(juce::Graphics& g) override;
+	void resized();
+
+	juce::Slider slider;
+
+	void sliderValueChanged(juce::Slider* slider);
+
+	void calculateZoomFactor();
+
+	float getCenter();
+	float getZoom() { return zoomFactor; }
+
+private:
+	float point1;	// Value & Position of Left Thumb
+	float point2;	// Value & Position of Right Thumb
+	float p01, p02;
+
+
+
+
+	bool leftHit{ false }, rightHit{ false }, midHit{ false };
+
+	float xDown, x0, x1;		// Determines Mouse Movement, X-Direction
+	float yDown, y0, y1;		// Determines Mouse Movement, Y-Direction
+
+	bool shouldUpdatePoint1, shouldUpdatePoint2, shouldCheckPanOrZoom;
+
+	//bool isPanning{ false };
+
+	int center;
+	int minWidth{ 80 };
+	int defaultWidth{ 160 };
+	float currentWidth { 100 };	// Rename to currentWidth
+	int maxWidth{ 360 };
+
+	float zoomFactor{ 1.f };
+
+	int thumbTolerance = 75;
+	//int edgeTolerance = 10;
+
+	//float panScale{ 1 };
+	int zoomScale{ 1 };
+
+	float zoomIncrement = 20;
+	//float panIncrement = 10;
+};
+
 struct Oscilloscope :	juce::Component,
 						juce::Timer, 
 						juce::MouseListener
@@ -28,17 +89,24 @@ struct Oscilloscope :	juce::Component,
 	void paintOverChildren(juce::Graphics& g) override;
 
 	//void drawBorder(juce::Graphics& g);
-	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color);
+	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds);
 
 	void drawLowLFO (juce::Rectangle<int> bounds);
 	void drawMidLFO (juce::Rectangle<int> bounds);
 	void drawHighLFO(juce::Rectangle<int> bounds);
 
+	void drawLFO(	juce::Rectangle<int> bounds,
+					juce::Path &lfoStrokePath,
+					juce::Path &lfoFillPath,
+					juce::Array<float>& waveTable,
+					bool showBand,
+					LFO lfo);
+
 	void resized() override;
 
 	void timerCallback() override;
 
-	void mouseEnter(const juce::MouseEvent& event) override;
+	void mouseEnter(const juce::MouseEvent& event) override {};
 	void mouseExit(const juce::MouseEvent& event) override;
 	void mouseDown(const juce::MouseEvent& event) override;
 	void mouseUp(const juce::MouseEvent& event) override;
@@ -50,6 +118,15 @@ struct Oscilloscope :	juce::Component,
 	void checkFocus();
 	void checkMousePosition();
 	void updateRegions();
+
+	void getPlayheadPosition();
+
+	void getWavesForDisplay();
+	juce::Array<float> scaleWaveAmplitude(juce::Array<float> waveTable, LFO lfo);
+	juce::Array<float> addWavePhaseShift(juce::Array<float> waveTable, LFO lfo);
+	juce::Array<float> scaleWaveTime(juce::Array<float> waveTable, LFO lfo);
+
+	float playHeadPositionPixel;
 
 	void drawStackedScope();
 
@@ -70,18 +147,28 @@ struct Oscilloscope :	juce::Component,
 						toggleShowHigh, 
 						toggleStackBands;
 
-	juce::Slider sliderScroll;
+	//juce::Slider sliderScroll;
+	ScrollPad sliderScroll;
 
 	juce::AudioParameterBool* showLowBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showMidBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showHighBand{ nullptr };      // Pointer to the APVTS
 	juce::AudioParameterBool* stackBands{ nullptr };        // Pointer to the APVTS
 
+	juce::AudioParameterFloat* displayPhase{ nullptr };
+	float mDisplayPhase = 0.f;
+
 private:
 
 	LFO& lowLFO;
 	LFO& midLFO;
 	LFO& highLFO;
+
+	int timerCounter = 0;
+
+	juce::Array<float> waveTableLow;
+	juce::Array<float> waveTableMid;
+	juce::Array<float> waveTableHigh;
 
 	juce::Rectangle<int> lowRegion, midRegion, highRegion, scopeRegion;
 	juce::Path lowPath, midPath, highPath;
@@ -122,3 +209,21 @@ private:
 
 	float numDepthLines{ 1 };
 };
+
+
+
+/*
+
+
+		dragX = event.getPosition().getX() / (float)getWidth();
+
+		if (event.getPosition().getX() < margin)
+			dragX = margin / (float)getWidth();
+
+		if (event.getPosition().getX() > (float)getWidth() - margin)
+			dragX = ((float)getWidth() - margin) / getWidth();
+
+
+
+
+*/

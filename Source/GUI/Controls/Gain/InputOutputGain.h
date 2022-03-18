@@ -33,6 +33,8 @@ struct InputOutputGain : juce::Component, juce::Timer
 
 	void getLevels();
 
+	juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness);
+
 private:
 
 	float leftLevel = -60.f;
@@ -41,17 +43,17 @@ private:
 	float rightLevelPixel;
 
 	// Grill Drawing Parameters
-	int margin = 10;			// Amount of Pixels removed from Top/Bottom before grill
-	int spacing = 10;			// Vertical Distance between LEDs
-	float ledWidth = 17;
-	float ledHeight = 6;
+	int margin = 0;			// Amount of Pixels removed from Top/Bottom before grill
+	int spacing = 5;			// Vertical Distance between LEDs
+	float ledWidth = 18;
+	float ledHeight = 3;
 	juce::Array<float> ledThresholds;
 
 	juce::Rectangle<float> leftBounds, rightBounds;
 
 	juce::String pickOffPoint = "NA"; // 0 = INPUT, 1 = OUTPUT
 
-	juce::ColourGradient gradient{};
+	juce::ColourGradient ledOffGradient, ledOnGradient{};
 
 	juce::Image grill;
 };

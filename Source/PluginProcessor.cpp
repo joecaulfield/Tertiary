@@ -106,10 +106,6 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
     boolHelper(highLFO.syncToHost,          Names::Sync_High_LFO);
     choiceHelper(highLFO.multiplier,        Names::Multiplier_High_LFO);
 
-	floatHelper(lowLFO.displayPhase,		Names::Scope_Scroll);
-	floatHelper(midLFO.displayPhase,		Names::Scope_Scroll);
-	floatHelper(highLFO.displayPhase,		Names::Scope_Scroll);
-
 	// Refactor - Optimize into a For Loop
 	apvts.addParameterListener(params.at(Names::Input_Gain), this);
 	apvts.addParameterListener(params.at(Names::Output_Gain), this);
@@ -242,6 +238,8 @@ void TertiaryAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     spec.numChannels = getTotalNumOutputChannels(); // Define the Maximum Number of Channels the Comp will use
     spec.sampleRate = sampleRate;                   // Define the Sample Rate
 
+	lastSampleRate = getSampleRate();
+
     inputGain.prepare(spec);    // Pass spec information into Input Gain
     outputGain.prepare(spec);   // Pass spec information into Output Gain
 
@@ -364,14 +362,10 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // Get Host PlayHead for BPM Sync ===========================
     playHead = this->getPlayHead();
 
-    if (playHead != nullptr)
-    {
-        playHead->getCurrentPosition(hostInfo);
-    }
-    else
-    {
+	playPosition = hostInfo.ppqPosition;
 
-    }
+    if (playHead != nullptr)
+        playHead->getCurrentPosition(hostInfo);
 
 	// Clear Input Buffers
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
@@ -458,7 +452,6 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             highWriteR[sample] *= mGainHighLFO;
         }
     }
-
 
     for (size_t i = 0; i < filterBuffers.size(); ++i)   // size_t is an unsigned int that is the result of the sizeof operator
     {
@@ -712,25 +705,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
     // LFO RATE PARAMETER ====================================================================================================================
 
-    auto rateRange = NormalisableRange<float> ( 0.05,                                           // Start
-                                                12.5,                                           // Stop
-                                                0.25f,                                          // Step Size
+    auto rateRange = NormalisableRange<float> ( 0.5f,											// Start
+                                                12.5f,                                           // Stop
+                                                0.25f,											// Step Size
                                                 1.f);                                           // Skew
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_Low_LFO),         // Parameter ID
                                                         params.at(Names::Rate_Low_LFO),         // Parameter Name
                                                         rateRange,                              // Range
-                                                        3.00));                                 // Default Value
+                                                        3.f));                                 // Default Value
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_Mid_LFO),         // Parameter ID
                                                         params.at(Names::Rate_Mid_LFO),         // Parameter Name
                                                         rateRange,                              // Range
-                                                        3.00));                                 // Default Value
+                                                        3.f));                                 // Default Value
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_High_LFO),         // Parameter ID
                                                         params.at(Names::Rate_High_LFO),         // Parameter Name
                                                         rateRange,                              // Range
-                                                        3.00));                                 // Default Value
+                                                        3.f));                                 // Default Value
 
     // LFO MULTIPLIER PARAMETER ====================================================================================================================
 
@@ -896,8 +889,8 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
 
 	// If we update 'Sync To Host', reset the phase of all
 	// LFOs so they remain in phase with each other.
-    if (parameterID == params.at(Names::Sync_Low_LFO) || 
-        parameterID == params.at(Names::Sync_Mid_LFO) ||
+    if (parameterID == params.at(Names::Sync_Low_LFO)  || 
+        parameterID == params.at(Names::Sync_Mid_LFO)  ||
         parameterID == params.at(Names::Sync_High_LFO))
     {
         lowLFO.phase = 0;

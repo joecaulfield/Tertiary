@@ -31,8 +31,8 @@ CrossoverControls::CrossoverControls(juce::AudioProcessorValueTreeState& apv)
 
 	// Initialize Low-Mid Cutoff Label =======
 	sliderValueLM.setEditable(false, true);
-	sliderValueLM.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white);
-	sliderValueLM.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
+	sliderValueLM.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
+	sliderValueLM.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
 	sliderValueLM.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::darkblue);
 	sliderValueLM.setJustificationType(juce::Justification::centred);
 	sliderValueLM.addListener(this);
@@ -40,8 +40,8 @@ CrossoverControls::CrossoverControls(juce::AudioProcessorValueTreeState& apv)
 
 	// Initialize Mid-High Cutoff Label =======
 	sliderValueMH.setEditable(false, true);
-	sliderValueMH.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::white);
-	sliderValueMH.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
+	sliderValueMH.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
+	sliderValueMH.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
 	sliderValueMH.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::darkblue);
 	sliderValueMH.setJustificationType(juce::Justification::centred);
 	sliderValueMH.addListener(this);
@@ -62,47 +62,11 @@ CrossoverControls::~CrossoverControls()
 
 void CrossoverControls::paint(juce::Graphics& g)
 {
-	//drawBorder(g);
+	using namespace juce;
 
 	auto bounds = getLocalBounds();
 
-	// Draw the Title Bounds
-	juce::Rectangle<int> titleBounds{ bounds.getX(), bounds.getY(), bounds.getWidth(), topBarHeight };
-
-	// Draw the Title
-	g.setColour(juce::Colours::white);
-
-	auto myTypeface = "Helvetica";
-	auto titleFont = juce::Font(myTypeface, topBarHeight * 0.75f, juce::Font::FontStyleFlags::bold);
-
-	g.setFont(titleFont);
-
-	g.setColour(juce::Colours::white);
-	g.drawFittedText("CROSSOVER", titleBounds, juce::Justification::centred, 1);
-
-	// Draw the Label Bounds
-	juce::Rectangle<int> labelBounds{ bounds.getX(), bounds.getBottom() - bottomBarHeight, bounds.getWidth(), bottomBarHeight };
-
-	// Set Font Height For Sub-Labels
-	g.setFont(16);
-
-	//g.setColour(juce::Colours::white);
-
-	// Draw Parameter Labels: Low-Mid Label ============================
-	juce::Rectangle<int> lmLabelBounds{	sliderLowMidCutoff.getX(),
-										labelBounds.getY(),
-										sliderLowMidCutoff.getWidth(),
-										labelBounds.getHeight() };
-
-	g.drawFittedText("LOW-MID", lmLabelBounds, juce::Justification::centred, 1);
-
-	// Draw Parameter Labels: Mid-High Label ============================
-	juce::Rectangle<int> mhLabelBounds{	sliderMidHighCutoff.getX(),
-										labelBounds.getY(),
-										sliderMidHighCutoff.getWidth(),
-										labelBounds.getHeight() };
-
-	g.drawFittedText("MID-HIGH", mhLabelBounds, juce::Justification::centred, 1);
+	g.drawImage(background, bounds.toFloat());
 }
 
 void CrossoverControls::resized()
@@ -111,47 +75,50 @@ void CrossoverControls::resized()
 
 	auto bounds = getLocalBounds();
 
-	bounds.removeFromTop(topBarHeight);
-	bounds.removeFromBottom(bottomBarHeight);
+	// Margins For Labels
+	int topBarHeight = 25;
+	int bottomBarHeight = 20;
 
-	auto spacerV = FlexItem().withHeight(3);
+	// Bounds In Which FlexBox is Performed
+	auto flexBounds = getLocalBounds();
+	flexBounds.removeFromTop(topBarHeight);
+	flexBounds.removeFromBottom(bottomBarHeight);
+
+	auto spacerV = FlexItem().withFlex(1.f);
+	auto sliderHeight = 83.f;
+	auto labelHeight = 15.f;
 
 	// COLUMN 1 ======================================================
 	FlexBox column1;
 	column1.flexDirection = FlexBox::Direction::column;
 	column1.flexWrap = FlexBox::Wrap::noWrap;
 
-	column1.items.add(spacerV);
-	column1.items.add(FlexItem(sliderLowMidCutoff).withFlex(1.f));
-	column1.items.add(FlexItem(sliderValueLM).withHeight(20));
-	column1.items.add(spacerV);
+	column1.items.add(FlexItem(sliderLowMidCutoff).withHeight(sliderHeight));
+	column1.items.add(FlexItem(sliderValueLM).withHeight(labelHeight));
 
 	// COLUMN 2 =======================================================
 	FlexBox column2;
 	column2.flexDirection = FlexBox::Direction::column;
 	column2.flexWrap = FlexBox::Wrap::noWrap;
 
-	column2.items.add(spacerV);
-	column2.items.add(FlexItem(sliderMidHighCutoff).withFlex(1.f));
-	column2.items.add(FlexItem(sliderValueMH).withHeight(20));
-	column2.items.add(spacerV);
+	column2.items.add(FlexItem(sliderMidHighCutoff).withHeight(sliderHeight));
+	column2.items.add(FlexItem(sliderValueMH).withHeight(labelHeight));
 
 	// ROW CONTAINING COLUMN 1 AND COLUMN 2 ===========================
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::row;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-	auto spacerH = FlexItem().withWidth(10);
-
 	flexBox.items.add(FlexItem(column1).withFlex(1.f));
 	flexBox.items.add(FlexItem(column2).withFlex(1.f));
 
-	flexBox.performLayout(bounds);
+	flexBox.performLayout(flexBounds);
 
-	//
+	// Trim the Width of Slider Value Labels
 	sliderValueLM.setBounds(sliderValueLM.getBounds().reduced(15, 0));
 	sliderValueMH.setBounds(sliderValueMH.getBounds().reduced(15, 0));
 
+	drawBackgroundImage(bounds);
 }
 
 void CrossoverControls::makeAttachments()
@@ -301,5 +268,81 @@ void CrossoverControls::labelTextChanged(juce::Label* labelThatHasChanged)
 		else
 			sliderMidHighCutoff.setValue(entryFloat);
 	}
+
+}
+
+void CrossoverControls::drawBackgroundImage(juce::Rectangle<int> bounds)
+{
+	using namespace juce;
+
+	background = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
+	Graphics g(background);
+
+	// Draw the Title Bounds
+	juce::Rectangle<int> titleBounds{	bounds.getX(), 
+										bounds.getY(), 
+										bounds.getWidth(), 
+										27};
+
+	// Draw the Title
+	g.setColour(juce::Colours::white);
+
+	auto myTypeface = "Helvetica";
+	auto titleFont = juce::Font(	myTypeface, 
+									titleBounds.getHeight() * 0.85f, 
+									juce::Font::FontStyleFlags::bold);
+
+	g.setFont(titleFont);
+
+	g.setColour(juce::Colours::white);
+	g.drawFittedText("CROSSOVER", titleBounds, juce::Justification::centred, 1);
+
+	// Draw the Label Bounds
+	juce::Rectangle<int> labelBounds{	bounds.getX(), 
+										sliderValueLM.getBottom() + 8,
+										bounds.getWidth(), 
+										bounds.getBottom() - sliderValueLM.getBottom() - 6};
+
+	// Set Font Height For Sub-Labels
+	g.setFont(16);
+
+	// Draw Parameter Labels: Low-Mid Label ============================
+	juce::Rectangle<int> lmLabelBounds{	sliderLowMidCutoff.getX(),
+										labelBounds.getY(),
+										sliderLowMidCutoff.getWidth(),
+										labelBounds.getHeight() };
+
+	g.drawFittedText("LOW-MID", lmLabelBounds, juce::Justification::centred, 1);
+
+	// Draw Parameter Labels: Mid-High Label ============================
+	juce::Rectangle<int> mhLabelBounds{	sliderMidHighCutoff.getX(),
+										labelBounds.getY(),
+										sliderMidHighCutoff.getWidth(),
+										labelBounds.getHeight() };
+
+	g.drawFittedText("MID-HIGH", mhLabelBounds, juce::Justification::centred, 1);
+
+	// Setup Gradient For Division Lines ======================
+	float p1 = 0.2f;
+	float p2 = 0.8f;
+
+	auto gradient = ColourGradient(	juce::Colours::black,
+									bounds.getBottomLeft().toFloat(),
+									juce::Colours::black,
+									bounds.getBottomRight().toFloat(), false);
+
+	gradient.addColour(p1, juce::Colours::white);
+	gradient.addColour(p2, juce::Colours::white);
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.5f);
+
+	// Draw Division Lines ======================
+
+	auto center = (titleBounds.getBottom() + sliderLowMidCutoff.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
+
+	center = (sliderValueLM.getBottom() + labelBounds.getY()) / 2.f;
+	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());
 
 }

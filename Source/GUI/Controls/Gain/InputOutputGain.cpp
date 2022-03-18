@@ -32,15 +32,13 @@ void InputOutputGain::paint(juce::Graphics& g)
 	auto bounds = getLocalBounds().toFloat();
 	bounds.reduce(4, 0);
 
-	g.setColour(juce::Colours::black);
+	// Fill Background Gradient (LED's Off)
+	g.setGradientFill(ledOffGradient);
 	g.fillRect(bounds);
 
-	// DRAW THE LEFT METER
-	g.setGradientFill(gradient);
+	// DRAW THE LEFT & RIGHT METER
+	g.setGradientFill(ledOnGradient);
 	g.fillRect(leftBounds);
-
-	// DRAW THE RIGHT METER
-	g.setGradientFill(gradient);
 	g.fillRect(rightBounds);
 
 	// Draw Left & Right Grills
@@ -56,17 +54,29 @@ void InputOutputGain::resized()
 	auto bounds = getLocalBounds().toFloat();
 
 	// Place The Slider ===========================================================
-	sliderGain.setSize(getWidth() * 0.5f, getHeight() * 0.9f);
+	sliderGain.setSize(getWidth(), getHeight() * 0.9f);
 	sliderGain.setCentreRelative(0.5f, 0.5f);
 
-	// Draw Level Gradient ========================================================
-	gradient = juce::ColourGradient{juce::Colours::green, bounds.getBottomLeft(),
-									 juce::Colours::red, bounds.getTopLeft(), false };
-
-	gradient.addColour(0.6f, juce::Colours::yellow);
+	ledOffGradient = makeMeterGradient(bounds, 0.75f);
+	ledOnGradient = makeMeterGradient(bounds, 2.5f);
 
 	// Draw The Grill Image =======================================================
 	drawGrill(bounds);
+}
+
+juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness)
+{
+	juce::ColourGradient gradient = juce::ColourGradient {	
+									juce::Colour(0xff084008).withMultipliedBrightness(brightness),	
+									bounds.getBottomLeft(),
+									juce::Colour(0xff8a1414).withMultipliedBrightness(brightness),	
+									bounds.getTopLeft(), false };
+
+	gradient.addColour(0.9f,  juce::Colour(0xff8a1414).withMultipliedBrightness(brightness));	// Red
+	gradient.addColour(0.4f,  juce::Colour(0xff084008).withMultipliedBrightness(brightness));	// Green
+	gradient.addColour(0.75f, juce::Colour(0xff929224).withMultipliedBrightness(brightness));	// Yellow
+
+	return gradient;
 }
 
 void InputOutputGain::timerCallback()
@@ -139,7 +149,7 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 	grill = Image(Image::PixelFormat::ARGB, bounds.getWidth(), bounds.getHeight(), true);
 	Graphics g(grill);
 
-	g.setGradientFill(GRILL_GRADIENT(bounds));
+	g.setColour(juce::Colours::black);
 	g.fillRect(bounds);
 
 	for (int x = 0; x < 2; x++)	// Iterate Loop Twice for Left/Right Grills
@@ -169,15 +179,6 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 
 				// Provide transparency in the image
 				grill.clear(ledArea.toNearestInt(), juce::Colours::hotpink.withAlpha(0.f));
-
-				// Draw bound around the grill
-				g.setColour(juce::Colours::darkgrey);
-				g.drawRect(ledArea, 1);
-
-				// Draw bound around the grill
-				ledArea.expand(1, 1);
-				g.setColour(juce::Colours::grey);
-				g.drawRect(ledArea, 1);
 			}
 
 

@@ -52,9 +52,6 @@ private:
 	std::unique_ptr<buttonAttachment>	syncLowAttachment,
 										syncMidAttachment,
 										syncHighAttachment;
-	
-	//int topBarHeight{ 25 };
-	//int bottomBarHeight{ 25 };
 
 	juce::Image background;
 };

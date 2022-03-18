@@ -42,28 +42,29 @@ struct LFO
     juce::AudioParameterChoice* waveshape{ nullptr };   
     juce::AudioParameterBool* invert{ nullptr };        
     juce::AudioParameterFloat* relativePhase{ nullptr };
-	juce::AudioParameterFloat* displayPhase{ nullptr };	
+	//juce::AudioParameterFloat* displayPhase{ nullptr };	
 
     juce::AudioParameterFloat* rate{ nullptr };         
     juce::AudioParameterBool* syncToHost{ nullptr };    
     juce::AudioParameterChoice* multiplier{ nullptr };  
 
+	// For BPM Cursor In Oscilloscope
 
     juce::Array<float> waveTable;                           // Array to store raw LFO waveshape
     juce::Array<float> waveTableMapped;                     // Mapped copy of waveTable so that max is always 1.0
 	juce::Array<float> waveTableDisplayScaled;				// For Display: Scale Time by 2, Shift by Quarter-Wave
 	juce::Array<float> waveTableDisplay;					// For Display: Map Amplitudes to -/+ 0.5
 
-    float increment = 1;		// Used to increment LFO samples within Processor
-    float phase = 0;			// Used to increment LFO samples within Processor
+    float increment = 1;		// Amount By Which To Increment In LFO Cycle
+    float phase = 0;			// Current Position In LFO Cycle
 
     float mRelativePhase = 0;	// Used to shift phase of LFO relative to others
 	float mMultiplier = 1.f;	// Rhythm of LFO timing (Rename to Rhythm)
-	float mDisplayPhase = 0.f;	// Used in Oscilloscope View-Scroll.  Shifts phase of all displayed Waves.
 
 	float min{ 2.0f };		// Used to Map LFO Amplitudes
 	float max{ -1.0f };		// Used to Map LFO Amplitudes
 	float mDepth{ 1.0f };	// LFO Amplitude Depth
+	float mRate{ 1.0f };
 
 	void initializeLFO(double sampleRate)
 	{
@@ -84,27 +85,26 @@ struct LFO
     {
         getWaveShape(sampleRate);
         getTempo(hostBPM, sampleRate);
-		getWaveShapeDisplay(hostBPM, sampleRate);
+		getWaveShapeDisplay();
     }
+
 
     void getTempo(float hostBPM, double sampleRate)
     {
+
         auto mHostBPM = hostBPM;
 
-        auto mRate = rate->get();	// Get Manual Rate Status
+        mRate = rate->get();	// Get Manual Rate Status
 
         mRelativePhase = relativePhase->get() / 360.0f;    // Get Relative Phase Shift
 
-        if (mRelativePhase <= 0)
-        {
+		// Phase Shift is + / - 180 Degrees
+        if (mRelativePhase <= 0)	// 0 to +180
             mRelativePhase = abs(mRelativePhase) * sampleRate;
-        }
-        else
-        {
+        else						// 0 to -180
             mRelativePhase = sampleRate * (1 - mRelativePhase);
-        }
 
-        mMultiplier = 1.0f;					// Multiplier Float
+        //mMultiplier = 1.0f;					// Multiplier Float
         switch (multiplier->getIndex())     // Convert Multiplier Choice into Float
         {
             case 0: mMultiplier = 0.5f; break;
@@ -115,14 +115,12 @@ struct LFO
             case 5: mMultiplier = 4.0f; break;
         }
 
-        if (syncToHost->get())  // BPM is Synced to Host
-        {
-            increment = (mHostBPM / 60.0f) * mMultiplier;
-        }
-        else
-        {                   
-            increment = mRate * mMultiplier;
-        }
+		// If 'Sync To Host', take Host BPM and Multiply by Rhythm
+		if (syncToHost->get())  // LFO rate is BPM * Rhythm
+			increment = (mHostBPM / 60.0f) * mMultiplier;
+		else
+			increment = mRate;	// LFO Rate is Hard-Programmed by 'Rate' Slider
+            //increment = mRate * mMultiplier;
 
     }
 
@@ -147,11 +145,37 @@ struct LFO
             case 1: mInvert = -1; break;
         }
 
-        // RAMP UP =====================================================================================
+		// RAMP DOWN ================================================================================
+
+		float deltaDown = 0.01f;
+
+		if (mWaveshapeID == 0)
+		{
+			for (float i = 0; i < waveTableSize; i++)
+			{
+				// Rounding Function
+				float y = ((1 / atan(1 / deltaDown)) * atan(sin(double_Pi * (i) / waveTableSize) / deltaDown));
+
+				// Waveshape Function
+				float x;
+
+				// Populate the Left-Hand Period
+				if (i < periodLeft)
+					x = mInvert * (1 + (0.5f) * (-i / periodLeft));
+
+				// Populate the Right-Hand Period
+				if (i >= periodLeft)
+					x = mInvert * ((0.5f) + (0.5f) * (-(i - periodLeft) / (periodRight)));
+
+				waveTable.set(i, y * x);
+			}
+		}
+
+        // RAMP UP ==================================================================================
 
         float deltaUp = 0.01f;          // Constant for Edge Rounding
 
-        if (mWaveshapeID == 0)
+        if (mWaveshapeID == 1)
         {
             for (float i = 0; i < waveTableSize; i++)
             {
@@ -173,33 +197,7 @@ struct LFO
             }
         }
 
-        // RAMP DOWN =====================================================================================
-
-        float deltaDown = 0.01f;
-
-        if (mWaveshapeID == 1)
-        {
-            for (float i = 0; i < waveTableSize; i++)
-            {
-				// Rounding Function
-                float y = ((1 / atan(1 / deltaDown)) * atan(sin(double_Pi * (i) / waveTableSize) / deltaDown));
-                
-				// Waveshape Function
-				float x;
-
-				// Populate the Left-Hand Period
-                if (i < periodLeft)
-                    x = mInvert * (1 + (0.5f) * (-i / periodLeft));
-
-				// Populate the Right-Hand Period
-                if (i >= periodLeft)
-                    x = mInvert * ((0.5f) + (0.5f) * (-(i - periodLeft) / (periodRight)));
-
-                waveTable.set(i, y * x);
-            }
-        }
-
-        // SQUARE =====================================================================================
+        // SQUARE ===================================================================================
 
         float deltaPulse = 0.01f;	// Rounding Function
 
@@ -217,7 +215,7 @@ struct LFO
             }
         }
 
-        // TRIANGLE =====================================================================================
+        // TRIANGLE =================================================================================
         if (mWaveshapeID == 3)
         {
 			// Populate the Left-Hand Period
@@ -253,7 +251,7 @@ struct LFO
             }
         }
 
-        // LUMPS =====================================================================================
+        // LUMPS ====================================================================================
         if (mWaveshapeID == 5)
         {
 			// Populate the Left-Hand Period
@@ -271,7 +269,7 @@ struct LFO
             }
         }
 
-        // HUMPS =====================================================================================
+        // HUMPS ====================================================================================
         if (mWaveshapeID == 6)
         {
 			// Populate the Left-Hand Period
@@ -316,51 +314,12 @@ struct LFO
 
     }
 
-	// Conditions selected waveshape for oscilloscope.
-	// Adds additional periods and centers them.
-	// Shifts Phase by Relative-Phase Offset
-	// Shifts Phase by Oscilloscope View-Scroll Offset
-	// ** Need to add functionality to display changes in 'Rate'
-
-	void getWaveShapeDisplay(float hostBPM, double sampleRate)
-	{
-		auto numCycles = mMultiplier*2+1;
-		auto downSample = 1;
-		mDisplayPhase = displayPhase->get() / 360.0f;    // Get Relative Phase Shift
-
-		float mCorrectivePhase = 0.f;
-
-		if (mMultiplier == 0.5f || mMultiplier == 1.5f)
-			mCorrectivePhase = 0.5f * waveTable.size();
-
-        if (mDisplayPhase <= 0)
-			mDisplayPhase = abs(mDisplayPhase) * waveTable.size();
-        else
-			mDisplayPhase = waveTable.size() * (1 - mDisplayPhase);
-
-		// DOWNSAMPLE, DISPLAY TWO CYCLES, SHIFT BY QUARTER WAVE + RELATIVE PHASE =====================
-
-		auto x = 0;
-
-		for (int i = 0; i < waveTable.size(); i++)
-		{
-			auto revolvingIndex = fmod(numCycles * i + mRelativePhase + mCorrectivePhase, waveTable.size());
-
-			int displayIndex = fmod(i + mDisplayPhase, waveTable.size());
-
-			waveTableDisplayScaled.set(displayIndex, waveTable[revolvingIndex]);
-		}
-
-		x = 0;
-
-		// MAP AMPLITUDE TO CENTER AROUND 0 ===================
-		for (int i = 0; i < waveTableDisplayScaled.size(); i++)
-		{
-			float value = juce::jmap<float>(waveTableDisplayScaled[i], min, max, -0.5f * mDepth, 0.5f * mDepth);
-			waveTableDisplay.set(fmod(i, waveTableDisplayScaled.size()), value);
-		}
-	}
-
+	juce::Array<float> getWaveShapeDisplay() {return waveTable; }
+	float getWaveDepth() { return mDepth;  }
+	float getWaveMultiplier() { return mMultiplier; }
+	float getRelativePhase() { return mRelativePhase; }
+	bool isSyncedToHost() { return syncToHost->get(); }
+	float getWaveRate() { return mRate; }
 };
 
 //==============================================================================
@@ -445,6 +404,9 @@ public:
 
 	juce::Atomic<bool> paramChangedForScope{ false };
 
+	double playPosition;
+	std::atomic<double> getPlayPosition() { return playPosition; }
+
 private:
 
     void updateState();			// Process Block, Update State
@@ -453,6 +415,7 @@ private:
 
     juce::AudioPlayHead* playHead;		// To get BPM
 
+	int lfoPhase{ 0 };
 
     // CROSSOVER =========================================================================
 

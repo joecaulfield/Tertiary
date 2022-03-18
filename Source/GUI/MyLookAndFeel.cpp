@@ -590,7 +590,7 @@ void StandardSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int 
 	auto valuePosition = juce::jmap((sliderPos / bounds.getWidth()), bounds.getX(), bounds.getRight() - 1);
 
 	// Fill Background
-	g.setColour(juce::Colours::darkgrey);
+	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
 	g.fillRect(valueBounds);
 	// Draw Value Bar
 	juce::Rectangle<float> valueBar = { (float)valueBounds.getX(),
@@ -639,7 +639,7 @@ void CenterSliderLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y,
 	auto valuePosition = juce::jmap((sliderPos / bounds.getWidth()), bounds.getX(), bounds.getRight() - 1);
 
 	// Fill Background
-	g.setColour(juce::Colours::darkgrey);
+	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
 	g.fillRect(valueBounds);
 
 	// Establish Value Bar
@@ -673,116 +673,151 @@ void CenterSliderLookAndFeel::setBandMode(int bandMode)
 
 // SCROLL SLIDER =================================================================
 
+//void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int width, int height,
+//											float sliderPos, float minSliderPos, float maxSliderPos,
+//											const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider)
+//{
+//	// Set Textbox Style
+//	slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+//	slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
+//
+//	// Establish Bounds
+//	juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
+//	//bounds.reduce(0, 6);
+//
+//	auto numLines = 100;
+//	auto wheelHeight = height;
+//	auto spacing = bounds.getWidth() / numLines;
+//
+//	// RESTRICT THE RANGE OF SCROLLING
+//	float z = (sliderPos - x) / width;
+//	auto scrollRange = juce::jmap(z, bounds.getX() + 20, bounds.getRight() - 20);
+//
+//	// Fill Rounded Background
+//	g.setGradientFill(AllColors::OscilloscopeColors::SCROLL_GRADIENT(bounds.toFloat(), z));
+//	g.fillPath(getOutline(g, bounds, wheelHeight));
+//
+//	// DRAW BARS
+//	for (int i = 1; i < numLines; i++)
+//	{
+//		// BARS TO THE LEFT
+//		auto linePos = scrollRange - i * spacing;
+//		auto top = evaluateHeight(linePos, bounds);
+//		auto thickness = 1.f;
+//
+//		if (i % 2 == 0)
+//		{
+//			g.setColour(juce::Colours::darkgrey);
+//			thickness = 2.f;
+//		}
+//		else
+//		{
+//			g.setColour(juce::Colours::lightgrey);
+//			thickness = 1.f;
+//		}
+//			
+//		if (linePos > x)
+//			g.drawLine(linePos, top, linePos, top + wheelHeight, thickness);
+//
+//		// BARS TO THE RIGHT
+//		linePos = scrollRange + i * spacing;
+//		top = evaluateHeight(linePos, bounds);
+//
+//		if (linePos < x + width)
+//			g.drawLine(linePos, top, linePos, top + wheelHeight, thickness);
+//	}
+//
+//	// DRAW CENTER BAR
+//	auto top = evaluateHeight(scrollRange, bounds);
+//
+//	g.setColour(juce::Colours::black);
+//	g.drawLine(scrollRange, top, scrollRange, top + wheelHeight, 8.f);
+//		
+//	g.setColour(juce::Colours::silver);
+//	g.drawLine(scrollRange, top, scrollRange, top + wheelHeight, 2.f);
+//
+//	// DRAW ROUNDED CORNER
+//	g.setColour(juce::Colours::darkgrey);
+//	g.strokePath(getOutline(g, bounds, wheelHeight), juce::PathStrokeType(2.f));
+//}
+//
+//
+//float ScrollLookAndFeel::evaluateHeight(int position, juce::Rectangle<float> bounds)
+//{
+//	using namespace juce;
+//
+//	auto distFromCenter = bounds.getX() + abs(position - bounds.getCentreX());
+//	auto heightScalar = distFromCenter / (bounds.getWidth() / 2.f);
+//
+//	auto wheelOffset = juce::jmap(heightScalar*heightScalar, bounds.getHeight()/4, 0.f);
+//
+//	auto top = bounds.getY() + wheelOffset;
+//
+//	return top;
+//}
+//
+//juce::Path ScrollLookAndFeel::getOutline(juce::Graphics& g, juce::Rectangle<float> bounds, int wheelHeight)
+//{
+//	using namespace juce;
+//
+//	Path p;
+//
+//	for (int i = bounds.getX(); i <= bounds.getRight(); i++)
+//	{
+//		auto top = evaluateHeight(i, bounds);
+//
+//		if (i == bounds.getX())
+//			p.startNewSubPath(i, top);
+//
+//		p.lineTo(i, top);
+//	}
+//
+//	for (int i = bounds.getRight(); i >= bounds.getX(); i--)
+//	{
+//		auto bottom = evaluateHeight(i, bounds) + wheelHeight;
+//
+//		p.lineTo(i, bottom);
+//
+//		if (i == bounds.getX())
+//			p.closeSubPath();
+//	}
+//
+//	return p;
+//}
+
 void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int width, int height,
 											float sliderPos, float minSliderPos, float maxSliderPos,
 											const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider)
 {
 	// Set Textbox Style
-	slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-	slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
+	//slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+	//slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
 
 	// Establish Bounds
-	juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
-	//bounds.reduce(0, 6);
+	//juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
 
-	auto numLines = 100;
-	auto wheelHeight = height;
-	auto spacing = bounds.getWidth() / numLines;
+	// Horizontal Scroll Track
+	//juce::Path track;
+	//track.startNewSubPath(bounds.getX() + 6, bounds.getCentreY());
+	//track.lineTo(bounds.getRight() - 6, bounds.getCentreY());
+	//g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
+	//g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
+	//											juce::PathStrokeType::EndCapStyle::rounded));
 
-	// RESTRICT THE RANGE OF SCROLLING
-	float z = (sliderPos - x) / width;
-	auto scrollRange = juce::jmap(z, bounds.getX() + 20, bounds.getRight() - 20);
+	//// Scaled Fader Position
+	//auto sliderPosScaled1 = (minSliderPos - bounds.getY()) / bounds.getWidth();
+	//auto sliderPosScaled2 = (maxSliderPos - bounds.getY()) / bounds.getWidth();
 
-	// Fill Rounded Background
-	g.setGradientFill(AllColors::OscilloscopeColors::SCROLL_GRADIENT(bounds.toFloat(), z));
-	g.fillPath(getOutline(g, bounds, wheelHeight));
+	//auto faderRange1 = juce::jmap(sliderPosScaled1, bounds.getX() + 6, bounds.getRight() - 6);
+	//auto faderRange2 = juce::jmap(sliderPosScaled2, bounds.getX() + 6, bounds.getRight() - 6);
 
-	// DRAW BARS
-	for (int i = 1; i < numLines; i++)
-	{
-		// BARS TO THE LEFT
-		auto linePos = scrollRange - i * spacing;
-		auto top = evaluateHeight(linePos, bounds);
-		auto thickness = 1.f;
+	//auto size = 10;
 
-		if (i % 2 == 0)
-		{
-			g.setColour(juce::Colours::darkgrey);
-			thickness = 2.f;
-		}
-		else
-		{
-			g.setColour(juce::Colours::lightgrey);
-			thickness = 1.f;
-		}
-			
-		if (linePos > x)
-			g.drawLine(linePos, top, linePos, top + wheelHeight, thickness);
+	//g.setColour(juce::Colours::lightgrey);
 
-		// BARS TO THE RIGHT
-		linePos = scrollRange + i * spacing;
-		top = evaluateHeight(linePos, bounds);
+	//g.fillEllipse(faderRange1 - size / 2.f, bounds.getCentreY() - size / 2.f, size, size);
+	//g.fillEllipse(faderRange2 - size / 2.f, bounds.getCentreY() - size / 2.f, size, size);
 
-		if (linePos < x + width)
-			g.drawLine(linePos, top, linePos, top + wheelHeight, thickness);
-	}
-
-	// DRAW CENTER BAR
-	auto top = evaluateHeight(scrollRange, bounds);
-
-	g.setColour(juce::Colours::black);
-	g.drawLine(scrollRange, top, scrollRange, top + wheelHeight, 8.f);
-		
-	g.setColour(juce::Colours::silver);
-	g.drawLine(scrollRange, top, scrollRange, top + wheelHeight, 2.f);
-
-	// DRAW ROUNDED CORNER
-	g.setColour(juce::Colours::darkgrey);
-	g.strokePath(getOutline(g, bounds, wheelHeight), juce::PathStrokeType(2.f));
-}
-
-
-float ScrollLookAndFeel::evaluateHeight(int position, juce::Rectangle<float> bounds)
-{
-	using namespace juce;
-
-	auto distFromCenter = bounds.getX() + abs(position - bounds.getCentreX());
-	auto heightScalar = distFromCenter / (bounds.getWidth() / 2.f);
-
-	auto wheelOffset = juce::jmap(heightScalar*heightScalar, bounds.getHeight()/4, 0.f);
-
-	auto top = bounds.getY() + wheelOffset;
-
-	return top;
-}
-
-juce::Path ScrollLookAndFeel::getOutline(juce::Graphics& g, juce::Rectangle<float> bounds, int wheelHeight)
-{
-	using namespace juce;
-
-	Path p;
-
-	for (int i = bounds.getX(); i <= bounds.getRight(); i++)
-	{
-		auto top = evaluateHeight(i, bounds);
-
-		if (i == bounds.getX())
-			p.startNewSubPath(i, top);
-
-		p.lineTo(i, top);
-	}
-
-	for (int i = bounds.getRight(); i >= bounds.getX(); i--)
-	{
-		auto bottom = evaluateHeight(i, bounds) + wheelHeight;
-
-		p.lineTo(i, bottom);
-
-		if (i == bounds.getX())
-			p.closeSubPath();
-	}
-
-	return p;
 }
 
 // IN/OUT METER SLIDER ===========================================================
@@ -799,8 +834,8 @@ void InOutLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 	juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
 
 	// Draw Track & Fader
-	auto faderWidth = 25;
-	auto faderHeight = 40;
+	auto faderWidth = 30;
+	auto faderHeight = 15;
 
 	auto sliderPosScaled = (sliderPos - bounds.getY()) / bounds.getHeight();
 
@@ -818,19 +853,28 @@ void InOutLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 						faderRange - faderHeight / 2.f,
 						faderWidth, faderHeight);
 	
+	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(1.5f));
+	g.setOpacity(0.85f);
+	g.fillRoundedRectangle(fader, 3.f);
+
+	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.5f));
+	g.drawRoundedRectangle(fader, 3.f, 1.f);
+
+	// Build dB Value String
+
+	float value;
+	juce::String valueString;
+
+	value = juce::jmap(sliderPosScaled, 24.f, -24.f);
+
+	if (value > 0.f)
+		valueString = "+";
+
+	valueString = valueString << juce::String(value);
+		
 	g.setColour(juce::Colours::white);
-	g.setOpacity(0.9f);
-	g.fillRoundedRectangle(fader, 5.f);
-
-	g.setColour(juce::Colours::black);
-	g.drawHorizontalLine(fader.getCentreY(), fader.getX()+8.f, fader.getRight()-8.f);
-
-	g.drawHorizontalLine(fader.getCentreY() - 7, fader.getX()+6.f, fader.getRight()-6.f);
-	g.drawHorizontalLine(fader.getCentreY() + 7, fader.getX()+6.f, fader.getRight()-6.f);
-											
-	g.drawHorizontalLine(fader.getCentreY() - 15,fader.getX()+4.f, fader.getRight()-4.f);
-	g.drawHorizontalLine(fader.getCentreY() + 15,fader.getX()+4.f, fader.getRight()-4.f);
-
+	g.setFont(15);
+	g.drawFittedText(valueString, fader.reduced(1,3).toNearestInt(), juce::Justification::centred, 1);
 }
 
 // CROSSOVER SLIDER ==============================================================
@@ -849,33 +893,66 @@ void CrossoverLookAndFeel::drawRotarySlider(	juce::Graphics& g, int x, int y, in
 	slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
 
 	auto bounds = Rectangle<float>(x, y, width, height).toFloat();
-	bounds.reduce(0, 5);
+	bounds.removeFromTop(10);
+	bounds.removeFromBottom(5);
 
+	// Use parent bounds as bounds of slider.  Square off and center.
 	juce::Rectangle<float> ellipseBounds = { bounds.getX(), bounds.getY(), bounds.getHeight(), bounds.getHeight() };
-
 	ellipseBounds.setCentre(bounds.getCentreX(), ellipseBounds.getCentreY());
 
+	// Draw Outer Ring (Fixed Background)
+	Path p1;
+
+	p1.addArc(	ellipseBounds.getX(), 
+				ellipseBounds.getY(), 
+				ellipseBounds.getWidth(), 
+				ellipseBounds.getHeight(), 
+				rotaryStartAngle, rotaryEndAngle,
+				true);
+
 	g.setColour(juce::Colours::grey);
-	g.fillEllipse(ellipseBounds);
+	g.strokePath(p1, juce::PathStrokeType(	4.f, 
+											juce::PathStrokeType::JointStyle::beveled, 
+											juce::PathStrokeType::EndCapStyle::rounded ) );
 
-	g.setColour(juce::Colours::black);
-	g.drawEllipse(ellipseBounds, 2.f);
+	// Draw Outer Ring (Value-Based)
+	Path p2;
 
-	auto center = ellipseBounds.getCentre();
-	Path p;
-
-	Rectangle<float> r;
-	r.setLeft(center.getX() - 2);
-	r.setRight(center.getX() + 2);
-	r.setTop(bounds.getY());
-	r.setBottom(center.getY());
-
-	p.addRoundedRectangle(r, 2.f);
-
+	// Current Angle of Parameter Selection
 	auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
 
-	p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
+	p2.addArc(	ellipseBounds.getX(),
+				ellipseBounds.getY(), 
+				ellipseBounds.getWidth(), 
+				ellipseBounds.getHeight(), 
+				rotaryStartAngle, sliderAngRad,
+				true);
 
-	g.setColour(juce::Colours::white);
-	g.fillPath(p);
+	g.setColour(juce::Colour(0xff2530bd));
+	g.strokePath(p2, juce::PathStrokeType(	5.f,
+											juce::PathStrokeType::JointStyle::beveled, 
+											juce::PathStrokeType::EndCapStyle::rounded ) );
+
+
+
+	//g.setColour(juce::Colours::black);
+	//g.drawEllipse(ellipseBounds, 2.f);
+
+	//auto center = ellipseBounds.getCentre();
+	//Path p;
+
+	//Rectangle<float> r;
+	//r.setLeft(center.getX() - 2);
+	//r.setRight(center.getX() + 2);
+	//r.setTop(bounds.getY());
+	//r.setBottom(center.getY());
+
+	//p.addRoundedRectangle(r, 2.f);
+
+	//auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
+
+	//p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
+
+	//g.setColour(juce::Colours::white);
+	//g.fillPath(p);
 }

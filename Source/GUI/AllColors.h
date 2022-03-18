@@ -516,27 +516,27 @@ namespace AllColors
 
 	namespace InputOutputMeterColors
 	{
-		// GRILL BACKGROUND GRADIENT ==========================================================
-		inline Colour GRADIENT1() { return juce::Colour(0xff353131); }
-		inline Colour GRADIENT2() { return juce::Colour(0xff474141); }
-		inline Colour GRADIENT3() { return juce::Colour(0xff92929a); }
-		inline Colour GRADIENT4() { return juce::Colour(0xff51514e); }
+		//// GRILL BACKGROUND GRADIENT ==========================================================
+		//inline Colour GRADIENT1() { return juce::Colour(0xff353131); }
+		//inline Colour GRADIENT2() { return juce::Colour(0xff474141); }
+		//inline Colour GRADIENT3() { return juce::Colour(0xff92929a); }
+		//inline Colour GRADIENT4() { return juce::Colour(0xff51514e); }
 
-		inline ColourGradient GRILL_GRADIENT(Rectangle<float> bounds)
-		{
-			float p1 = 0.25f;
-			float p2 = 0.75f;
+		//inline ColourGradient GRILL_GRADIENT(Rectangle<float> bounds)
+		//{
+		//	float p1 = 0.25f;
+		//	float p2 = 0.75f;
 
-			auto gradient =	ColourGradient(GRADIENT1(),
-							bounds.getTopLeft(),
-							GRADIENT2(),
-							bounds.getBottomRight(), true);
+		//	auto gradient =	ColourGradient(GRADIENT1(),
+		//					bounds.getTopLeft(),
+		//					GRADIENT2(),
+		//					bounds.getBottomRight(), true);
 
-			gradient.addColour(p1, GRADIENT3());
-			gradient.addColour(p2, GRADIENT4());
+		//	gradient.addColour(p1, GRADIENT3());
+		//	gradient.addColour(p2, GRADIENT4());
 
-			return gradient;
-		}
+		//	return gradient;
+		//}
 	};
 
 
@@ -550,7 +550,8 @@ namespace AllColors
 		inline float gStep3 = 0.75f;
 		inline float gStep4 = 0.9f;
 
-		inline Colour BASE_COLOR() { return Colour(0xff03010d); }
+		inline Colour BASE_COLOR() { return Colour(0xff181212); }
+
 
 		inline ColourGradient BACKGROUND_GRADIENT(Rectangle<float> bounds)
 		{
@@ -560,7 +561,7 @@ namespace AllColors
 			auto gradient = ColourGradient(	BASE_COLOR(),
 											bounds.getCentre(),
 											BASE_COLOR().withMultipliedAlpha(gStep1),
-											bounds.getTopLeft(), true);
+											bounds.getTopLeft(), false);
 
 			gradient.addColour( p1, BASE_COLOR().withMultipliedAlpha(gStep3));
 			gradient.addColour( p2, BASE_COLOR().withMultipliedAlpha(gStep4));
@@ -569,31 +570,31 @@ namespace AllColors
 		}
 
 		// SCROLL SLIDER GRADIENT
-		inline Colour GRADIENT_SCROLL_1() { return juce::Colour(0xff201f1f); }
-		inline Colour GRADIENT_SCROLL_2() { return juce::Colour(0xff393333); }
-		inline Colour GRADIENT_SCROLL_3() { return juce::Colour(0xffa0a0a9); }
-		inline Colour GRADIENT_SCROLL_4() { return juce::Colour(0xffffffff); }
-		inline Colour GRADIENT_SCROLL_5() { return juce::Colour(0xff9f7b8d); }
+		//inline Colour GRADIENT_SCROLL_1() { return juce::Colour(0xff201f1f); }
+		//inline Colour GRADIENT_SCROLL_2() { return juce::Colour(0xff393333); }
+		//inline Colour GRADIENT_SCROLL_3() { return juce::Colour(0xffa0a0a9); }
+		//inline Colour GRADIENT_SCROLL_4() { return juce::Colour(0xffffffff); }
+		//inline Colour GRADIENT_SCROLL_5() { return juce::Colour(0xff9f7b8d); }
 
-		inline ColourGradient SCROLL_GRADIENT(Rectangle<float> bounds, float scrollRange)
-		{
-			float p1 = 0.25f;
-			float p2 = 0.75f;
+		//inline ColourGradient SCROLL_GRADIENT(Rectangle<float> bounds, float scrollRange)
+		//{
+		//	float p1 = 0.25f;
+		//	float p2 = 0.75f;
 
-			scrollRange = juce::jmap(scrollRange, 0.1f, 0.9f);
+		//	scrollRange = juce::jmap(scrollRange, 0.1f, 0.9f);
 
-			auto gradient =	ColourGradient(GRADIENT_SCROLL_1(),
-							bounds.getTopLeft(),
-							GRADIENT_SCROLL_2(),
-							bounds.getBottomRight(), false);
+		//	auto gradient =	ColourGradient(GRADIENT_SCROLL_1(),
+		//					bounds.getTopLeft(),
+		//					GRADIENT_SCROLL_2(),
+		//					bounds.getBottomRight(), false);
 
-			gradient.addColour(scrollRange/2.f, GRADIENT_SCROLL_3());
-			gradient.addColour(scrollRange, GRADIENT_SCROLL_4());
-			gradient.addColour((1.f+scrollRange)/2.f, GRADIENT_SCROLL_5());
-			
+		//	gradient.addColour(scrollRange/2.f, GRADIENT_SCROLL_3());
+		//	gradient.addColour(scrollRange, GRADIENT_SCROLL_4());
+		//	gradient.addColour((1.f+scrollRange)/2.f, GRADIENT_SCROLL_5());
+		//	
 
-			return gradient;
-		}
+		//	return gradient;
+		//}
 
 		// LOW WAVEFORM GRADIENT ===================================================================================
 		inline ColourGradient WAVEFORM_LOW_GRADIENT(Rectangle<float> bounds)
@@ -615,13 +616,13 @@ namespace AllColors
 		// MID WAVEFORM GRADIENT  ==========================================================
 		inline ColourGradient WAVEFORM_MID_GRADIENT(Rectangle<float> bounds)
 		{
-			float p1 = 0.33f;
-			float p2 = 0.66;
+			float p1 = 0.25f;
+			float p2 = 0.5f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1(),
-											bounds.getCentreX(), bounds.getBottom(),
+											bounds.getBottomLeft(),
 											BandColors::GRADIENT_MID_2(),
-											bounds.getCentreX(), bounds.getY(), true);
+											bounds.getTopRight(), true);
 
 			gradient.addColour(p1, BandColors::GRADIENT_MID_3());
 			gradient.addColour(p2, BandColors::GRADIENT_MID_4());
@@ -670,13 +671,13 @@ namespace AllColors
 		inline Colour REGION_BORDER_COLOR_BYPASS() { return BandColors::REGION_BORDER_BYPASS(); }
 
 		// OUTER BORDER COLOR =======================================================================================
-		inline Colour BORDER_COLOR() { return juce::Colour(0xffffffff); }
+	/*	inline Colour BORDER_COLOR() { return juce::Colour(0xffffffff); }*/
 
 		// AXIS =======================================================================================
-		const Colour GRID_LINES_LOW		(169, 169, 169);	// Grid - Low
-		const Colour GRID_LINES_MID		(169, 169, 169);	// Grid - Mid
-		const Colour GRID_LINES_HIGH	(169, 169, 169);	// Grid - High
-		const Colour GRID_LINES_NONE	(169, 169, 169);	// Grid - None
+		//const Colour GRID_LINES_LOW		(169, 169, 169);	// Grid - Low
+		//const Colour GRID_LINES_MID		(169, 169, 169);	// Grid - Mid
+		//const Colour GRID_LINES_HIGH	(169, 169, 169);	// Grid - High
+		//const Colour GRID_LINES_NONE	(169, 169, 169);	// Grid - None
 
 		// CURSOR =====================================================================================
 		const Colour CURSOR_LINE (255, 255, 255);	// Cursor
