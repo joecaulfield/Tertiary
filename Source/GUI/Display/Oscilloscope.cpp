@@ -498,16 +498,58 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 
 	// DRAW VERTICAL LINES =============================
 	juce::Line<float> verticalAxis;
-	auto numLines = 2;
+	//auto numLines = 2;
+
+	// Convert Zoom Factor to Int
+	// Represents Number of Full Quarter-Notes to be Shown
+	float zoomFactor = sliderScroll.getZoom();
+
+	auto center = bounds.getCentreX();
+
 
 	g.setColour(juce::Colours::lightgrey);
 	g.setOpacity(0.35f);
 
-	for (int i = 1; i <= numLines; i++)
+	// At 1x Zoom, bounds.getWidth() = 1 Metronome Tick (Quarter Note)
+
+	//for (int i = 1; i <= numLines; i++)
+	//{
+	//	verticalAxis.setStart(bounds.getX() + bounds.getWidth() * (float)i/(numLines+1) , bounds.getY());
+	//	verticalAxis.setEnd(bounds.getX() + bounds.getWidth() * (float) i/(numLines + 1), bounds.getY() + bounds.getHeight());
+	//	g.drawLine(verticalAxis, 1.f);
+	//}
+	
+	// Default Zoom: Spacing = bounds.getWidth() / 2
+	// Zoom In / Zoom Up --- Zoom Out / Zoom Down
+
+	// Scaled Zoom: Spacing = bounds.getWidth() / (2 * zoom)
+
+	float spacing = bounds.getWidth() / (zoomFactor);
+
+	float num = 0.5f;
+
+	for (int i = bounds.getCentreX(); i <= bounds.getRight(); i++)
 	{
-		verticalAxis.setStart(bounds.getX() + bounds.getWidth() * (float)i/(numLines+1) , bounds.getY());
-		verticalAxis.setEnd(bounds.getX() + bounds.getWidth() * (float) i/(numLines + 1), bounds.getY() + bounds.getHeight());
-		g.drawLine(verticalAxis, 1.f);
+
+		if (i % (int)spacing == 0)
+		{
+			verticalAxis.setStart(center + num * spacing, bounds.getY());
+			verticalAxis.setEnd(center + num * spacing, bounds.getBottom());
+			g.drawLine(verticalAxis, 1.f);
+
+			verticalAxis.setStart(center - num * spacing, bounds.getY());
+			verticalAxis.setEnd(center - num * spacing, bounds.getBottom());
+			g.drawLine(verticalAxis, 1.f);
+
+			playBackOffset = spacing - (bounds.getRight() - (bounds.getCentreX() + (num * spacing)));
+			playBackNumBeats = (2.f * num) + 1.5;
+			playBackWidth = playBackNumBeats * spacing;
+
+			num++;
+		}
+
+
+		
 	}
 
 	// DRAW HORIZONTAL LINES =============================
@@ -663,12 +705,12 @@ juce::Array<float> Oscilloscope::scaleWaveTime(juce::Array<float> waveTable, LFO
 	waveTableScaled.resize(waveTable.size());
 	waveTableScaled.clearQuick();
 
-	int numCycles = 2;
+	int numCycles = 8;
 
 	auto sync = lfo.isSyncedToHost();
 
 	float zoomFactor = sliderScroll.getZoom();
-
+	zoomFactor = 1.f;
 	//float scalar = numCycles * sliderScroll.getZoom();
 
 	//zoomFactor = 1.f;
@@ -693,12 +735,23 @@ juce::Array<float> Oscilloscope::scaleWaveTime(juce::Array<float> waveTable, LFO
 // Checks Host Playhead for Current Position
 void Oscilloscope::getPlayheadPosition()
 {
-	auto numBeats = 8;
+	auto bounds = getLocalBounds();
 
+	//float numBeats = 1;
+	
+	float zoomFactor = sliderScroll.getZoom();
+
+	//zoomFactor = 1.f;
 	// Retrieve Play Position From Processor
 	
-	auto position = fmod(audioProcessor.getPlayPosition(), numBeats) / numBeats;
-	playHeadPositionPixel = position * scopeRegion.getWidth();
+	//auto position = fmod((float)audioProcessor.getPlayPosition() * numBeats, numBeats * zoomFactor) / (numBeats * zoomFactor);
+	
+	auto position = fmod((float)audioProcessor.getPlayPosition(), playBackNumBeats) / playBackNumBeats;
+
+	DBG(position);
+
+	//playHeadPositionPixel = position * scopeRegion.getWidth();
+	playHeadPositionPixel = bounds.getX() - playBackOffset + position * playBackWidth;
 }
 
 // Update the scope-regions based on the configured viewing scheme
@@ -719,9 +772,9 @@ void Oscilloscope::updateRegions()
 	//drawMidLFO(midRegion);
 	//drawHighLFO(highRegion);
 
-	drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
-	drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
-	drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
+	//drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
+	//drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
+	//drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
 }
 
 // Draw the scope boundaries based on the configured viewing scheme
@@ -791,6 +844,7 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 			int numCycles = 2;	// Hard-Coded Base Number of Cycles
 			auto sync = lfo.isSyncedToHost();	// Check if Synced
 			float zoomFactor = sliderScroll.getZoom();	// Display Zoom Factor
+			zoomFactor = 1.f;
 
 			// Scale WaveTable by Multiplier, or by Rate, but not Both
 			float scalar;

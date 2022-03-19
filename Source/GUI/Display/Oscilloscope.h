@@ -121,6 +121,10 @@ struct Oscilloscope :	juce::Component,
 
 	void getPlayheadPosition();
 
+	int playBackWidth;
+	int playBackOffset;
+	int playBackNumBeats;
+
 	void getWavesForDisplay();
 	juce::Array<float> scaleWaveAmplitude(juce::Array<float> waveTable, LFO lfo);
 	juce::Array<float> addWavePhaseShift(juce::Array<float> waveTable, LFO lfo);

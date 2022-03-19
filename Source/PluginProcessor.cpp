@@ -363,7 +363,7 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     playHead = this->getPlayHead();
 
 	playPosition = hostInfo.ppqPosition;
-
+	
     if (playHead != nullptr)
         playHead->getCurrentPosition(hostInfo);
 
@@ -893,9 +893,9 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
         parameterID == params.at(Names::Sync_Mid_LFO)  ||
         parameterID == params.at(Names::Sync_High_LFO))
     {
-        lowLFO.phase = 0;
-        midLFO.phase = 0;
-        highLFO.phase = 0;
+        //lowLFO.phase = 0;
+        //midLFO.phase = 0;
+        //highLFO.phase = 0;
     }
 
 	//paramChangedForScope.set(true);
