@@ -15,127 +15,55 @@
 // Scroll Pad
 ScrollPad::ScrollPad()
 {
-	// Scroll Pad allows for combined zoom and pan functionality of the oscilloscope.
-
-	// Mouse Drag Up/Down gesture will zoom in/out
-	// Mouse Drag Left/Right gesture will pan left/right
-
-	// Dragging or clicking either one of the thumbs will change width of slider,
-	// thus changing the zoom and pan
-
-	// Center-Point between the two thumbs defines the focal point of the pan.
-	// Distance between the two thumbs defines the zoom
-
-	//slider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-	//slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-
-	//slider.addListener(this);
-	//slider.addMouseListener(this, true);
-	//addAndMakeVisible(slider);
 }
 
 ScrollPad::~ScrollPad()
 {
-
 }
 
 void ScrollPad::resized()
 {
-	auto bounds = getLocalBounds();
-
-	point1 = bounds.getCentreX() - currentWidth / 2;
-	point2 = bounds.getCentreX() + currentWidth / 2;
-
-	slider.setBounds(bounds);
-	slider.setRange(0, bounds.getWidth(), 1);
 }
 
-void ScrollPad::paint(juce::Graphics& g)
+// Takes In Saved Points For Initialization
+void ScrollPad::initializePoints(float newP1, float newP2)
 {
-	//g.fillAll(juce::Colours::hotpink);
+	// Prevent Crossing Points via Parameters List
+	if (point2 - point1 >= minWidth)
+	{
+		point1 = newP1;
+		point2 = newP2;
 
-	// Establish Bounds
-	auto bounds = getLocalBounds().toFloat();
+		currentCenter = float(point1 + point2) / 2.f;
+		currentWidth = point2 - point1;
 
-	// Draw Slider Track
-	juce::Path track;
-	track.startNewSubPath(	bounds.getCentreX() - maxWidth / 2.f,		bounds.getCentreY());
-	track.lineTo(			bounds.getCentreX() + maxWidth / 2.f,		bounds.getCentreY());
-	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
-	g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
-												juce::PathStrokeType::EndCapStyle::rounded));
-
-	// Draw Point-To-Point Range
-	juce::Path range;
-	range.startNewSubPath(point1, bounds.getCentreY());
-	range.lineTo(point2, bounds.getCentreY());
-	g.setColour(juce::Colours::purple);
-	g.strokePath(range, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
-												juce::PathStrokeType::EndCapStyle::rounded));
-
-	auto size = 10;
-	g.setColour(juce::Colours::lightgrey);
-
-	g.setOpacity(0.25f);
-	g.fillEllipse(point1 - size / 2, bounds.getCentreY() - size / 2, size, size);
-	g.fillEllipse(point2 - size / 2, bounds.getCentreY() - size / 2, size, size);
+		calculateZoomFactor();
+	}
+	else
+		makeDefaultPoints();
 }
 
-void ScrollPad::mouseDown(const juce::MouseEvent& event)
-{
-	// Initial Mouse Position
-	xDown = event.getMouseDownX();
-	yDown = event.getMouseDownY();
-
-	// Historical Mouse Position
-	x0 = xDown;
-	y0 = yDown;
-
-	// Historical Point1/2 Positions
-	p01 = point1;
-	p02 = point2;
-
-	// Reset Flags
-	shouldUpdatePoint1 = false;
-	shouldUpdatePoint2 = false;
-	shouldCheckPanOrZoom = false;
-
-	int clickTolerance = 5;
-
-	// Mouse is clicked on or beyond Point1
-	if (xDown < point1 + clickTolerance)
-		shouldUpdatePoint1 = true;
-
-	// Mouse is clicked in between points
-	if (xDown >= point1 + clickTolerance && xDown <= point2 - clickTolerance)
-		shouldCheckPanOrZoom = true;
-
-	// Mouse is clicked on or beyond Point2
-	if (xDown > point2 - clickTolerance)
-		shouldUpdatePoint2 = true;
-}
-
-void ScrollPad::mouseDrag(const juce::MouseEvent& event)
+// Change Points & Calculate P/Z Upon Movement
+void ScrollPad::updatePoints(int x1, int y1)
 {
 	auto bounds = getLocalBounds();
-
-	// Immediate Mouse Position
-	x1 = event.getPosition().getX();
-	y1 = event.getPosition().getY();
 
 	int edgeTolerance = bounds.getX() + bounds.getCentreX() - maxWidth / 2.f;
-
-	// Based On click, we know to update single-point only
-	// Or to apply further insection to determine zoom or pan intentions
 
 	// Mouse is clicked on or beyond left thumb
 	if (shouldUpdatePoint1)
 	{
 		point1 = x1;
 
+		if (point1 < bounds.getCentreX() - (float)maxWidth / 2.f)
+			point1 = bounds.getCentreX() - (float)maxWidth / 2.f;
+
 		// Halt At Minimum Width
 		if (point2 - point1 < minWidth)
 			point1 = point2 - minWidth;
+
+		currentCenter = (float)(point1 + point2) / 2.f;
+		currentWidth = point2 - point1;
 	}
 
 	// Mouse is clicked on or beyond right thumb
@@ -143,13 +71,16 @@ void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 	{
 		point2 = x1;
 
+		if (point2 > bounds.getCentreX() + (float)maxWidth / 2.f)
+			point2 = bounds.getCentreX() + (float)maxWidth / 2.f;
+
 		// Halt At Minimum Width
 		if (point2 - point1 < minWidth)
 			point2 = point1 + minWidth;
-	}
 
-	//// Update Width After Single-Point Adjustment
-	//currentWidth = point2 - point1;
+		currentCenter = (float)(point1 + point2) / 2.f;
+		currentWidth = point2 - point1;
+	}
 
 	// Mouse is clicked in between thumbs
 	if (shouldCheckPanOrZoom)
@@ -203,19 +134,19 @@ void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 		int c0 = (p01 + p02) / 2.f; // Actual Center of Points at time of Downclick
 		int offset = xDown - c0;	// Distance between Mouse Down and Points-Center
 
-		center = x1 - offset;		// Center of points as a function of mouse position
+		currentCenter = x1 - offset;		// Center of points as a function of mouse position
 
 		// Prevent Panning Beyond Left Edge
-		if (center < bounds.getX() + edgeTolerance + currentWidth / 2.f)
-			center = bounds.getX() + edgeTolerance + currentWidth / 2.f;
+		if (currentCenter < bounds.getX() + edgeTolerance + currentWidth / 2.f)
+			currentCenter = bounds.getX() + edgeTolerance + currentWidth / 2.f;
 
 		// Prevent Panning Beyond Right Edge
-		if (center > bounds.getRight() - edgeTolerance - currentWidth / 2.f)
-			center = bounds.getRight() - edgeTolerance - currentWidth / 2.f;
+		if (currentCenter > bounds.getRight() - edgeTolerance - currentWidth / 2.f)
+			currentCenter = bounds.getRight() - edgeTolerance - currentWidth / 2.f;
 
 		// Update Points
-		point1 = center - currentWidth / 2.f;
-		point2 = center + currentWidth / 2.f;
+		point1 = currentCenter - currentWidth / 2.f;
+		point2 = currentCenter + currentWidth / 2.f;
 
 		// 'Current' Mouse Position become 'Old' position
 		x0 = x1;
@@ -233,56 +164,120 @@ void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 	calculateZoomFactor();
 }
 
-void ScrollPad::mouseDoubleClick(const juce::MouseEvent& event)
+void ScrollPad::paint(juce::Graphics& g)
+{
+	// Establish Bounds
+	auto bounds = getLocalBounds().toFloat();
+
+	// Draw Slider Track
+	juce::Path track;
+	track.startNewSubPath(	bounds.getCentreX() - maxWidth / 2.f,		bounds.getCentreY());
+	track.lineTo(			bounds.getCentreX() + maxWidth / 2.f,		bounds.getCentreY());
+	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
+	g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
+												juce::PathStrokeType::EndCapStyle::rounded));
+
+	// Draw Point-To-Point Range
+	juce::Path range;
+	range.startNewSubPath(point1, bounds.getCentreY());
+	range.lineTo(point2, bounds.getCentreY());
+	g.setColour(juce::Colours::purple);
+	g.strokePath(range, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
+												juce::PathStrokeType::EndCapStyle::rounded));
+
+	auto size = 10;
+	g.setColour(juce::Colours::lightgrey);
+}
+
+// Reset Pan & Zoom to Default
+void ScrollPad::makeDefaultPoints()
 {
 	auto bounds = getLocalBounds();
 
-	center = bounds.getCentreX();
-	point1 = center - defaultWidth / 2;
-	point2 = center + defaultWidth / 2;
+	currentCenter = bounds.getCentreX();
+	point1 = currentCenter - defaultWidth / 2;
+	point2 = currentCenter + defaultWidth / 2;
 
 	calculateZoomFactor();
 }
 
+// Record Mouse-Down Positions
+void ScrollPad::mouseDown(const juce::MouseEvent& event)
+{
+	// Initial Mouse Position
+	xDown = event.getMouseDownX();
+	yDown = event.getMouseDownY();
+
+	// Historical Mouse Position
+	x0 = xDown;
+	y0 = yDown;
+
+	// Historical Point1/2 Positions
+	p01 = point1;
+	p02 = point2;
+
+	// Reset Flags
+	shouldUpdatePoint1 = false;
+	shouldUpdatePoint2 = false;
+	shouldCheckPanOrZoom = false;
+
+	int clickTolerance = 5;
+
+	// Mouse is clicked on or beyond Point1
+	if (xDown < point1 + clickTolerance)
+		shouldUpdatePoint1 = true;
+
+	// Mouse is clicked in between points
+	if (xDown >= point1 + clickTolerance && xDown <= point2 - clickTolerance)
+		shouldCheckPanOrZoom = true;
+
+	// Mouse is clicked on or beyond Point2
+	if (xDown > point2 - clickTolerance)
+		shouldUpdatePoint2 = true;
+}
+
+// Mouse Drag Callback
+void ScrollPad::mouseDrag(const juce::MouseEvent& event)
+{
+	auto bounds = getLocalBounds();
+
+	// Immediate Mouse Position
+	x1 = event.getPosition().getX();
+	y1 = event.getPosition().getY();
+
+	updatePoints(x1, y1);
+}
+
+// Mouse Double-Click Callback
+void ScrollPad::mouseDoubleClick(const juce::MouseEvent& event)
+{
+	makeDefaultPoints();
+}
+
+// Take Width and Derive Zoom Factor
 void ScrollPad::calculateZoomFactor()
 {
-
-	// Define Default Width.  This equates to zoom of 1x or 100%
-
-	// At min width, zoom should be max zoom factor.
-
-	// At max width, zoom sohuld be min zoom factor.
-
-	// Update Width After Single-Point Adjustment
 	currentWidth = point2 - point1;
-
-	float minZoomFactor = 0.5f;
-	float maxZoomFactor = 10.f;
-
-	zoomFactor = juce::jmap((float)currentWidth, (float)minWidth, (float)maxWidth, minZoomFactor, maxZoomFactor);
-
-	//float roundToTheNearest = 0.5f;
-
-	//zoomFactor = zoomFactor - fmod(zoomFactor, roundToTheNearest);
+	currentZoomFactor = juce::jmap((float)currentWidth, (float)minWidth, (float)maxWidth, minZoomFactor, maxZoomFactor);
 }
 
-void ScrollPad::sliderValueChanged(juce::Slider* slider)
-{
-	// Change in slider value implies panning
-
-	//x1 = slider->getValue();
-}
-
+// Returns Current Center Position
 float ScrollPad::getCenter()
 {
 	// Center should represent a percentage of the total waveform.
 	auto bounds = getLocalBounds().toFloat();
-	auto centerScaled = juce::jmap(	(float)center, 
+	auto centerScaled = juce::jmap(	(float)currentCenter,
 									bounds.getCentreX() - maxWidth / 2.f, 
 									bounds.getCentreX() + maxWidth / 2.f,
 									+0.5f, -0.5f);
 
 	return centerScaled;
+}
+
+// Returns Current Zoom Value
+float ScrollPad::getZoom()
+{
+	return currentZoomFactor;
 }
 
 // Constructor
@@ -305,6 +300,8 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	boolHelper(showMidBand, Names::Show_Mid_Scope);
 	boolHelper(showHighBand, Names::Show_High_Scope);
 	boolHelper(stackBands, Names::Stack_Bands_Scope);
+	boolHelper(showCursor, Names::Show_Cursor_Scope);
+	boolHelper(showPlayhead, Names::Show_Playhead_Scope);
 
 	auto floatHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)              // Float Helper --> Part 8 Param Namespace
 	{
@@ -313,21 +310,29 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	};
 
 	// Cursor Position.  Rename scopeScrollParam
-	floatHelper(scopeScrollParam, Names::Cursor_Position);
-	dragX = scopeScrollParam->get();
+	floatHelper(scopeCursorParam, Names::Cursor_Position);
+	floatHelper(scopePoint1Param, Names::Scope_Point1);
+	floatHelper(scopePoint2Param, Names::Scope_Point2);
 
 
-	// Scroll-Bar Position
-	//floatHelper(displayPhase, Names::Scope_Scroll);
+	dragX = scopeCursorParam->get();
 
+	// Update Scroll Points
+	
+	buttonOptions.setLookAndFeel(&optionsLookAndFeel);
 
-
-	//sliderScroll.setSliderStyle(juce::Slider::SliderStyle::LinearBar);
-	//sliderScroll.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
-	//sliderScroll.setLookAndFeel(&scrollLookAndFeel);
 	addAndMakeVisible(sliderScroll);
+	addAndMakeVisible(buttonOptions);
+
+	buttonOptions.setButtonText("Options");
+	buttonOptions.addListener(this);
 
 	addMouseListener(this, true);
+
+
+
+	sliderScroll.addMouseListener(this, true);
+	buttonOptions.addMouseListener(this, true);
 
 	sampleRate = audioProcessor.getSampleRate();
 	makeAttachments();
@@ -347,23 +352,44 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	waveTableHigh.clearQuick();			// Initialize Wavetable
 }
 
+void Oscilloscope::getPanZoom()
+{
+}
+
 // Destructor
 Oscilloscope::~Oscilloscope()
 {
 	//sliderScroll.setLookAndFeel(nullptr);
+	buttonOptions.setLookAndFeel(nullptr);
 }
 
 // Called on component resize
 void Oscilloscope::resized()
 {
-	drawToggles();
-
+	//drawToggles();
+	
 	auto bounds = getLocalBounds();
 	bounds.reduce(4, 0);		// To account for in-set border
 	bounds.removeFromBottom(5); // To account for in-set border
 
 	sliderScroll.setSize(bounds.getWidth(), 10);
 	sliderScroll.setTopLeftPosition(bounds.getX(), bounds.getBottom() - sliderScroll.getHeight());
+	
+	int x = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
+	float p1 = scopePoint1Param->get() / 100.f * (float)sliderScroll.getMaxWidth();
+	float p2 = scopePoint2Param->get() / 100.f * (float)sliderScroll.getMaxWidth();
+
+	buttonOptions.setSize(100, 25);
+	buttonOptions.setTopLeftPosition(4,4);
+
+	sliderScroll.initializePoints(x + p1, x + p2);
+}
+
+void Oscilloscope::buttonClicked(juce::Button* button)
+{
+	showMenu = !showMenu;
+
+	drawToggles(showMenu);
 }
 
 // Graphics class
@@ -420,6 +446,8 @@ void Oscilloscope::paint(juce::Graphics& g)
 	if (mShowHighBand)
 		drawAxis(g, highRegion);
 
+	// Draw in order so that focus is on top
+
 	// DRAW & FILL LOW REGION
 	g.setGradientFill(mLowBypass ? WAVEFORM_BYPASS_GRADIENT(lowRegion.toFloat()) : WAVEFORM_LOW_GRADIENT(lowRegion.toFloat()));
 	g.setOpacity(mLowFocus ? 0.95 : 0.85);
@@ -435,6 +463,35 @@ void Oscilloscope::paint(juce::Graphics& g)
 	g.setOpacity(mMidFocus ? 0.95 : 0.85);
 	g.fillPath(midPathFill);
 
+	g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
+	g.setOpacity(mMidFocus ? 1.f : 0.85f);
+	g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+
+	// DRAW & FILL HIGH REGION
+	g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
+	g.setOpacity(mHighFocus ? 0.95 : 0.85);
+	g.fillPath(highPathFill);
+
+	g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
+	g.setOpacity(mHighFocus ? 1.f : 0.85f);
+	g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+	// DRAW THE MOVING PLAYHEAD
+	if (mShowPlayhead)
+	{
+		g.setColour(juce::Colours::darkgrey);
+		g.drawVerticalLine(playHeadPositionPixel, lowRegion.getY(), lowRegion.getBottom());
+		g.drawVerticalLine(playHeadPositionPixel, midRegion.getY(), midRegion.getBottom());
+		g.drawVerticalLine(playHeadPositionPixel, highRegion.getY(), highRegion.getBottom());
+	}
+
+	// DRAW THE CURSOR
+	drawAndFadeCursor(g, getLocalBounds());
+
+	// DRAW THE OPTIONS MENU
 	fadeInOutComponents(g);
 }
 
@@ -447,46 +504,6 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 
 	auto bounds = getLocalBounds().toFloat();
 
-	g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
-	g.setOpacity(mMidFocus ? 1.f : 0.85f);
-	g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
-										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
-
-	// DRAW & FILL HIGH REGION
-	g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
-	g.setOpacity(mHighFocus ? 0.95 : 0.85);
-	g.fillPath(highPathFill);
-
-	g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
-	g.setOpacity(mHighFocus ? 1.f : 0.85f);
-	g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
-										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
-
-	// DRAW REGION OUTLINES
-	g.setColour(juce::Colour(0xff252323));
-	g.setOpacity(1.f);
-
-	float width = 2.f; // Line Width
-
-	if (!mShowLowBand && !mShowMidBand && !mShowHighBand)
-		g.drawRoundedRectangle(scopeRegion.toFloat(), 5.f, width);
-
-	if (mShowLowBand)
-		g.drawRoundedRectangle(lowRegion.toFloat(),  5.f, width);
-
-	if (mShowMidBand)
-		g.drawRoundedRectangle(midRegion.toFloat(),  5.f, width);
-
-	if (mShowHighBand)
-		g.drawRoundedRectangle(highRegion.toFloat(), 5.f, width);
-
-	drawAndFadeCursor(g, getLocalBounds());
-
-	// Draw the Moving Playhead
-	g.setColour(juce::Colours::darkgrey);
-	g.drawVerticalLine(playHeadPositionPixel, lowRegion.getY(), lowRegion.getBottom());
-	g.drawVerticalLine(playHeadPositionPixel, midRegion.getY(), midRegion.getBottom());
-	g.drawVerticalLine(playHeadPositionPixel, highRegion.getY(), highRegion.getBottom());
 
 	paintBorder(g, juce::Colours::purple, bounds);
 }
@@ -504,52 +521,54 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 	// Represents Number of Full Quarter-Notes to be Shown
 	float zoomFactor = sliderScroll.getZoom();
 
-	auto center = bounds.getCentreX();
+	float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
 
+	auto c = bounds.getCentreX();
 
 	g.setColour(juce::Colours::lightgrey);
-	g.setOpacity(0.35f);
 
-	// At 1x Zoom, bounds.getWidth() = 1 Metronome Tick (Quarter Note)
+	if (mStackAllBands)
+		g.setOpacity(0.35f);
+	else
+		g.setOpacity(0.1f);
 
-	//for (int i = 1; i <= numLines; i++)
-	//{
-	//	verticalAxis.setStart(bounds.getX() + bounds.getWidth() * (float)i/(numLines+1) , bounds.getY());
-	//	verticalAxis.setEnd(bounds.getX() + bounds.getWidth() * (float) i/(numLines + 1), bounds.getY() + bounds.getHeight());
-	//	g.drawLine(verticalAxis, 1.f);
-	//}
-	
-	// Default Zoom: Spacing = bounds.getWidth() / 2
-	// Zoom In / Zoom Up --- Zoom Out / Zoom Down
+	if (bounds.getWidth() > 0)
+		beatSpacing = bounds.getWidth() / (zoomFactor);
+	else
+		beatSpacing = 1.f;
 
-	// Scaled Zoom: Spacing = bounds.getWidth() / (2 * zoom)
-
-	float spacing = bounds.getWidth() / (zoomFactor);
-
+	// Allows Grid to Split Center
 	float num = 0.5f;
 
-	for (int i = bounds.getCentreX(); i <= bounds.getRight(); i++)
+	// Calculate Number of Quarter-Notes to Draw
+	for (int i = bounds.getCentreX(); i <= 2*bounds.getRight(); i++)
 	{
-
-		if (i % (int)spacing == 0)
+		if (i % (int)beatSpacing == 0)
 		{
-			verticalAxis.setStart(center + num * spacing, bounds.getY());
-			verticalAxis.setEnd(center + num * spacing, bounds.getBottom());
+			// Draw Twice as Many Gridlines to Account for Panning
+			verticalAxis.setStart(c + mDisplayPhase + num * beatSpacing, bounds.getY());
+			verticalAxis.setEnd(c + mDisplayPhase + num * beatSpacing, bounds.getBottom());
 			g.drawLine(verticalAxis, 1.f);
 
-			verticalAxis.setStart(center - num * spacing, bounds.getY());
-			verticalAxis.setEnd(center - num * spacing, bounds.getBottom());
+			verticalAxis.setStart(c + mDisplayPhase - num * beatSpacing, bounds.getY());
+			verticalAxis.setEnd(c + mDisplayPhase - num * beatSpacing, bounds.getBottom());
 			g.drawLine(verticalAxis, 1.f);
 
-			playBackOffset = spacing - (bounds.getRight() - (bounds.getCentreX() + (num * spacing)));
-			playBackNumBeats = (2.f * num) + 1.5;
-			playBackWidth = playBackNumBeats * spacing;
+			// Calculate the Data Points for PlayHead Information
+			if (i <= bounds.getWidth())
+			{
+				// Offset to account for remainder of the Quarter Note not shown on screen
+				playBackOffset = beatSpacing - (bounds.getRight() - (bounds.getCentreX() + (num * beatSpacing)));
+
+				// Number of Quarter Notes Shown In Display - Including One Overhanging QN
+				playBackNumBeats = (2.f * num) + 2;
+
+				// Total Size (In Pixels) of Number of Quarter-Notes Present
+				playBackWidth = playBackNumBeats * beatSpacing;
+			}
 
 			num++;
 		}
-
-
-		
 	}
 
 	// DRAW HORIZONTAL LINES =============================
@@ -563,32 +582,35 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 // Draw the cursor.  Fade based on mouse-focus.
 void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
-	using namespace AllColors::OscilloscopeColors;
-
-	// FADE FUNCTIONS FOR MOUSE-ENTER -> TOGGLES AND SLIDERS
-	if (fadeInCursor) // If mouse entered... fade Toggles Alpha up
+	if (mShowCursor)
 	{
-		if (fadeAlphaCursor < fadeMaxCursor)
-			fadeAlphaCursor += fadeStepUpCursor;
+		using namespace AllColors::OscilloscopeColors;
+
+		// FADE FUNCTIONS FOR MOUSE-ENTER -> TOGGLES AND SLIDERS
+		if (fadeInCursor) // If mouse entered... fade Toggles Alpha up
+		{
+			if (fadeAlphaCursor < fadeMaxCursor)
+				fadeAlphaCursor += fadeStepUpCursor;
+		}
+		else // If mouse exit... fade Toggles Alpha down
+		{
+			if (fadeAlphaCursor > fadeMinCursor)
+				fadeAlphaCursor -= fadeStepDownCursor;
+		}
+
+		if (fadeAlphaCursor > fadeMaxCursor)
+			fadeAlphaCursor = fadeMaxCursor;
+
+		if (fadeAlphaCursor < fadeMinCursor)
+			fadeAlphaCursor = fadeMinCursor;
+
+		cursor.setStart(bounds.getX() + dragX * getWidth(), scopeRegion.getY() + 1);
+		cursor.setEnd(bounds.getX() + dragX * getWidth(), scopeRegion.getBottom() - 1);
+
+		g.setColour(CURSOR_LINE);
+		g.setOpacity(fadeAlphaCursor);
+		g.drawLine(cursor, 3.f);
 	}
-	else // If mouse exit... fade Toggles Alpha down
-	{
-		if (fadeAlphaCursor > fadeMinCursor)
-			fadeAlphaCursor -= fadeStepDownCursor;
-	}
-
-	if (fadeAlphaCursor > fadeMaxCursor)
-		fadeAlphaCursor = fadeMaxCursor;
-
-	if (fadeAlphaCursor < fadeMinCursor)
-		fadeAlphaCursor = fadeMinCursor;
-
-	cursor.setStart(bounds.getX() + dragX*getWidth(), scopeRegion.getY()+1);
-	cursor.setEnd(bounds.getX() + dragX * getWidth(), scopeRegion.getBottom()-1);
-
-	g.setColour(CURSOR_LINE);
-	g.setOpacity(fadeAlphaCursor);
-	g.drawLine(cursor, 3.f);
 }
 
 // Methods to call on a timed-basis
@@ -601,8 +623,6 @@ void Oscilloscope::timerCallback()
 		getWavesForDisplay();
 		timerCounter = 0;
 	}
-
-
 
 	checkMousePosition();
 	updateRegions();
@@ -620,16 +640,6 @@ void Oscilloscope::getWavesForDisplay()
 	waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
 	waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
 	waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
-
-	// Time-Shifting
-	//waveTableLow = addWavePhaseShift(waveTableLow, lowLFO);
-	//waveTableMid = addWavePhaseShift(waveTableMid, midLFO);
-	//waveTableHigh = addWavePhaseShift(waveTableHigh, highLFO);
-
-	// Time-Scaling
-	//waveTableLow = scaleWaveTime(waveTableLow, lowLFO);
-	//waveTableMid = scaleWaveTime(waveTableMid, midLFO);
-	//waveTableHigh = scaleWaveTime(waveTableHigh, highLFO);
 }
 
 // Maps incoming WaveTable amplitude from [0, -1] to [-0.5, +0.5]
@@ -653,83 +663,11 @@ juce::Array<float> Oscilloscope::scaleWaveAmplitude(juce::Array<float> waveTable
 	// MAP AMPLITUDE TO CENTER AROUND 0 ===================
 	for (int i = 0; i < waveTable.size(); i++)
 	{
-		float value = juce::jmap<float>(waveTable[i], min, max, -0.5f * mDepth, 0.5f * mDepth);
+		float value = juce::jmap<float>(waveTable[i], min, max, 0.5f * mDepth, -0.5f * mDepth);
 		waveTable.set(fmod(i, waveTable.size()), value);
 	}
 
 	return waveTable;
-}
-
-// Introduces Relative Phase Shift + Scroll-Bar Display Phase Shift
-juce::Array<float> Oscilloscope::addWavePhaseShift(juce::Array<float> waveTable, LFO lfo)
-{
-	juce::Array<float> waveTableShifted;
-
-	waveTableShifted.resize(waveTable.size());
-	waveTableShifted.clearQuick();
-
-	// Calculate Relative Phase Shift
-	float mRelativePhase = lfo.getRelativePhase();
-
-	// Phase Shift = Number of Samples of WaveTable to Offset
-	//mDisplayPhase = sliderScroll.getCenter() / 360.f;
-
-	// Calculate Display Phase Shift
-	// Refactor so that mDisplayPhase is not the value of one slider thumb, 
-	// but the difference between the two.
-	
-	//float mDisplayPhase = displayPhase->get() / 360.f;
-
-	float mDisplayPhase = sliderScroll.getCenter();
-
-	if (mDisplayPhase <= 0)
-		mDisplayPhase = abs(mDisplayPhase) * waveTable.size();
-	else
-		mDisplayPhase = waveTable.size() * (1 - mDisplayPhase);
-
-	// Add Phase Shifts
-	for (int i = 0; i < waveTable.size(); i++)
-	{
-		auto revolvingIndex = fmod(i + mRelativePhase + mDisplayPhase, waveTable.size());
-		waveTableShifted.set(i, waveTable[revolvingIndex]);
-	}
-
-	return waveTableShifted;
-}
-
-// Scales incoming WaveTable Frequency based on Rate, Rhythm and Display Params
-juce::Array<float> Oscilloscope::scaleWaveTime(juce::Array<float> waveTable, LFO lfo)
-{
-	juce::Array<float> waveTableScaled;
-
-	waveTableScaled.resize(waveTable.size());
-	waveTableScaled.clearQuick();
-
-	int numCycles = 8;
-
-	auto sync = lfo.isSyncedToHost();
-
-	float zoomFactor = sliderScroll.getZoom();
-	zoomFactor = 1.f;
-	//float scalar = numCycles * sliderScroll.getZoom();
-
-	//zoomFactor = 1.f;
-
-	// Scale WaveTable by Multiplier, or by Rate, but not Both
-	float scalar;
-
-	if (sync)
-		scalar = lfo.getWaveMultiplier() * zoomFactor;
-	else
-		scalar = lfo.getWaveRate() * zoomFactor;
-
-	// Scale By Multiplier if Applicable
-	for (int i = 0; i < waveTable.size(); i++)
-	{
-		waveTableScaled.set(i, waveTable[fmod(i * scalar * numCycles, waveTable.size())]);
-	}
-
-	return waveTableScaled;
 }
 
 // Checks Host Playhead for Current Position
@@ -737,20 +675,10 @@ void Oscilloscope::getPlayheadPosition()
 {
 	auto bounds = getLocalBounds();
 
-	//float numBeats = 1;
-	
 	float zoomFactor = sliderScroll.getZoom();
 
-	//zoomFactor = 1.f;
-	// Retrieve Play Position From Processor
-	
-	//auto position = fmod((float)audioProcessor.getPlayPosition() * numBeats, numBeats * zoomFactor) / (numBeats * zoomFactor);
-	
 	auto position = fmod((float)audioProcessor.getPlayPosition(), playBackNumBeats) / playBackNumBeats;
 
-	DBG(position);
-
-	//playHeadPositionPixel = position * scopeRegion.getWidth();
 	playHeadPositionPixel = bounds.getX() - playBackOffset + position * playBackWidth;
 }
 
@@ -765,16 +693,19 @@ void Oscilloscope::updateRegions()
 	midRegion = scopeRegion;
 	highRegion = scopeRegion;
 
+	// Stacking Bands Displays the Individual Waveforms Separately
 	if (mStackAllBands)
 		drawStackedScope();
+	else
+	{
+		lowRegion.reduce(0, 3);
+		midRegion.reduce(0, 3);
+		highRegion.reduce(0, 3);
+	}
 
-	//drawLowLFO(lowRegion);
-	//drawMidLFO(midRegion);
-	//drawHighLFO(highRegion);
-
-	//drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
-	//drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
-	//drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
+	drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
+	drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
+	drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
 }
 
 // Draw the scope boundaries based on the configured viewing scheme
@@ -809,7 +740,6 @@ void Oscilloscope::drawStackedScope()
 	midRegion.setBounds(scopeRegion.getX(), scopeRegion.getY() + lowRegion.getHeight(), width, height * y);
 	highRegion.setBounds(scopeRegion.getX(), scopeRegion.getY() + lowRegion.getHeight() + midRegion.getHeight(), width, height * z);
 
-	scopeRegion.reduce(0, 3);
 	lowRegion.reduce(0, 3);
 	midRegion.reduce(0, 3);
 	highRegion.reduce(0, 3);
@@ -826,57 +756,59 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 
 	float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);
 
-	bounds.reduce(3, 3);
+	bounds.reduce(0, 3);
 
 	lfoFillPath.clear();
 	lfoStrokePath.clear();
 
 	if (showBand)
 	{
-		int dataSize = 10 * bounds.getWidth();
+		// Width of Area to Render Paint Data
+		auto paintAreaWidth = playBackWidth;
 
-		
-		// Build Stroke Path
-		for (int i = 0; i <= 2 * dataSize; i++)
+		for (int i = 0; i <= 3 * paintAreaWidth; i++)
 		{
-			// Get Zoom Factor ===========================================
-
-			int numCycles = 2;	// Hard-Coded Base Number of Cycles
-			auto sync = lfo.isSyncedToHost();	// Check if Synced
-			float zoomFactor = sliderScroll.getZoom();	// Display Zoom Factor
-			zoomFactor = 1.f;
+			bool sync = lfo.isSyncedToHost();
 
 			// Scale WaveTable by Multiplier, or by Rate, but not Both
 			float scalar;
 
 			if (sync)
-				scalar = lfo.getWaveMultiplier() * zoomFactor;
+				scalar = lfo.getWaveMultiplier();
 			else
-				scalar = lfo.getWaveRate() * zoomFactor;
+				scalar = lfo.getWaveRate() * 60.f / lfo.getHostBPM();
 
-			// Get Wave's Relative Phase Shift ==================
+			// Get Relative Phase Shift
 			auto mRelativePhase = lfo.getRelativePhase();
 
-			// Get Display's Scroll Phase Shift ==================
+			// Get Display Phase Shift
 			float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
 
-			// Get WaveTable Value and Convert to Pixel Value Y Coordinate
-			auto increment = scalar * waveTable.size() / (bounds.getWidth());
+			// Match Width of 1x Multiplier to Width of One Quarter-Note
+			auto increment = scalar * waveTable.size() / beatSpacing;
+
+			// Index sweeps through WaveTable Array
 			float index = fmod(i * increment + mRelativePhase, waveTable.size());
+
+			// Get value in terms of pixels.  Offset by Region's Midpoint
 			float y = midY + waveTable[index] * (float)bounds.getHeight();
 
-			// Start New Subpath
+			// Display Offset Establishes Wave Starting Point (In-Line with Grid)
+			float displayOffsetStart = bounds.getX() + bounds.getCentreX() - (beatSpacing/2.f) - paintAreaWidth;
+
+			// Incorporate Pan Shift
+			float point = displayOffsetStart + mDisplayPhase;
+
 			if (i == 0)
 			{
-				lfoStrokePath.startNewSubPath(bounds.getX() + mDisplayPhase - dataSize, y);
-				
-				lfoFillPath.startNewSubPath(bounds.getX() + mDisplayPhase - dataSize, midY);
-				lfoFillPath.lineTo(bounds.getX() + mDisplayPhase - dataSize, y);
+				lfoStrokePath.startNewSubPath(point, y);
+				lfoFillPath.startNewSubPath(point, midY);
+				lfoFillPath.lineTo(point, y);
 			}
 			else 
 			{
-				lfoStrokePath.lineTo(bounds.getX() + mDisplayPhase + i - dataSize, y);
-				lfoFillPath.lineTo(bounds.getX() + mDisplayPhase + i - dataSize, y);
+				lfoStrokePath.lineTo(point + i, y);
+				lfoFillPath.lineTo(point + i, y);
 			}
 		}
 	}
@@ -908,6 +840,8 @@ void Oscilloscope::updatePreferences()
 	mShowMidBand = showMidBand->get();
 	mShowHighBand = showHighBand->get();
 	mStackAllBands = stackBands->get();
+	mShowCursor = showCursor->get();
+	mShowPlayhead = showPlayhead->get();
 
 	mLowBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
 	mMidBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
@@ -940,33 +874,53 @@ void Oscilloscope::makeAttachments()
 							params.at(Names::Stack_Bands_Scope),
 							toggleStackBands);
 
-	//scrollAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-	//						audioProcessor.apvts,
-	//						params.at(Names::Scope_Scroll),
-	//						sliderScroll);
+	showCursorAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Show_Cursor_Scope),
+							toggleShowCursor);
+
+	showPlayheadAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+							audioProcessor.apvts,
+							params.at(Names::Show_Playhead_Scope),
+							toggleShowPlayhead);
 }
 
 // Initialize and place toggle buttons.  Refactor later.
-void Oscilloscope::drawToggles()
+void Oscilloscope::drawToggles(bool showMenu)
 {
 	using namespace juce;
 
-	buttonBounds.setBounds(scopeRegion.getX()+5, scopeRegion.getY()+5, 65, 70);
-	buttonBounds.reduce(3, 3);
+
+	if (showMenu)
+	{
+		buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 150);
+		//buttonBounds.reduce(3, 3);
+	}
+	else
+		buttonBounds.setBounds(0, 0, 0, 0);
+
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
+	auto margin = FlexItem().withHeight(5);
 	auto spacer = FlexItem().withHeight(2.5);
+	auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
 
+	flexBox.items.add(margin);
+	flexBox.items.add(FlexItem(toggleShowLow).withHeight(height));
 	flexBox.items.add(spacer);
-	flexBox.items.add(FlexItem(toggleShowLow).withHeight(20));
+	flexBox.items.add(FlexItem(toggleShowMid).withHeight(height));
 	flexBox.items.add(spacer);
-	flexBox.items.add(FlexItem(toggleShowMid).withHeight(20));
+	flexBox.items.add(FlexItem(toggleShowHigh).withHeight(height));
 	flexBox.items.add(spacer);
-	flexBox.items.add(FlexItem(toggleShowHigh).withHeight(20));
+	flexBox.items.add(FlexItem(toggleStackBands).withHeight(height));
 	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(toggleShowCursor).withHeight(height));
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(toggleShowPlayhead).withHeight(height));
+	flexBox.items.add(margin);
 
 	flexBox.performLayout(buttonBounds);
 	
@@ -974,25 +928,36 @@ void Oscilloscope::drawToggles()
 	toggleShowMid.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
 	toggleShowHigh.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
 	toggleStackBands.setColour(	ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	toggleShowCursor.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	toggleShowPlayhead.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
 
 	toggleShowLow.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
 	toggleShowMid.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
 	toggleShowHigh.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
 	toggleStackBands.setColour(	ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleShowCursor.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	toggleShowPlayhead.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
 
 	toggleShowLow.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
 	toggleShowMid.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
 	toggleShowHigh.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
 	toggleStackBands.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	toggleShowCursor.setColour(	ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	toggleShowPlayhead.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
 
 	toggleShowLow.setButtonText("Low");
 	toggleShowMid.setButtonText("Mid");
 	toggleShowHigh.setButtonText("High");
 	toggleStackBands.setButtonText("Stack");
+	toggleShowCursor.setButtonText("Cursor");
+	toggleShowPlayhead.setButtonText("Playhead");
 
 	addAndMakeVisible(toggleShowLow);
 	addAndMakeVisible(toggleShowMid);
 	addAndMakeVisible(toggleShowHigh);
+	addAndMakeVisible(toggleStackBands);
+	addAndMakeVisible(toggleShowCursor);
+	addAndMakeVisible(toggleShowPlayhead);
 }
 
 // Function to fade in view-menu.  Should optimize view-menu to its own class.
@@ -1002,13 +967,17 @@ void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 	using namespace AllColors::OscilloscopeColors;
 
 	// FADE FUNCTIONS FOR MOUSE-ENTER -> TOGGLES AND SLIDERS
-	if (fadeIn && !fadeInCursor) // If mouse entered... fade Toggles Alpha up
+	if (fadeIn || showMenu) // If mouse entered... fade Toggles Alpha up
 	{
 		if (fadeAlpha < fadeMax)
 			fadeAlpha += fadeStepUp;
-
+		
 		if (fadeAlpha > fadeMax)
+		{
 			fadeAlpha = fadeMax;
+			//setToggleEnable(true);
+		}
+			
 	}
 	else // If mouse exit... fade Toggles Alpha down
 	{
@@ -1016,39 +985,94 @@ void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 			fadeAlpha -= fadeStepDown;
 
 		if (fadeAlpha < fadeMin)
+		{
 			fadeAlpha = fadeMin;
+			//setToggleEnable(false);
+		}
+			
 	}
 
 	g.setColour(BUTTON_BACKGROUND_FILL);
-	g.setOpacity(fadeAlpha*0.55f);
-	g.fillRoundedRectangle(buttonBounds, 5.f);
+	g.setOpacity(0.9f);
+	g.fillRoundedRectangle(	buttonBounds.getX(),
+							buttonBounds.getY(),
+							buttonBounds.getWidth(),
+							buttonBounds.getHeight(),
+							2.f);
 
-	toggleShowLow.setAlpha(fadeAlpha);
-	toggleShowMid.setAlpha(fadeAlpha);
-	toggleShowHigh.setAlpha(fadeAlpha);
-	toggleStackBands.setAlpha(fadeAlpha);
+	buttonOptions.setAlpha(fadeAlpha);
+
+}
+
+void Oscilloscope::setToggleEnable(bool enabled)
+{
+	toggleShowLow.setEnabled(enabled);
+	toggleShowMid.setEnabled(enabled);
+	toggleShowHigh.setEnabled(enabled);
+	toggleStackBands.setEnabled(enabled);
+	toggleShowCursor.setEnabled(enabled);
+	toggleShowPlayhead.setEnabled(enabled);
 }
 
 // On mouse-enter, fade in view-menu unless dragging cursor
+void Oscilloscope::mouseEnter(const juce::MouseEvent& event)
+{
+}
 
 // On mouse exit, fade out view-menu
 void Oscilloscope::mouseExit(const juce::MouseEvent& event)
 {
-	fadeIn = false;
+	auto x = event.getPosition().getX();
+	auto y = event.getPosition().getY();
+
+	if (x < 0 || y < 0)
+	{
+		fadeIn = false;
+	}
 }
 
 // If mouse-down within range of cursor, begin moving cursor
 void Oscilloscope::mouseDown(const juce::MouseEvent& event)
 {
-	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10 && !sliderScroll.isMouseOverOrDragging())
+	auto x = event.getPosition().getX();
+	auto y = event.getPosition().getY();
+
+	bool mouseIsWithinMenu;
+
+	if (x < buttonBounds.getRight() && y < buttonBounds.getBottom())
+		mouseIsWithinMenu = true;
+	else
+		mouseIsWithinMenu = false;
+
+	if (!mouseIsWithinMenu && 
+		abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10 && 
+		!sliderScroll.isMouseOverOrDragging() &&
+		mShowCursor)
 		cursorDrag = true;
 }
 
 // A mouse-up gesture indicates the cursor is done being dragged
 void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
+	auto x = event.getPosition().getX();
+	auto y = event.getPosition().getY();
+
+	auto bounds = getLocalBounds();
+
 	cursorDrag = false;
-	scopeScrollParam->setValueNotifyingHost(dragX);
+
+	scopeCursorParam->setValueNotifyingHost(dragX);
+
+	float maxWidth = (float)sliderScroll.getMaxWidth();
+
+	int cursorX = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
+
+	float p1 = (float)(sliderScroll.getPoint1() - cursorX) / (float)maxWidth;
+	float p2 = (float)(sliderScroll.getPoint2() - cursorX) / (float)maxWidth;
+
+	scopePoint1Param->setValueNotifyingHost(p1);
+	scopePoint2Param->setValueNotifyingHost(p2);
+
 }
 
 // Move the cursor when it is dragged
@@ -1071,22 +1095,71 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 // Fade-In the cursor when mouse is within 10 pixels of it
 void Oscilloscope::mouseMove(const juce::MouseEvent& event)
 {
-	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10 && !sliderScroll.isMouseOverOrDragging())
+	auto bounds = getLocalBounds();
+
+	auto x = event.getPosition().getX();
+	auto y = event.getPosition().getY();
+
+	// Check Mouse Proximity to Cursor ===================
+	bool mouseIsNearCursor{ false };
+
+	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
+		mouseIsNearCursor = true;
+
+	// Check if Cursor is Within Menu Region ==============
+	bool cursorIsWithinMenu{ true };
+
+	if (cursor.getStartX() < buttonOptions.getRight())
+		cursorIsWithinMenu = true;
+	else
+		cursorIsWithinMenu = false;
+		
+	// Check If Mouse Enters Menu Region ==========
+	bool mouseIsWithinMenu;
+
+	if (x < buttonOptions.getRight() && y < buttonOptions.getBottom())
+		mouseIsWithinMenu = true;
+	else
+		mouseIsWithinMenu = false;
+
+
+	// If Mouse is Within Menu, Fade in Menu
+	if (mouseIsWithinMenu)
 	{
-		fadeInCursor = true;
+		fadeIn = true;
+		fadeInCursor = false;
 	}
-	else fadeInCursor = false;
+	else
+	{
+		if (!showMenu)
+			fadeIn = false;
+	}
+
+	// If Mouse is Within Cursor, Fade In Cursor
+	if (mouseIsNearCursor)
+	{
+		if (mouseIsWithinMenu)
+			fadeIn = true;
+		else
+			fadeInCursor = true;
+	}
+	else
+		fadeInCursor = false;
 }
 
 // Reset scroll-view position on double-click
 void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 {
-	if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
+	if (!fadeIn)
 	{
-		dragX = 0.5f;
-		cursorDrag = false;
-		scopeScrollParam->setValueNotifyingHost(dragX);
+		if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
+		{
+			dragX = 0.5f;
+			cursorDrag = false;
+			scopeCursorParam->setValueNotifyingHost(dragX);
+		}
 	}
+
 }
 
 // Fade out the view-menu if mouse has left focus
@@ -1095,6 +1168,6 @@ void Oscilloscope::checkMousePosition()
 	if (!isMouseOverOrDragging(true))
 	{
 		fadeInCursor = false;
-		fadeIn = false;
+		//fadeIn = false;
 	}
 }

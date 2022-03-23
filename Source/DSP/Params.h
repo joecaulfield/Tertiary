@@ -68,8 +68,13 @@ namespace Params    // Mapping between Parameter Names and Unique ID's
 		Show_Mid_Scope,
 		Show_High_Scope,
 		Stack_Bands_Scope,
-		Scope_Scroll,
-		Cursor_Position
+		Show_Cursor_Scope,
+		Show_Playhead_Scope,
+
+		Cursor_Position,
+
+		Scope_Point1,
+		Scope_Point2
 	};
 
 	inline const std::map<Names, juce::String>& GetParams()
@@ -129,8 +134,13 @@ namespace Params    // Mapping between Parameter Names and Unique ID's
 			{Show_Mid_Scope,			"Show Mid Band In Scope"},
 			{Show_High_Scope,			"Show High Band In Scope"},
 			{Stack_Bands_Scope,			"Stack All Bands"},
-			{Scope_Scroll,				"Scope Horizontal Scroll"},
+			{Show_Cursor_Scope,			"Show Cursor In Scope"},
+			{Show_Playhead_Scope,		"Show Playhead In Scope"},
+
 			{Cursor_Position,			"Scope Cursor Position"},
+
+			{Scope_Point1,				"Scope Point 1"},
+			{Scope_Point2,				"Scope Point 2"},
 		};
 
 		return params;

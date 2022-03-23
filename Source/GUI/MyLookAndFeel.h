@@ -127,6 +127,20 @@ struct CrossoverLookAndFeel : juce::LookAndFeel_V4
                            float rotaryEndAngle, juce::Slider&) override;
 };
 
+struct ButtonOptionsLookAndFeel : juce::LookAndFeel_V4
+{
+	void drawButtonBackground(	juce::Graphics& g, 
+								juce::Button&button, 
+								const juce::Colour& backgroundColour, 
+								bool shouldDrawButtonAsHighlighted, 
+								bool shouldDrawButtonAsDown) override;
+
+	void drawButtonText(	juce::Graphics& g, 
+							juce::TextButton& button,
+							bool shouldDrawButtonAsHighlighted, 
+							bool shouldDrawButtonAsDown) override;
+};
+
 struct CustomSlider : juce::Component, juce::Slider::Listener, juce::Label::Listener
 {
 	CustomSlider();

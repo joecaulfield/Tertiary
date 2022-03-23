@@ -36,20 +36,31 @@ public:
 
 	juce::Slider slider;
 
-	void sliderValueChanged(juce::Slider* slider);
+	void sliderValueChanged(juce::Slider* slider) {};
 
 	void calculateZoomFactor();
 
+	void initializePoints(float newP1 = 0.f, float newP2 = 0.f);
+	void updatePoints(int x1, int y1);
+	void makeDefaultPoints();
+
+	void setCenter(float panPercentage);
 	float getCenter();
-	float getZoom() { return zoomFactor; }
+
+	int getMaxWidth(){ return maxWidth; }
+	int getMinWidth() { return minWidth; }
+	float getMinZoomFactor() { return minZoomFactor; }
+	float getMaxZoomFactor() { return maxZoomFactor; }
+	float getPoint1() { return point1; }
+	float getPoint2() { return point2; }
+
+	void setZoom(float zoom);
+	float getZoom();
 
 private:
 	float point1;	// Value & Position of Left Thumb
 	float point2;	// Value & Position of Right Thumb
 	float p01, p02;
-
-
-
 
 	bool leftHit{ false }, rightHit{ false }, midHit{ false };
 
@@ -60,13 +71,16 @@ private:
 
 	//bool isPanning{ false };
 
-	int center;
+	int currentCenter{ 0 };
 	int minWidth{ 80 };
 	int defaultWidth{ 160 };
 	float currentWidth { 100 };	// Rename to currentWidth
 	int maxWidth{ 360 };
 
-	float zoomFactor{ 1.f };
+	float minZoomFactor{ 0.5f };
+	float currentZoomFactor{ 1.f };
+	float maxZoomFactor{ 10.f };
+
 
 	int thumbTolerance = 75;
 	//int edgeTolerance = 10;
@@ -74,13 +88,15 @@ private:
 	//float panScale{ 1 };
 	int zoomScale{ 1 };
 
-	float zoomIncrement = 20;
+	// [*] float zoomIncrement = 20;
+	float zoomIncrement = 10;
 	//float panIncrement = 10;
 };
 
 struct Oscilloscope :	juce::Component,
 						juce::Timer, 
-						juce::MouseListener
+						juce::MouseListener,
+						juce::Button::Listener
 {
 	Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc);
 	~Oscilloscope() override;
@@ -95,6 +111,8 @@ struct Oscilloscope :	juce::Component,
 	void drawMidLFO (juce::Rectangle<int> bounds);
 	void drawHighLFO(juce::Rectangle<int> bounds);
 
+	void buttonClicked(juce::Button* button) override;
+
 	void drawLFO(	juce::Rectangle<int> bounds,
 					juce::Path &lfoStrokePath,
 					juce::Path &lfoFillPath,
@@ -106,7 +124,7 @@ struct Oscilloscope :	juce::Component,
 
 	void timerCallback() override;
 
-	void mouseEnter(const juce::MouseEvent& event) override {};
+	void mouseEnter(const juce::MouseEvent& event) override;
 	void mouseExit(const juce::MouseEvent& event) override;
 	void mouseDown(const juce::MouseEvent& event) override;
 	void mouseUp(const juce::MouseEvent& event) override;
@@ -119,22 +137,35 @@ struct Oscilloscope :	juce::Component,
 	void checkMousePosition();
 	void updateRegions();
 
+	void getPanZoom();
+	
 	void getPlayheadPosition();
 
-	int playBackWidth;
-	int playBackOffset;
-	int playBackNumBeats;
+
+
+	/*	Amount of not-shown pixels in the quarter-note 
+	that overhangs the edge of the screen.
+	Ignores display shift and assumes centered pan.	*/
+	float playBackOffset{ 0.f };
+
+	// Number of Full-Beats Which Fit Into Display
+	float beatSpacing{ 1.f };
+
+	/*Number of Quarter Notes Shown In Display - Including One Overhanging QN*/
+	float playBackNumBeats{ 1.f };
+
+	// Total Number of Beats scaled into a Pixel-Valued Width
+	float playBackWidth{ 1.f };
 
 	void getWavesForDisplay();
 	juce::Array<float> scaleWaveAmplitude(juce::Array<float> waveTable, LFO lfo);
-	juce::Array<float> addWavePhaseShift(juce::Array<float> waveTable, LFO lfo);
-	juce::Array<float> scaleWaveTime(juce::Array<float> waveTable, LFO lfo);
 
 	float playHeadPositionPixel;
 
 	void drawStackedScope();
 
-	void drawToggles();
+	void drawToggles(bool showMenu);
+	void setToggleEnable(bool enabled);
 	void drawSliders() {};
 	void fadeInOutComponents(juce::Graphics& g);
 	void drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bounds);
@@ -145,11 +176,17 @@ struct Oscilloscope :	juce::Component,
 	GlobalControls& globalControls;
 	
 	ScrollLookAndFeel scrollLookAndFeel;
+	ButtonOptionsLookAndFeel optionsLookAndFeel;
+
 
 	juce::ToggleButton	toggleShowLow, 
 						toggleShowMid, 
 						toggleShowHigh, 
-						toggleStackBands;
+						toggleStackBands,
+						toggleShowCursor,
+						toggleShowPlayhead;
+
+	juce::TextButton buttonOptions;
 
 	//juce::Slider sliderScroll;
 	ScrollPad sliderScroll;
@@ -158,8 +195,11 @@ struct Oscilloscope :	juce::Component,
 	juce::AudioParameterBool* showMidBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showHighBand{ nullptr };      // Pointer to the APVTS
 	juce::AudioParameterBool* stackBands{ nullptr };        // Pointer to the APVTS
+	juce::AudioParameterBool* showCursor{ nullptr };        // Pointer to the APVTS
+	juce::AudioParameterBool* showPlayhead{ nullptr };      // Pointer to the APVTS
 
-	juce::AudioParameterFloat* displayPhase{ nullptr };
+	//juce::AudioParameterFloat* displayPhase{ nullptr };
+
 	float mDisplayPhase = 0.f;
 
 private:
@@ -167,6 +207,8 @@ private:
 	LFO& lowLFO;
 	LFO& midLFO;
 	LFO& highLFO;
+
+	bool showMenu{ false };
 
 	int timerCounter = 0;
 
@@ -184,13 +226,15 @@ private:
 	std::unique_ptr<buttonAttachment>	showLowAttachment,
 										showMidAttachment,
 										showHighAttachment,
-										stackBandsAttachment;
+										stackBandsAttachment,
+										showCursorAttachment,
+										showPlayheadAttachment;
 
 	using sliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
 	std::unique_ptr<sliderAttachment>	scrollAttachment;
 
-	bool mShowLowBand, mShowMidBand, mShowHighBand, mStackAllBands;
+	bool mShowLowBand, mShowMidBand, mShowHighBand, mStackAllBands, mShowCursor, mShowPlayhead;
 	bool mLowFocus, mMidFocus, mHighFocus;
 	bool mLowBypass{ false }, mMidBypass{ false }, mHighBypass{ false };
 
@@ -199,7 +243,7 @@ private:
 	float fadeMax = 1.f;			float fadeMaxCursor = 1.f;
 	float fadeMin = 0.0f;			float fadeMinCursor = 0.65;
 	float fadeStepUp = 0.1f;		float fadeStepUpCursor = 0.1f;
-	float fadeStepDown = 0.1f;		float fadeStepDownCursor = 0.1f;
+	float fadeStepDown = 0.01f;		float fadeStepDownCursor = 0.05f;
 
 	float sampleRate;
 
@@ -208,26 +252,12 @@ private:
 	juce::Line<float> cursor;
 	bool cursorDrag{ false };
 	float dragX{ 0 };
+	float scrollZoom{ 0 };
+	float scrollPan{ 0 };
 
-	juce::AudioParameterFloat* scopeScrollParam{ nullptr };
+	juce::AudioParameterFloat* scopeCursorParam{ nullptr };
+	juce::AudioParameterFloat* scopePoint1Param{ nullptr };
+	juce::AudioParameterFloat* scopePoint2Param{ nullptr };
 
 	float numDepthLines{ 1 };
 };
-
-
-
-/*
-
-
-		dragX = event.getPosition().getX() / (float)getWidth();
-
-		if (event.getPosition().getX() < margin)
-			dragX = margin / (float)getWidth();
-
-		if (event.getPosition().getX() > (float)getWidth() - margin)
-			dragX = ((float)getWidth() - margin) / getWidth();
-
-
-
-
-*/

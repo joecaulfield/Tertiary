@@ -785,6 +785,54 @@ void CenterSliderLookAndFeel::setBandMode(int bandMode)
 //	return p;
 //}
 
+void ButtonOptionsLookAndFeel::drawButtonBackground(juce::Graphics& g,
+													juce::Button& button,
+													const juce::Colour& backgroundColour,
+													bool shouldDrawButtonAsHighlighted,
+													bool shouldDrawButtonAsDown)
+{
+	auto bounds = button.getLocalBounds();
+
+	if (!shouldDrawButtonAsDown)
+	{
+		g.fillAll(juce::Colours::white);
+
+		g.setColour(juce::Colours::darkgrey);
+		g.drawRect(bounds);
+	}
+	else
+	{
+		g.fillAll(juce::Colours::whitesmoke);
+
+		g.setColour(juce::Colours::darkgrey);
+		g.drawRect(bounds);
+
+		bounds.reduce(1, 1);
+		g.setColour(juce::Colours::darkslategrey);
+		g.drawRect(bounds);
+	}
+		
+
+
+}
+
+void ButtonOptionsLookAndFeel::drawButtonText(	juce::Graphics& g, 
+												juce::TextButton& button,
+												bool shouldDrawButtonAsHighlighted, 
+												bool shouldDrawButtonAsDown)
+{
+	auto bounds = button.getLocalBounds();
+
+	auto myTypeface = "Helvetica";
+	auto buttonFont = juce::Font(	myTypeface, 
+									bounds.getHeight() * 0.75f, 
+									juce::Font::FontStyleFlags::bold);
+
+	g.setFont(buttonFont);
+
+	g.drawText("Options", bounds, juce::Justification::centred, false);
+}
+
 void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int width, int height,
 											float sliderPos, float minSliderPos, float maxSliderPos,
 											const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider)

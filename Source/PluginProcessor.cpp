@@ -151,8 +151,9 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
 	apvts.addParameterListener(params.at(Names::Show_Mid_Scope), this);
 	apvts.addParameterListener(params.at(Names::Show_High_Scope), this);
 	apvts.addParameterListener(params.at(Names::Stack_Bands_Scope), this);
-	apvts.addParameterListener(params.at(Names::Scope_Scroll), this);
 	apvts.addParameterListener(params.at(Names::Cursor_Position), this);
+	apvts.addParameterListener(params.at(Names::Scope_Point1), this);
+	apvts.addParameterListener(params.at(Names::Scope_Point2), this);
 
     // Set Crossover Types
     LP1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
@@ -302,30 +303,92 @@ bool TertiaryAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void TertiaryAudioProcessor::updateState()
 {
-    auto sampleRate = getSampleRate();
-	
+	auto sampleRate = getSampleRate();
+
 	// Update Input Gain Params
-    inputGain.setGainDecibels(inputGainParam->get());
-    outputGain.setGainDecibels(outputGainParam->get());
+	inputGain.setGainDecibels(inputGainParam->get());
+	outputGain.setGainDecibels(outputGainParam->get());
 
 	// Update Tremolo Params
-    for (auto& trem : tremolos)                         // Update Tremolo Settings In One Pass
-        trem.updateTremoloSettings();
+	for (auto& trem : tremolos)                         // Update Tremolo Settings In One Pass
+		trem.updateTremoloSettings();
 
-    lowLFO.updateLFO(sampleRate, hostInfo.bpm);
-    midLFO.updateLFO(sampleRate, hostInfo.bpm);
-    highLFO.updateLFO(sampleRate, hostInfo.bpm);
+	lowLFO.updateLFO(sampleRate, hostInfo.bpm);
+	midLFO.updateLFO(sampleRate, hostInfo.bpm);
+	highLFO.updateLFO(sampleRate, hostInfo.bpm);
 
 	// Update Crossover Params
 
-    auto lowMidCutoffFreq = lowMidCrossover->get();     // Cutoff Frequency
-    LP1.setCutoffFrequency(lowMidCutoffFreq);           // Set Cutoff Frequency of LPF
-    HP1.setCutoffFrequency(lowMidCutoffFreq);           // Set Cutoff Frequency of HPF
+	auto lowMidCutoffFreq = lowMidCrossover->get();     // Cutoff Frequency
+	LP1.setCutoffFrequency(lowMidCutoffFreq);           // Set Cutoff Frequency of LPF
+	HP1.setCutoffFrequency(lowMidCutoffFreq);           // Set Cutoff Frequency of HPF
 
-    auto midHighCutoffFreq = midHighCrossover->get();
-    AP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of APF 2
-    LP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of LPF 2
-    HP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of HPF 2
+	auto midHighCutoffFreq = midHighCrossover->get();
+	AP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of APF 2
+	LP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of LPF 2
+	HP2.setCutoffFrequency(midHighCutoffFreq);          // Set Cutoff Frequency of HPF 2
+
+	/* Set up a SR latch on Hit-Play */
+	if (hostInfo.isPlaying)
+	{
+		setLatchPlay = true;
+
+		if (setLatchStop)
+		{
+			hitPlay = true;
+			setLatchStop = false;
+			
+			// Force Low LFO Onto Grid
+			if (hostInfo.isPlaying && lowLFO.isSyncedToHost())
+			{
+				float div = 1.f;
+
+				// Special Case for Mult = 0.5x
+				if (lowLFO.getWaveMultiplier() == 0.5f)
+					div = 2.f;
+
+				lowLFO.phase = fmod(playPosition, div) * lowLFO.waveTableMapped.size();
+			}
+
+			// Force Mid LFO Onto Grid
+			if (hostInfo.isPlaying && midLFO.isSyncedToHost())
+			{
+				float div = 1.f;
+
+				// Special Case for Mult = 0.5x
+				if (midLFO.getWaveMultiplier() == 0.5f)
+					div = 2.f;
+
+				midLFO.phase = fmod(playPosition, div) * midLFO.waveTableMapped.size();
+			}
+
+			// Force High LFO Onto Grid
+			if (hostInfo.isPlaying && highLFO.isSyncedToHost())
+			{
+				float div = 1.f;
+
+				// Special Case for Mult = 0.5x
+				if (highLFO.getWaveMultiplier() == 0.5f)
+					div = 2.f;
+
+				highLFO.phase = fmod(playPosition, div) * highLFO.waveTableMapped.size();
+			}
+
+
+		}
+	}
+	else
+	{
+		setLatchStop = true;
+
+		if (setLatchPlay)
+		{
+			hitPlay = false;
+			setLatchPlay = false;
+			DBG("STOP");
+		}
+	}
+
 }
 
 void TertiaryAudioProcessor::splitBands(const juce::AudioBuffer<float>& inputBuffer)
@@ -363,7 +426,7 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     playHead = this->getPlayHead();
 
 	playPosition = hostInfo.ppqPosition;
-	
+
     if (playHead != nullptr)
         playHead->getCurrentPosition(hostInfo);
 
@@ -402,6 +465,8 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 	// APPLY CROSSOVER =====
     splitBands(buffer);
 
+	// Maybe need to apply gain to all trem-bands in same sample-pass?
+
     // Apply Low Band Tremolo =======================================================================
 
     auto* lowWriteL = filterBuffers[0].getWritePointer(0);
@@ -410,12 +475,15 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (int sample = 0; sample < filterBuffers[0].getNumSamples(); ++sample)
     {
         float mGainLowLFO = lowLFO.waveTableMapped[fmod((lowLFO.phase + lowLFO.mRelativePhase), lowLFO.waveTableMapped.size())];
-        lowLFO.phase = fmod((lowLFO.phase + lowLFO.increment), lowLFO.waveTableMapped.size());
 
+		lowLFO.phase = fmod((lowLFO.phase + lowLFO.increment), lowLFO.waveTableMapped.size());		
+		
         if (!lowBandTrem.bypass->get())
         {
             lowWriteL[sample] *= mGainLowLFO;
             lowWriteR[sample] *= mGainLowLFO;
+
+			//lowWriteL[sample] = mGainLowLFO;
         }
     }
 
@@ -427,9 +495,10 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (int sample = 0; sample < filterBuffers[1].getNumSamples(); ++sample)
     {
         float mGainMidLFO = midLFO.waveTableMapped[fmod((midLFO.phase + midLFO.mRelativePhase), midLFO.waveTableMapped.size())];
-        midLFO.phase = fmod((midLFO.phase + midLFO.increment), midLFO.waveTableMapped.size());
 
-        if (!midBandTrem.bypass->get())
+		midLFO.phase = fmod((midLFO.phase + midLFO.increment), midLFO.waveTableMapped.size());
+
+		if (!midBandTrem.bypass->get())
         {
             midWriteL[sample] *= mGainMidLFO;
             midWriteR[sample] *= mGainMidLFO;
@@ -444,7 +513,8 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (int sample = 0; sample < filterBuffers[2].getNumSamples(); ++sample)
     {
         float mGainHighLFO = highLFO.waveTableMapped[fmod((highLFO.phase + highLFO.mRelativePhase), highLFO.waveTableMapped.size())];
-        highLFO.phase = fmod((highLFO.phase + highLFO.increment), highLFO.waveTableMapped.size());
+ 
+		highLFO.phase = fmod((highLFO.phase + highLFO.increment), highLFO.waveTableMapped.size());
 
         if (!highBandTrem.bypass->get())
         {
@@ -533,6 +603,8 @@ void TertiaryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 			rmsLevelOutputRight.setTargetValue(newValueRight);
 		else rmsLevelOutputRight.setCurrentAndTargetValue(newValueRight);
 	}
+
+	
 
 }
 
@@ -858,15 +930,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 														params.at(Names::Stack_Bands_Scope),    // Parameter Name
 														true));  
 
-	auto scrollRange = NormalisableRange<float> ( -180,	// Start
-                                                180,	// Stop
-                                                2,		// Step Size
-                                                1.f);	// Skew 
+	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Cursor_Scope),	// Parameter ID
+														params.at(Names::Show_Cursor_Scope),    // Parameter Name
+														true)); 
 
-	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Scope_Scroll),		// Parameter ID
-														params.at(Names::Scope_Scroll),     // Parameter Name
-														scrollRange,                        // Range
-														0));                                // Default Value
+	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Playhead_Scope),	// Parameter ID
+														params.at(Names::Show_Playhead_Scope),  // Parameter Name
+														true)); 
 
 	auto cursorRange = NormalisableRange<float> (0.f,	// Start
                                                 1.f,	// Stop
@@ -876,7 +946,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Cursor_Position),	// Parameter ID
 														params.at(Names::Cursor_Position),  // Parameter Name
 														cursorRange,                        // Range
-														0.5f));                                // Default Value
+														0.5f));                             // Default Value
+
+	auto pointRange = NormalisableRange<float> ( 0,		// Start
+                                                100.f,	// Stop
+                                                1.f,	// Step Size
+                                                1.f);	// Skew 
+
+	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Scope_Point1),		// Parameter ID
+														params.at(Names::Scope_Point1),     // Parameter Name
+														pointRange,                        // Range
+														25.f));							// Default Value
+
+	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Scope_Point2),		// Parameter ID
+														params.at(Names::Scope_Point2),		// Parameter Name
+														pointRange,							// Range
+														75.f));								// Default Value
 
     return layout;
 }
