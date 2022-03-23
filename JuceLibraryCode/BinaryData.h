@@ -26,8 +26,23 @@ namespace BinaryData
     extern const char*   Mult5_png;
     const int            Mult5_pngSize = 504;
 
+    extern const char*   TitleHeader_png;
+    const int            TitleHeader_pngSize = 21643;
+
+    extern const char*   TitleWaveShape_png;
+    const int            TitleWaveShape_pngSize = 12024;
+
+    extern const char*   TitleWaveTiming_png;
+    const int            TitleWaveTiming_pngSize = 11807;
+
+    extern const char*   TitleCrossover_png;
+    const int            TitleCrossover_pngSize = 9410;
+
+    extern const char*   TitleGainControls_png;
+    const int            TitleGainControls_pngSize = 8161;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 6;
+    const int namedResourceListSize = 11;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

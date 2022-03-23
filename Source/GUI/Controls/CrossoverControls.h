@@ -55,4 +55,5 @@ private:
 	juce::Label sliderValueLM, sliderValueMH;
 
 	juce::Image background;
+	juce::Image imageCrossover;
 };

@@ -28,6 +28,9 @@ WaveControls::WaveControls(juce::AudioProcessorValueTreeState& apv)
 	makeAttachments();
 
 	setSize(500, 140);
+
+	imageWaveShape = juce::ImageCache::getFromMemory(BinaryData::TitleWaveShape_png, BinaryData::TitleWaveShape_pngSize);
+
 }
 
 void WaveControls::paint(juce::Graphics& g)
@@ -35,6 +38,9 @@ void WaveControls::paint(juce::Graphics& g)
 	auto bounds = getLocalBounds();
 
 	g.drawImage(background, bounds.toFloat());
+
+
+
 }
 
 void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
@@ -51,7 +57,9 @@ void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 										25};
 
 	// Draw the Title
+	g.drawImage(imageWaveShape, titleBounds.toFloat());
 	g.setColour(juce::Colours::white);
+	g.setOpacity(0.5f);
 
 	auto myTypeface = "Helvetica";
 	auto titleFont = juce::Font(	myTypeface, 
@@ -59,9 +67,6 @@ void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
-
-	g.setColour(juce::Colours::white);
-	g.drawFittedText("WAVE SHAPE", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{	bounds.getX(), 
@@ -71,8 +76,6 @@ void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 
 	// Set Font Height For Sub-Labels
 	g.setFont(16);
-
-	//g.setColour(juce::Colours::white);
 
 	// Draw Parameter Labels: Invert ======================
 	juce::Rectangle<int> invertLabelBounds{		waveBarHigh.toggleInvert.getX(),
@@ -103,7 +106,7 @@ void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 							waveBarLow.sliderWave.getX() + (waveBarLow.sliderWave.getWidth() / 2.f) + 35,
 							waveBarLow.sliderWave.getRight());
 
-	g.setOpacity(1.f);
+	g.setOpacity(0.5f);
 
 	// Draw Parameter Labels: Symmetry AKA Skew ======================
 	juce::Rectangle<int> symLabelBounds{ waveBarHigh.sliderSymmetry.getX(),
@@ -133,12 +136,12 @@ void WaveControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 	gradient.addColour(p1, juce::Colours::white);
 	gradient.addColour(p2, juce::Colours::white);
 
+
+
 	g.setGradientFill(gradient);
-	g.setOpacity(0.5f);
+	g.setOpacity(0.25f);
 
 	// Draw Division Lines ======================
-
-	g.setOpacity(0.25f);
 
 	auto center = (titleBounds.getBottom() + waveBarLow.getY()) / 2.f;
 	g.drawHorizontalLine(center, bounds.getX(), bounds.getRight());

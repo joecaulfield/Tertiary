@@ -3086,6 +3086,11 @@
     <None Include="..\..\Assets\Mult3.png"/>
     <None Include="..\..\Assets\Mult4.png"/>
     <None Include="..\..\Assets\Mult5.png"/>
+    <None Include="..\..\Assets\TitleHeader.png"/>
+    <None Include="..\..\Assets\TitleWaveShape.png"/>
+    <None Include="..\..\Assets\TitleWaveTiming.png"/>
+    <None Include="..\..\Assets\TitleCrossover.png"/>
+    <None Include="..\..\Assets\TitleGainControls.png"/>
     <None Include="..\..\..\..\&#96;JUCE\modules\juce_audio_devices\native\oboe\CMakeLists.txt"/>
     <None Include="..\..\..\..\&#96;JUCE\modules\juce_audio_devices\native\oboe\README.md"/>
     <None Include="..\..\..\..\&#96;JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt"/>

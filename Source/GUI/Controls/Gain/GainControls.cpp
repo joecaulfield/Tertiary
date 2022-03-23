@@ -28,6 +28,8 @@ GainControls::GainControls(juce::AudioProcessorValueTreeState& apv)
 	makeAttachments();
 
 	setSize(200, 140);
+	imageGainControls = juce::ImageCache::getFromMemory(BinaryData::TitleGainControls_png, BinaryData::TitleGainControls_pngSize);
+
 }
 
 void GainControls::paint(juce::Graphics& g)
@@ -51,7 +53,10 @@ void GainControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 										25};
 
 	// Draw the Title
+
+	g.drawImage(imageGainControls, titleBounds.toFloat());
 	g.setColour(juce::Colours::white);
+	g.setOpacity(0.5f);
 
 	auto myTypeface = "Helvetica";
 	auto titleFont = juce::Font(	myTypeface, 
@@ -59,9 +64,6 @@ void GainControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
-
-	g.setColour(juce::Colours::white);
-	g.drawFittedText("GAIN CONTROL", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{	bounds.getX(), 
@@ -78,7 +80,7 @@ void GainControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 											gainBarHigh.sliderGain.getWidth(),
 											labelBounds.getHeight()};
 
-	g.drawFittedText("BAND GAIN", gainLabelBounds, juce::Justification::centred, 1);
+	g.drawFittedText("GAIN", gainLabelBounds, juce::Justification::centred, 1);
 
 	// Draw Parameter Labels: Bypass ======================
 	juce::Rectangle<int> bypLabelBounds{	gainBarHigh.toggleBypass.getX(),
@@ -117,7 +119,10 @@ void GainControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 	gradient.addColour(p2, juce::Colours::white);
 
 	g.setGradientFill(gradient);
-	g.setOpacity(0.5f);
+	g.setOpacity(0.25f);
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.25f);
 
 	// Draw Division Lines ======================
 

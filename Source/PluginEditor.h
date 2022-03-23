@@ -35,7 +35,10 @@ private:
 	Oscilloscope oscilloscope{ audioProcessor, globalControls};						// Instance of Oscilloscope Panel
 	FrequencyResponse frequencyResponse{ audioProcessor.apvts, globalControls };	// Instance of Frequency Response Panel
 
-	juce::Label pluginTitle;
+	juce::Label companyTitle;
+	juce::Image imageTitleHeader;
+
+	juce::String version = "1.5";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TertiaryAudioProcessorEditor)
 };

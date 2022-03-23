@@ -82,6 +82,15 @@
       <FILE id="pM4vta" name="Mult3.png" compile="0" resource="1" file="Assets/Mult3.png"/>
       <FILE id="Oh8xDR" name="Mult4.png" compile="0" resource="1" file="Assets/Mult4.png"/>
       <FILE id="SSdKFM" name="Mult5.png" compile="0" resource="1" file="Assets/Mult5.png"/>
+      <FILE id="jHtH16" name="TitleHeader.png" compile="0" resource="1" file="Assets/TitleHeader.png"/>
+      <FILE id="v8jzI1" name="TitleWaveShape.png" compile="0" resource="1"
+            file="Assets/TitleWaveShape.png"/>
+      <FILE id="j6Gc6D" name="TitleWaveTiming.png" compile="0" resource="1"
+            file="Assets/TitleWaveTiming.png"/>
+      <FILE id="lWvxT5" name="TitleCrossover.png" compile="0" resource="1"
+            file="Assets/TitleCrossover.png"/>
+      <FILE id="smUVQ0" name="TitleGainControls.png" compile="0" resource="1"
+            file="Assets/TitleGainControls.png"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

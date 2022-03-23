@@ -37,6 +37,8 @@ private:
 
     using sliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
+
+
 	std::unique_ptr<sliderAttachment>	waveLowAttachment,
 										waveMidAttachment,
 										waveHighAttachment,
@@ -54,4 +56,5 @@ private:
 										invertHighAttachment;
 
 	juce::Image background;
+	juce::Image imageWaveShape;
 };

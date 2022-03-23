@@ -18,15 +18,19 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 	addAndMakeVisible(oscilloscope);		// Time-Domain LFO Display
 
 	addMouseListener(this, true);
-    //setSize (800, 580);
+
 	setSize(800, 625);
 
+	imageTitleHeader = juce::ImageCache::getFromMemory(BinaryData::TitleHeader_png, BinaryData::TitleHeader_pngSize);
+
 	// TITLE LABEL =============================================================
-	pluginTitle.setJustificationType(juce::Justification::centred);
-	pluginTitle.setFont(juce::Font(24.f, juce::Font::bold));
-	pluginTitle.setColour(juce::Label::textColourId, juce::Colours::white);
-	pluginTitle.setText("TERTIARY v0.3a", juce::NotificationType::dontSendNotification);
-	addAndMakeVisible(pluginTitle);
+
+	companyTitle.setJustificationType(juce::Justification::centredRight);
+	companyTitle.setFont(juce::Font(17.f, juce::Font::bold));
+	companyTitle.setColour(juce::Label::textColourId, juce::Colours::white);
+	companyTitle.setAlpha(0.5f);
+	companyTitle.setText("Caulfield Engineering \n Version " + version, juce::NotificationType::dontSendNotification);
+	addAndMakeVisible(companyTitle);
 }
 
 TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
@@ -35,12 +39,15 @@ TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
 }
 
 //==============================================================================
-void TertiaryAudioProcessorEditor::paint (juce::Graphics& g)
+void TertiaryAudioProcessorEditor::paint(juce::Graphics& g)
 {
 	using namespace AllColors::PluginEditorColors;
 
 	g.setGradientFill(BACKGROUND_GRADIENT(getLocalBounds().toFloat()));
 	g.fillAll();
+
+	juce::Rectangle<float> titleBounds{ 0, 0, 800, 50 };
+	g.drawImage(imageTitleHeader, titleBounds);
 }
 
 void TertiaryAudioProcessorEditor::resized()
@@ -54,8 +61,8 @@ void TertiaryAudioProcessorEditor::resized()
 	bounds.removeFromLeft(5);	// Left Padding
 	bounds.removeFromRight(5);	// Right Padding
 
-	pluginTitle.setSize(250, 50);
-	pluginTitle.setCentrePosition(bounds.getCentreX(), bounds.getY() / 2.f);
+	companyTitle.setSize(250, 50);
+	companyTitle.setTopRightPosition(bounds.getRight(), 0);
 
 	// Flexbox to Wrap Oscilloscope and FrequencyResponse
 	juce::FlexBox flexBox;	

@@ -54,4 +54,5 @@ private:
 										syncHighAttachment;
 
 	juce::Image background;
+	juce::Image imageWaveTiming;
 };

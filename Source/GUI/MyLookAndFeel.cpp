@@ -88,9 +88,11 @@ void CustomSlider::labelTextChanged(juce::Label* labelThatHasChanged)
 
 	for (int i = 0; i <= 127; i++)
 	{
-		if ((i < 48 || i > 57) && i !=46)
+		// Remove all characters not '0-9' or '-' or '.'
+		if ((i < 48 || i > 57) && i !=46 && i != 45)
 			entryString = entryString.removeCharacters(juce::String::charToString(char(i)));
 
+		// Entry must contain at least one numeric value
 		if ((i >= 48 || i <= 57))
 		{
 			if (entryString.contains(juce::String::charToString(char(i))))
@@ -558,7 +560,7 @@ void MultLookAndFeel::drawMult5(juce::Graphics& g, juce::Rectangle<int> bounds, 
 
 	// Draw Icon Background
 	drawOptionButtonBackground(g, bounds, selected, slider, mode);
-
+	
 	// Draw Icon
 	g.drawImage(imageMultIcon5, bounds.toFloat());
 }
@@ -837,34 +839,6 @@ void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int w
 											float sliderPos, float minSliderPos, float maxSliderPos,
 											const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider)
 {
-	// Set Textbox Style
-	//slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-	//slider.setColour(juce::Slider::ColourIds::textBoxOutlineColourId, juce::Colours::black.withAlpha(0.f));
-
-	// Establish Bounds
-	//juce::Rectangle<float> bounds = { (float)x, (float)y, (float)width, (float)height };
-
-	// Horizontal Scroll Track
-	//juce::Path track;
-	//track.startNewSubPath(bounds.getX() + 6, bounds.getCentreY());
-	//track.lineTo(bounds.getRight() - 6, bounds.getCentreY());
-	//g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
-	//g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
-	//											juce::PathStrokeType::EndCapStyle::rounded));
-
-	//// Scaled Fader Position
-	//auto sliderPosScaled1 = (minSliderPos - bounds.getY()) / bounds.getWidth();
-	//auto sliderPosScaled2 = (maxSliderPos - bounds.getY()) / bounds.getWidth();
-
-	//auto faderRange1 = juce::jmap(sliderPosScaled1, bounds.getX() + 6, bounds.getRight() - 6);
-	//auto faderRange2 = juce::jmap(sliderPosScaled2, bounds.getX() + 6, bounds.getRight() - 6);
-
-	//auto size = 10;
-
-	//g.setColour(juce::Colours::lightgrey);
-
-	//g.fillEllipse(faderRange1 - size / 2.f, bounds.getCentreY() - size / 2.f, size, size);
-	//g.fillEllipse(faderRange2 - size / 2.f, bounds.getCentreY() - size / 2.f, size, size);
 
 }
 

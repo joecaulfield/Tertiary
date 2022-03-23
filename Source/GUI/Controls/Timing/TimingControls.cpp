@@ -26,6 +26,8 @@ TimingControls::TimingControls(juce::AudioProcessorValueTreeState& apv)
 	makeAttachments();
 
 	setSize(500, 140);
+	imageWaveTiming = juce::ImageCache::getFromMemory(BinaryData::TitleWaveTiming_png, BinaryData::TitleWaveTiming_pngSize);
+
 }
 
 void TimingControls::paint(juce::Graphics& g)
@@ -49,7 +51,10 @@ void TimingControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 										25};
 
 	// Draw the Title
+
+	g.drawImage(imageWaveTiming, titleBounds.toFloat());
 	g.setColour(juce::Colours::white);
+	g.setOpacity(0.5f);
 
 	auto myTypeface = "Helvetica";
 	auto titleFont = juce::Font(	myTypeface, 
@@ -57,9 +62,6 @@ void TimingControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
-
-	g.setColour(juce::Colours::white);
-	g.drawFittedText("WAVE TIMING", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{	bounds.getX(), 
@@ -101,7 +103,7 @@ void TimingControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 							timingBarLow.sliderMultuplier.getX() + (timingBarLow.sliderMultuplier.getWidth() / 2.f) + 40,
 							timingBarLow.sliderMultuplier.getRight());
 
-	g.setOpacity(1.0f);
+	g.setOpacity(0.5f);
 
 	// Draw Parameter Labels: Rate ======================
 	juce::Rectangle<int> rateLabelBounds{	timingBarHigh.sliderRate.getX(),
@@ -132,7 +134,7 @@ void TimingControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 	gradient.addColour(p2, juce::Colours::white);
 
 	g.setGradientFill(gradient);
-	g.setOpacity(0.5f);
+	g.setOpacity(0.25f);
 
 	// Draw Division Lines ======================
 

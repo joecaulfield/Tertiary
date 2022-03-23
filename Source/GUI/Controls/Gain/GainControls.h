@@ -57,4 +57,5 @@ private:
 	//int bottomBarHeight{ 25 };
 
 	juce::Image background;
+	juce::Image imageGainControls;
 };

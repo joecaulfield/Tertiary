@@ -52,6 +52,8 @@ CrossoverControls::CrossoverControls(juce::AudioProcessorValueTreeState& apv)
 	updateStringText();
 
 	setSize(200, 140);
+	imageCrossover = juce::ImageCache::getFromMemory(BinaryData::TitleCrossover_png, BinaryData::TitleCrossover_pngSize);
+
 }
 
 CrossoverControls::~CrossoverControls()
@@ -285,7 +287,10 @@ void CrossoverControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 										27};
 
 	// Draw the Title
+
+	g.drawImage(imageCrossover, titleBounds.toFloat());
 	g.setColour(juce::Colours::white);
+	g.setOpacity(0.5f);
 
 	auto myTypeface = "Helvetica";
 	auto titleFont = juce::Font(	myTypeface, 
@@ -293,9 +298,6 @@ void CrossoverControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 									juce::Font::FontStyleFlags::bold);
 
 	g.setFont(titleFont);
-
-	g.setColour(juce::Colours::white);
-	g.drawFittedText("CROSSOVER", titleBounds, juce::Justification::centred, 1);
 
 	// Draw the Label Bounds
 	juce::Rectangle<int> labelBounds{	bounds.getX(), 
@@ -335,7 +337,7 @@ void CrossoverControls::drawBackgroundImage(juce::Rectangle<int> bounds)
 	gradient.addColour(p2, juce::Colours::white);
 
 	g.setGradientFill(gradient);
-	g.setOpacity(0.5f);
+	g.setOpacity(0.25f);
 
 	// Draw Division Lines ======================
 
