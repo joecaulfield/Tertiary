@@ -136,6 +136,9 @@ void ScrollPad::updatePoints(int x1, int y1)
 
 		currentCenter = x1 - offset;		// Center of points as a function of mouse position
 
+		//// Disable Panning Function
+		//currentCenter = bounds.getCentreX();
+
 		// Prevent Panning Beyond Left Edge
 		if (currentCenter < bounds.getX() + edgeTolerance + currentWidth / 2.f)
 			currentCenter = bounds.getX() + edgeTolerance + currentWidth / 2.f;
@@ -314,6 +317,8 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	floatHelper(scopePoint1Param, Names::Scope_Point1);
 	floatHelper(scopePoint2Param, Names::Scope_Point2);
 
+	sliderScroll.initializePoints(scopePoint1Param->get(), scopePoint2Param->get());
+	
 
 	dragX = scopeCursorParam->get();
 
@@ -326,6 +331,11 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	buttonOptions.setButtonText("Options");
 	buttonOptions.addListener(this);
+
+	toggleShowLow.addListener(this);
+	toggleShowMid.addListener(this);
+	toggleShowHigh.addListener(this);
+	toggleStackBands.addListener(this);
 
 	addMouseListener(this, true);
 
@@ -383,13 +393,18 @@ void Oscilloscope::resized()
 	buttonOptions.setTopLeftPosition(4,4);
 
 	sliderScroll.initializePoints(x + p1, x + p2);
+
+	updateRegions();
 }
 
 void Oscilloscope::buttonClicked(juce::Button* button)
 {
-	showMenu = !showMenu;
+	if (button == &buttonOptions)
+		showMenu = !showMenu;
 
 	drawToggles(showMenu);
+
+	updateLfoDisplay = true;
 }
 
 // Graphics class
@@ -480,7 +495,7 @@ void Oscilloscope::paint(juce::Graphics& g)
 										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
 
 	// DRAW THE MOVING PLAYHEAD
-	if (mShowPlayhead)
+	if (mShowPlayhead && !panOrZoomChanging)
 	{
 		g.setColour(juce::Colours::darkgrey);
 		g.drawVerticalLine(playHeadPositionPixel, lowRegion.getY(), lowRegion.getBottom());
@@ -521,10 +536,6 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 	// Represents Number of Full Quarter-Notes to be Shown
 	float zoomFactor = sliderScroll.getZoom();
 
-	float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
-
-	auto c = bounds.getCentreX();
-
 	g.setColour(juce::Colours::lightgrey);
 
 	if (mStackAllBands)
@@ -538,38 +549,79 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 		beatSpacing = 1.f;
 
 	// Allows Grid to Split Center
-	float num = 0.5f;
+	float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
 
-	// Calculate Number of Quarter-Notes to Draw
-	for (int i = bounds.getCentreX(); i <= 2*bounds.getRight(); i++)
+	auto c = bounds.getCentreX() + mDisplayPhase;
+	int num = 0;
+
+	float leftGridLine;
+	float rightGridLine;
+
+	// Draw Gridlines
+	for (int i = bounds.getCentreX(); i <= 2 * bounds.getRight(); i++)
 	{
+
+		// Draw Markers at Single-Beat Intervals
 		if (i % (int)beatSpacing == 0)
 		{
+			g.setColour(juce::Colours::darkgrey);
+
+			// Highlight Even Markers
+			if (num % 2 == 0)
+				g.setColour(juce::Colours::lightgrey);
+
+			// Highlight Origin
+			if (num == 0)
+				g.setColour(juce::Colours::slategrey);
+
+			if (mStackAllBands)
+				g.setOpacity(0.35f);
+			else
+				g.setOpacity(0.1f);
+
 			// Draw Twice as Many Gridlines to Account for Panning
-			verticalAxis.setStart(c + mDisplayPhase + num * beatSpacing, bounds.getY());
-			verticalAxis.setEnd(c + mDisplayPhase + num * beatSpacing, bounds.getBottom());
+			rightGridLine = c + num * beatSpacing;
+
+			verticalAxis.setStart(rightGridLine, bounds.getY());
+			verticalAxis.setEnd(rightGridLine, bounds.getBottom());
 			g.drawLine(verticalAxis, 1.f);
 
-			verticalAxis.setStart(c + mDisplayPhase - num * beatSpacing, bounds.getY());
-			verticalAxis.setEnd(c + mDisplayPhase - num * beatSpacing, bounds.getBottom());
+			leftGridLine = c - num * beatSpacing;
+			verticalAxis.setStart(leftGridLine, bounds.getY());
+			verticalAxis.setEnd(leftGridLine, bounds.getBottom());
 			g.drawLine(verticalAxis, 1.f);
 
-			// Calculate the Data Points for PlayHead Information
-			if (i <= bounds.getWidth())
-			{
-				// Offset to account for remainder of the Quarter Note not shown on screen
-				playBackOffset = beatSpacing - (bounds.getRight() - (bounds.getCentreX() + (num * beatSpacing)));
+			// Calculate Left-Most Onscreen Valid (Even) Marker
 
-				// Number of Quarter Notes Shown In Display - Including One Overhanging QN
-				playBackNumBeats = (2.f * num) + 2;
+			if (leftGridLine >= bounds.getX())
+				leastOnscreenLeftGridLine = leftGridLine;
 
-				// Total Size (In Pixels) of Number of Quarter-Notes Present
-				playBackWidth = playBackNumBeats * beatSpacing;
-			}
+			// Calculate Right-Most Onscreen Valid (Even) Marker
+			if (rightGridLine <= bounds.getRight())
+				greatestOnscreenRightGridLine = rightGridLine;
 
 			num++;
 		}
+
+		// Calulate Beat Information
+
+		playBackNumBeats = 2 * num;
+		playBackWidth = playBackNumBeats * beatSpacing;
+
+		// Number of Onscreen Beats Present
+		onScreenBeatWidth = greatestOnscreenRightGridLine - leastOnscreenLeftGridLine;
+		onScreenNumBeats = onScreenBeatWidth / beatSpacing;
+
+		onScreenNumBeatsLeftFromCenter = (c - leastOnscreenLeftGridLine) / beatSpacing;
+		onScreenNumBeatsRightFromCenter = (greatestOnscreenRightGridLine - c) / beatSpacing;
 	}
+
+	g.setColour(juce::Colours::lightgrey);
+
+	if (mStackAllBands)
+		g.setOpacity(0.35f);
+	else
+		g.setOpacity(0.1f);
 
 	// DRAW HORIZONTAL LINES =============================
 	for (int i = 1; i < numDepthLines; i++)
@@ -616,30 +668,133 @@ void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bou
 // Methods to call on a timed-basis
 void Oscilloscope::timerCallback()
 {
-	timerCounter++;
+	updatePreferences();
+	updateRegions();
 
-	if (timerCounter = 10)
+	if (checkIfLfoHasChanged(lowLFO) || 
+		checkIfLfoHasChanged(midLFO) ||
+		checkIfLfoHasChanged(highLFO) ||
+		updateLfoDisplay)
 	{
-		getWavesForDisplay();
-		timerCounter = 0;
+
+		waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
+		drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
+
+		waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
+		drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
+
+		waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
+		drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
+
+		updateLfoDisplay = false;
 	}
 
+	
+	
+	
+
 	checkMousePosition();
-	updateRegions();
-	updatePreferences();
 	checkFocus();
 	repaint();
 	getPlayheadPosition();
 
 }
 
+bool Oscilloscope::checkIfLfoHasChanged(LFO& lfo)
+{
+	// Update LFO Display On...
+	// Invert, Shape, Skew, Depth, Sync, Rhythm, Rate, Phase
+
+	auto index = 0;
+
+	if (&lfo == &midLFO)
+		index = 1;
+
+	if (&lfo == &highLFO)
+		index = 2;
+
+	// Get Parameters
+	auto newInvert = lfo.getWaveInvert();
+	auto newShape = lfo.getWaveform();
+	auto newSkew = lfo.getWaveSkew();
+	auto newDepth = lfo.getWaveDepth();
+	auto newSync = lfo.isSyncedToHost();
+	auto newRhythm = lfo.getWaveMultiplier();
+	auto newRate = lfo.getWaveRate();
+	auto newPhase = lfo.getRelativePhase();
+
+	bool hasChanged = false;
+
+ 	// Invert
+	if (oldInvert[index] != newInvert)
+	{
+		oldInvert[index] = newInvert;
+		hasChanged = true;
+	}
+
+	// Shape
+	if (oldShape[index] != newShape)
+	{
+		oldShape[index] = newShape;
+		hasChanged = true;
+	}
+
+	// Skew
+	if (oldSkew[index] != newSkew)
+	{
+		oldSkew[index] = newSkew;
+		hasChanged = true;
+	}
+
+	// Depth
+	if (oldDepth[index] != newDepth)
+	{
+		oldDepth[index] = newDepth;
+		hasChanged = true;
+	}
+
+	// Sync
+	if (oldSync[index] != newSync)
+	{
+		oldSync[index] = newSync;
+		hasChanged = true;
+	}
+
+	// Rhythm
+	if (oldRhythm[index] != newRhythm)
+	{
+		oldRhythm[index] = newRhythm;
+		hasChanged = true;
+	}
+
+	// Rate
+	if (oldRate[index] != newRate)
+	{
+		oldRate[index] = newRate;
+		hasChanged = true;
+	}
+
+	// Phase
+	if (oldPhase[index] != newPhase)
+	{
+		oldPhase[index] = newPhase;
+		hasChanged = true;
+	}
+
+	if (hasChanged)
+		return true;
+	else
+		return false;
+		
+}
+
 // Grab WaveShapes From Processor For Display
 void Oscilloscope::getWavesForDisplay()
 {
-	// Pull Waves And Scale Amplitude
-	waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
-	waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
-	waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
+	//// Pull Waves And Scale Amplitude
+	//waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
+	//waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
+	//waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
 }
 
 // Maps incoming WaveTable amplitude from [0, -1] to [-0.5, +0.5]
@@ -673,39 +828,116 @@ juce::Array<float> Oscilloscope::scaleWaveAmplitude(juce::Array<float> waveTable
 // Checks Host Playhead for Current Position
 void Oscilloscope::getPlayheadPosition()
 {
+	/* Determine current condition of display and onscreen beats and make a decision as to how to loop playhead. 
+	
+	[0] To be a valid starting point, a cursor must be an even multiple.  Representing a downbeat.
+	
+	[1] If a valid starting/ending point is within X percent of window edge, use that.
+
+	[2] If nearest valid starting point is too far out of tolerance, add two beats to the left/offscreen.
+
+	[3] If nearest starting point to edge is invalid, add one beat to left/offscreen.
+
+	[4] Given calculated starting point, distance to ending point in beats must be even.
+
+	[5] If even number of beats, use Right-Most Ending-Point, if RMEP is within tolerance of edge.
+
+	[6] If not within tolerance of edge, add two beats to the right/offscreen. 	*/
+
 	auto bounds = getLocalBounds();
 
-	float zoomFactor = sliderScroll.getZoom();
+	// Shift to Determine Playhead Downbeat Starting Point
+	float playHeadStart = bounds.getX();
+	float playHeadStop = bounds.getRight();
 
-	auto position = fmod((float)audioProcessor.getPlayPosition(), playBackNumBeats) / playBackNumBeats;
+	// If a valid starting point is within X % of beatspacing from X-Origin, use it.
+	float onScreenTolerance = 0.25f;
 
-	playHeadPositionPixel = bounds.getX() - playBackOffset + position * playBackWidth;
+	// Determine Left Starting Loop Point =============================================
+
+	if ((int)onScreenNumBeatsLeftFromCenter % 2 == 0)
+	{
+		if (leastOnscreenLeftGridLine < beatSpacing * onScreenTolerance)
+			playHeadStart = leastOnscreenLeftGridLine;
+		else
+			playHeadStart = leastOnscreenLeftGridLine - 2 * beatSpacing;
+	}
+	else
+		playHeadStart = leastOnscreenLeftGridLine - beatSpacing;
+
+	// Determine Right Ending Loop Point =============================================
+
+	auto resultantBeatsWithNewStart = round((greatestOnscreenRightGridLine - playHeadStart) / beatSpacing);
+
+	if ((int)resultantBeatsWithNewStart % 2 == 0)
+	{
+		if (bounds.getRight() - greatestOnscreenRightGridLine < beatSpacing * onScreenTolerance)
+			playHeadStop = greatestOnscreenRightGridLine;
+		else
+			playHeadStop = greatestOnscreenRightGridLine + 2 * beatSpacing;
+	}
+	else
+		playHeadStop = greatestOnscreenRightGridLine + beatSpacing;
+
+	// Calculations =============================================
+	auto playHeadLoopWidth = playHeadStop - playHeadStart;
+	auto playHeadNumBeats = playHeadLoopWidth / beatSpacing;
+	auto position = fmod((float)audioProcessor.getPlayPosition(), playHeadNumBeats) / (playHeadNumBeats);
+
+	playHeadPositionPixel = bounds.getX() + playHeadStart + position * (playHeadLoopWidth);
 }
 
 // Update the scope-regions based on the configured viewing scheme
 void Oscilloscope::updateRegions()
 {
-	scopeRegion = getLocalBounds();
-	scopeRegion.reduce(0, 6);
-	scopeRegion.removeFromBottom(10);	// Make room for scroll slider
+	bool update = false;
 
-	lowRegion = scopeRegion;
-	midRegion = scopeRegion;
-	highRegion = scopeRegion;
-
-	// Stacking Bands Displays the Individual Waveforms Separately
-	if (mStackAllBands)
-		drawStackedScope();
-	else
+	if (oldRegions[0] != mShowLowBand)
 	{
-		lowRegion.reduce(0, 3);
-		midRegion.reduce(0, 3);
-		highRegion.reduce(0, 3);
+		oldRegions[0] = mShowLowBand;
+		update = true;
 	}
 
-	drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
-	drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
-	drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
+	if (oldRegions[1] != mShowMidBand)
+	{
+		oldRegions[1] = mShowMidBand;
+		update = true;
+	}
+
+	if (oldRegions[2] != mShowHighBand)
+	{
+		oldRegions[2] = mShowHighBand;
+		update = true;
+	}
+
+	if (oldRegions[3] != mStackAllBands)
+	{
+		oldRegions[3] = mStackAllBands;
+		update = true;
+	}
+
+	if (update)
+	{
+		scopeRegion = getLocalBounds();
+		scopeRegion.reduce(0, 6);
+		scopeRegion.removeFromBottom(10);	// Make room for scroll slider
+
+		lowRegion = scopeRegion;
+		midRegion = scopeRegion;
+		highRegion = scopeRegion;
+
+		// Stacking Bands Displays the Individual Waveforms Separately
+		if (mStackAllBands)
+			drawStackedScope();
+		else
+		{
+			lowRegion.reduce(0, 3);
+			midRegion.reduce(0, 3);
+			highRegion.reduce(0, 3);
+		}
+
+		updateLfoDisplay = true;
+	}
 }
 
 // Draw the scope boundaries based on the configured viewing scheme
@@ -745,6 +977,7 @@ void Oscilloscope::drawStackedScope()
 	highRegion.reduce(0, 3);
 }
 
+/* Generate paths for LFO when new information is available */
 void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 							juce::Path &lfoStrokePath, 
 							juce::Path &lfoFillPath,
@@ -794,7 +1027,7 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 			float y = midY + waveTable[index] * (float)bounds.getHeight();
 
 			// Display Offset Establishes Wave Starting Point (In-Line with Grid)
-			float displayOffsetStart = bounds.getX() + bounds.getCentreX() - (beatSpacing/2.f) - paintAreaWidth;
+			float displayOffsetStart = bounds.getX() + bounds.getCentreX() - paintAreaWidth;
 
 			// Incorporate Pan Shift
 			float point = displayOffsetStart + mDisplayPhase;
@@ -1090,6 +1323,14 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 		if (event.getPosition().getX() > (float)getWidth() - margin)
 			dragX = ((float)getWidth() - margin) / getWidth();
 	}
+
+	if (sliderScroll.isMouseOverOrDragging())
+	{
+		panOrZoomChanging = true;
+		updateLfoDisplay = true;
+	}
+	else
+		panOrZoomChanging = false;
 }
 
 // Fade-In the cursor when mouse is within 10 pixels of it

@@ -57,9 +57,12 @@ struct LFO
 
     float increment = 1.f;		// Amount By Which To Increment In LFO Cycle
     float phase = 0.f;			// Current Position In LFO Cycle
+	int mInvert{ 0 };
+	int mWaveshapeID{ 0 };
+	float mSymmetry{ 0.5f };
 
     float mRelativePhase = 0;	// Used to shift phase of LFO relative to others
-	float mMultiplier = 1.f;	// Rhythm of LFO timing (Rename to Rhythm)
+	float mMultiplier = 10.f;	// Rhythm of LFO timing (Rename to Rhythm)
 	float mHostBPM{ 1.f };
 
 	float min{ 2.0f };		// Used to Map LFO Amplitudes
@@ -134,10 +137,10 @@ struct LFO
 		auto waveTableSize = sampleRate;
 
 		// Get the Waveshape Index
-        auto mWaveshapeID = waveshape->getIndex();
+        mWaveshapeID = waveshape->getIndex();
 
 		// Get the Symmetry Parameter (Skew)
-        auto mSymmetry = symmetry->get();
+        mSymmetry = symmetry->get();
 		auto periodLeft = waveTableSize * mSymmetry / 100.f;            // Convert Symmetry Float into Sample Ranges
 		auto periodRight = waveTableSize * (1 - mSymmetry / 100.0f);    // Convert Symmetry Float into Sample Ranges
 
@@ -145,8 +148,8 @@ struct LFO
         mDepth = depth->get() / 100.0f;
 
 		// Get the Invert Parameter
-        int mInvert = 1;
-        switch (invert->get())
+		mInvert = invert->get();
+        switch (mInvert)
         {
             case 0: mInvert = 1; break;
             case 1: mInvert = -1; break;
@@ -322,11 +325,18 @@ struct LFO
     }
 
 	juce::Array<float> getWaveShapeDisplay() {return waveTable; }
+
+	int getWaveInvert() { return mInvert; }
+	int getWaveform() { return mWaveshapeID; }
+	float getWaveSkew() { return mSymmetry; }
 	float getWaveDepth() { return mDepth;  }
-	float getWaveMultiplier() { return mMultiplier; }
-	float getRelativePhase() { return mRelativePhase; }
 	bool isSyncedToHost() { return syncToHost->get(); }
+	float getWaveMultiplier() { return mMultiplier; }
 	float getWaveRate() { return mRate; }
+	float getRelativePhase() { return mRelativePhase; }
+
+
+
 	float getHostBPM() { return mHostBPM; }
 };
 
@@ -412,6 +422,12 @@ public:
 	bool setLatchPlay{ false };
 	bool setLatchStop{ true };
 
+	bool rateChanged{ true };
+	bool multChanged{ true };
+
+	float oldMultLow{ 0.f }, oldMultMid{ 0.f }, oldMultHigh{ 0.f };
+	float multLow{ 1.f }, multMid{ 1.f }, multHigh{ 1.f };
+
 	LFO lowLFO, midLFO, highLFO;	// Instances of LFO
 
 	juce::Atomic<bool> paramChangedForScope{ false };
@@ -419,15 +435,35 @@ public:
 	double playPosition;
 	std::atomic<double> getPlayPosition() { return playPosition; }
 
+	// FFT Components ===================
+
+	enum
+	{
+		fftOrder = 12,
+		fftSize = 1 << fftOrder,
+		scopeSize = 512
+	};
+
+	float fifo[fftSize];
+	float fftData[2 * fftSize];
+
+	bool nextFFTBlockReady = false;
+	float scopeData[scopeSize];
+
+	int fifoIndex = 0;
+
+	void pushNextSampleIntoFifo(float sample);
+
 private:
 
     void updateState();			// Process Block, Update State
+	void resetPhase(LFO &lfo);
 
     double lastSampleRate;		// To get Sample Rate
 
-    juce::AudioPlayHead* playHead;		// To get BPM
+    juce::AudioPlayHead* playHead;		//i To get BPM
 
-	int lfoPhase{ 0 };
+	//int lfoPhase{ 0 };
 
     // CROSSOVER =========================================================================
 

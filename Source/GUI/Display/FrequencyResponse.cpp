@@ -13,9 +13,22 @@
 #include "FrequencyResponse.h"
 
 // Constructor
-FrequencyResponse::FrequencyResponse(juce::AudioProcessorValueTreeState& apv, GlobalControls& gc)
-	: apvts(apv), globalControls(gc)
+FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p, 
+										juce::AudioProcessorValueTreeState& apv, 
+										GlobalControls& gc)
+	: audioProcessor(p), 
+	apvts(apv), 
+	globalControls(gc), 
+	forwardFFT(audioProcessor.fftOrder),
+	window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
+	// Array Maintenance ==========
+	fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
+	fftDrawingPoints.resize(audioProcessor.scopeSize);
+
+	for (int i = 0; i < audioProcessor.scopeSize; i++)
+		fftDrawingPoints.setUnchecked(i, 0);
+
 	// Linear Slider from 0 to 1
 	sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 	sliderLowMidInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -125,7 +138,9 @@ void FrequencyResponse::paint(juce::Graphics& g)
 	drawGridVertical(g);
 	drawGridHorizontal(g);
 
-	// If low-band is hovered, draw low-band on top with highlight
+	paintFFT(g, responseArea);
+
+	/* If low-band is hovered, draw low-band on top with highlight */
 	if (mLowFocus)
 	{
 		drawHighRegion(g,	responseArea, gainHighPixel,	freq2Pixel,				mHighFocus	? fadeMaxRegion : fadeAlphaRegionHG);
@@ -403,6 +418,13 @@ void FrequencyResponse::timerCallback()
 	fadeRegions();
 	checkExternalFocus();
 	repaint();
+
+	// Check for new FFT information
+	if (audioProcessor.nextFFTBlockReady)
+	{
+		drawNextFrameOfSpectrum();
+		audioProcessor.nextFFTBlockReady = false;
+	}
 }
 
 // Check for external band hovering.  Refactor for encapsulation.
@@ -911,3 +933,129 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 	}
 }
 
+void FrequencyResponse::paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds)
+{
+	// Wrap in Toggle Button
+
+	for (int i = 1; i < audioProcessor.scopeSize; ++i)
+	{
+		float width = bounds.getWidth();
+		float height = bounds.getHeight();
+
+		float startX = bounds.getX() + (float)juce::jmap(	(float)i - 1, 
+															0.f,
+															(float)audioProcessor.scopeSize - 1.f,
+															0.f, 
+															width);
+
+		float startY = bounds.getY() + juce::jmap(	audioProcessor.scopeData[i - 1], 
+													0.0f,
+													1.0f, 
+													height, 
+													0.0f);
+
+		float endX = bounds.getX() + juce::jmap(	(float)i, 
+													0.f,
+													(float)audioProcessor.scopeSize - 1.f,
+													0.f,
+													width);
+		
+		float endY = bounds.getY() + juce::jmap(	audioProcessor.scopeData[i],		
+													0.0f,
+													1.0f, 
+													height, 
+													0.0f);
+
+		fftDrawingPoints.set(i - 1, startY);
+
+		//g.setColour(juce::Colours::whitesmoke);
+		//g.setOpacity(1.0f);
+		//g.drawLine(startX, bounds.getBottom(), startX, endY, 0.2f);
+	}
+
+	juce::Path f;
+
+    f.startNewSubPath(bounds.getX() + 2, bounds.getBottom());
+
+    for (int i = 0; i < fftDrawingPoints.size()-1; i++)
+    {
+        float point = juce::jmap(	(float)i, 
+									0.f, 
+									(float)(fftDrawingPoints.size()) - 1.f,
+									2.f, 
+									bounds.getWidth()-2 );
+
+        f.lineTo(bounds.getX() + point, fftDrawingPoints[i] - 2);
+    }
+
+	f.lineTo(bounds.getRight(), bounds.getBottom());
+	f.closeSubPath();
+
+	// Fill FFT Background
+	float p1 = 0.25f;
+	float p2 = 0.5f;
+
+	auto gradient = juce::ColourGradient(	juce::Colours::grey,
+											bounds.getBottomLeft(),
+											juce::Colours::lightgrey,
+											bounds.getTopRight(), false);
+
+	gradient.addColour(p1, juce::Colours::white.withBrightness(1.25f));
+	gradient.addColour(p2, juce::Colours::whitesmoke.withBrightness(1.25f));
+
+	g.setGradientFill(gradient);
+	g.setOpacity(0.75f);
+	g.fillPath(f);
+
+	// Fill FFT Outline 
+    g.setColour(juce::Colours::darkgrey);
+    g.setOpacity(1.0f);
+    g.strokePath(f, juce::PathStrokeType(1.0f));
+
+}
+
+void FrequencyResponse::drawNextFrameOfSpectrum()
+{
+	// Apply Window Function to Data
+	window.multiplyWithWindowingTable(audioProcessor.fftData, audioProcessor.fftSize);
+
+	// Render FFT Data
+	forwardFFT.performFrequencyOnlyForwardTransform(audioProcessor.fftData);
+
+	auto mindB = -100.0f;
+	auto maxdB = 0.0f;
+
+	for (int i = 0; i < audioProcessor.scopeSize; ++i)
+	{
+		//auto skewedProportionX = 1.0f - pow(2, std::log2(1.0f - (float)i / (float)processor.scopeSize * 0.2f));
+		//auto skewedProportionX = 1.0f - std::exp(std::log(1.0f - (float)i / (float)processor.scopeSize) * 0.2f);
+		//auto linearScale = i / float(processor.scopeSize) * 0.835f;
+
+		auto linearScale = i / float(audioProcessor.scopeSize) * 9.699f;
+		auto skewedProportionX = (20 * pow(2, linearScale)) / 20000;
+
+        // 
+        auto fftDataIndex = juce::jlimit	(   0,                                                          // Lower
+												audioProcessor.fftSize / 2,                                      // Upper Limit
+												(int)(skewedProportionX * (float)audioProcessor.fftSize * 0.5f)  // Value to Constrain
+											);
+
+        // Clamps the value to within specified dB range
+        auto limit = juce::jlimit	(	mindB,      // Lower Limit
+										maxdB,      // Upper Limit
+										juce::Decibels::gainToDecibels(audioProcessor.fftData[fftDataIndex]) - juce::Decibels::gainToDecibels((float)audioProcessor.fftSize)  // Value to Constrain
+									);
+
+
+        auto level = juce::jmap (	limit,  // Source Value
+									mindB,  // Source Range Min
+									maxdB,  // Source Range Max
+									0.0f,   // Target Range Min
+									1.0f    // Target Range Max
+								);
+
+        audioProcessor.scopeData[i] = level;                                   // [4]
+	}
+
+
+}

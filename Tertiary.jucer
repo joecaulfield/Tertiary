@@ -9,6 +9,7 @@
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="VGNRlz" name="Params.cpp" compile="1" resource="0" file="Source/DSP/Params.cpp"/>
       <FILE id="guk95Z" name="Params.h" compile="0" resource="0" file="Source/DSP/Params.h"/>
+      <FILE id="AWPwJ9" name="LockFreeQueue.h" compile="0" resource="0" file="Source/DSP/LockFreeQueue.h"/>
     </GROUP>
     <GROUP id="{015ED6FA-482B-8BDD-1A0A-39876D18454B}" name="GUI">
       <GROUP id="{B219FD33-719E-79FC-6A47-8ADA4F45032C}" name="Controls">

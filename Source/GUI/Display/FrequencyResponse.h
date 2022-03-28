@@ -21,9 +21,11 @@ struct FrequencyResponse : juce::Component,
 	juce::Slider::Listener
 {
 
-	FrequencyResponse(juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
+	FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
 
 	void paint(juce::Graphics& g) override;
+	void paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds);
+	
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color) {};
 
 	void sliderValueChanged(juce::Slider* slider) override;
@@ -80,6 +82,7 @@ struct FrequencyResponse : juce::Component,
 
 	void checkSolos();
 
+	TertiaryAudioProcessor& audioProcessor;
 	GlobalControls& globalControls;
 
 	// Frequency Response Parameters
@@ -145,4 +148,14 @@ private:
 										lowGainAttachment,
 										midGainAttachment,
 										highGainAttachment;
+
+	// FFT Components =========
+	juce::Array<float> fftDrawingPoints;
+	juce::dsp::FFT forwardFFT;
+	juce::dsp::WindowingFunction<float> window;
+	float fftConstant{ 9.9658f };
+	juce::ToggleButton mButton_FFT;
+	bool mShowFFT{ true };
+
+	void drawNextFrameOfSpectrum();
 };

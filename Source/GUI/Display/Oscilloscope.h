@@ -141,18 +141,57 @@ struct Oscilloscope :	juce::Component,
 	
 	void getPlayheadPosition();
 
+	bool checkIfLfoHasChanged(LFO &lfo);
+
+	bool lowLfoChanged{ true };
+	bool midLfoChanged{ true };
+	bool highLfoChanged{ true };
+
+	bool panOrZoomChanging{ false };
+
+	int oldInvert[3] = { 0,0,0 };
+	int oldShape[3] = { 0,0,0 };
+	float oldSkew[3] = { 0,0,0 };
+	float oldDepth[3] = { 0,0,0 };
+	int oldSync[3] = { 0,0,0 };
+	float oldRhythm[3] = { 0,0,0 };
+	float oldRate[3] = { 0,0,0 };
+	float oldPhase[3] = { 0,0,0 };
+
+	int oldRegions[4] = { 0,0,0,0 };
+
+
 
 
 	/*	Amount of not-shown pixels in the quarter-note 
 	that overhangs the edge of the screen.
 	Ignores display shift and assumes centered pan.	*/
 	float playBackOffset{ 0.f };
+	//float playBackOffsetLeft{ 0.f };
+	//float playBackOffsetRight{ 0.f };
 
 	// Number of Full-Beats Which Fit Into Display
 	float beatSpacing{ 1.f };
 
 	/*Number of Quarter Notes Shown In Display - Including One Overhanging QN*/
 	float playBackNumBeats{ 1.f };
+	int playBackNumOnscreenBeats{ 2 };
+
+	// Left-Most Complete Onscreen Beat
+	float leastOnscreenLeftGridLine{ 0.f };
+
+	// Right-Most Complete Onscreen Beat
+	float greatestOnscreenRightGridLine{ 0.f };
+
+	// Total Number of COmplete Onscreen Beats
+	float onScreenNumBeats{ 1.f };
+
+	// Pixel Width of All Beats Onscreen
+	float onScreenBeatWidth{ 1.f };
+
+	// Number of Onscreen Beats to the Left of Center 
+	float onScreenNumBeatsLeftFromCenter{ 1.f };
+	float onScreenNumBeatsRightFromCenter{ 1.f };
 
 	// Total Number of Beats scaled into a Pixel-Valued Width
 	float playBackWidth{ 1.f };
@@ -174,7 +213,7 @@ struct Oscilloscope :	juce::Component,
 
 	TertiaryAudioProcessor& audioProcessor;
 	GlobalControls& globalControls;
-	
+
 	ScrollLookAndFeel scrollLookAndFeel;
 	ButtonOptionsLookAndFeel optionsLookAndFeel;
 
@@ -190,6 +229,8 @@ struct Oscilloscope :	juce::Component,
 
 	//juce::Slider sliderScroll;
 	ScrollPad sliderScroll;
+
+	bool updateLfoDisplay{ true };
 
 	juce::AudioParameterBool* showLowBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showMidBand{ nullptr };       // Pointer to the APVTS

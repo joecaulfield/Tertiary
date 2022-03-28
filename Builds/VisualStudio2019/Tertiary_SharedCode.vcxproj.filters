@@ -2763,6 +2763,9 @@
     <ClInclude Include="..\..\Source\DSP\Params.h">
       <Filter>Tertiary\DSP</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\DSP\LockFreeQueue.h">
+      <Filter>Tertiary\DSP</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Controls\Gain\GainBar.h">
       <Filter>Tertiary\GUI\Controls\Gain</Filter>
     </ClInclude>
