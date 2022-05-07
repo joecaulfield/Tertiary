@@ -65,12 +65,12 @@ void TertiaryAudioProcessorEditor::resized()
 	companyTitle.setTopRightPosition(bounds.getRight(), 0);
 
 	// Flexbox to Wrap Oscilloscope and FrequencyResponse
-	juce::FlexBox flexBox;	
+	juce::FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::row;
 	flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
 	auto spacer = FlexItem().withWidth(5);	// Gap between O-Scope and Freq Resp
-	 
+	
 	flexBox.items.add(FlexItem(oscilloscope).withFlex(1.f));		// Insert O-Scope
 	flexBox.items.add(spacer);										// Insert Spacer
 	flexBox.items.add(FlexItem(frequencyResponse).withFlex(1.f));	// Insert Freq Response

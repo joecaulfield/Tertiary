@@ -75,7 +75,6 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
     boolHelper(lowLFO.syncToHost,           Names::Sync_Low_LFO);
     choiceHelper(lowLFO.multiplier,         Names::Multiplier_Low_LFO);
 
-
     // Initialize Mid Band Parameters
     boolHelper(midBandTrem.bypass,          Names::Bypass_Mid_Band);            // Attach Value to Parameter
     boolHelper(midBandTrem.mute,            Names::Mute_Mid_Band);              // Attach Value to Parameter
@@ -493,6 +492,17 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 	/* Apply Input Gain */
 	applyGain(buffer, inputGain);
 
+	// Push Buffer to FFT if Pick-Off Point is 'Input'
+	if (fftPickoffPointIsInput)
+	{
+		for (int i = 0; i < buffer.getNumSamples(); i++)
+		{
+			float sample = buffer.getSample(0, i) / 2.f + buffer.getSample(1, i) / 2.f;
+
+			pushNextSampleIntoFifo(sample);
+		}
+	}
+
 	/* Get Input Gains for Meters */
 	rmsLevelInputLeft.skip(buffer.getNumSamples());
 	rmsLevelInputRight.skip(buffer.getNumSamples());
@@ -562,101 +572,101 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 			highWriteL[sample] *= mGainHighLFO;
 			highWriteR[sample] *= mGainHighLFO;
 		}
+	}
 
-		for (size_t i = 0; i < filterBuffers.size(); ++i)   // size_t is an unsigned int that is the result of the sizeof operator
+	for (size_t i = 0; i < filterBuffers.size(); ++i)   // size_t is an unsigned int that is the result of the sizeof operator
+	{
+		applyGain(filterBuffers[i], tremolos[i].bandGain);  // Apply individual band gains to Lows, Mids, Highs
+	}
+		
+	auto numSamples = buffer.getNumSamples();
+	auto numChannels = buffer.getNumChannels();
+
+	buffer.clear(); // Clear buffer before adding audio (filter buffers) to it
+
+	// Each channel of filter buffer needs to be copied back to input buffer
+	// Helper function to do so...
+	auto addFilterBand = [nc = numChannels, ns = numSamples](auto& inputBuffer, const auto& source)
+	{
+		for (auto i = 0; i < nc; ++i)
 		{
-			applyGain(filterBuffers[i], tremolos[i].bandGain);  // Apply individual band gains to Lows, Mids, Highs
+			inputBuffer.addFrom(i, 0, source, i, 0, ns);
 		}
+	};
 
-		auto numSamples = buffer.getNumSamples();
-		auto numChannels = buffer.getNumChannels();
-
-		buffer.clear(); // Clear buffer before adding audio (filter buffers) to it
-
-		// Each channel of filter buffer needs to be copied back to input buffer
-		// Helper function to do so...
-		auto addFilterBand = [nc = numChannels, ns = numSamples](auto& inputBuffer, const auto& source)
+	// Check for if any bands are soloed
+	auto bandsAreSoloed = false;
+	for (auto& trem : tremolos)
+	{
+		if (trem.solo->get())
 		{
-			for (auto i = 0; i < nc; ++i)
-			{
-				inputBuffer.addFrom(i, 0, source, i, 0, ns);
-			}
-		};
-
-		// Check for if any bands are soloed
-		auto bandsAreSoloed = false;
-		for (auto& trem : tremolos)
-		{
-			if (trem.solo->get())
-			{
-				bandsAreSoloed = true;
-				break;
-			}
+			bandsAreSoloed = true;
+			break;
 		}
+	}
 
-		if (bandsAreSoloed)										// If bands are soloed
+	if (bandsAreSoloed)										// If bands are soloed
+	{
+		for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
 		{
-			for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
+			auto& trem = tremolos[i];
+			if (trem.solo->get())                           // If that band is soloed
 			{
-				auto& trem = tremolos[i];
-				if (trem.solo->get())                           // If that band is soloed
-				{
-					addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
-				}
-			}
-		}
-		else
-		{
-			for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
-			{
-				auto& trem = tremolos[i];
-				if (!trem.mute->get())                          // If the trem is NOT muted
-				{
-					addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
-				}
+				addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
 			}
 		}
+	}
+	else
+	{
+		for (size_t i = 0; i < tremolos.size(); ++i)		// Loop through all bands
+		{
+			auto& trem = tremolos[i];
+			if (!trem.mute->get())                          // If the trem is NOT muted
+			{
+				addFilterBand(buffer, filterBuffers[i]);    // Add the corresponding buffer
+			}
+		}
+	}
 
-		/* Apply Output Gain */
-		applyGain(buffer, outputGain);
+	/* Apply Output Gain */
+	applyGain(buffer, outputGain);
 
-		/* Print Output to FFT */
+	// Push Buffer to FFT if Pick-Off Point is 'Input'
+	if (!fftPickoffPointIsInput)
+	{
 		for (int i = 0; i < buffer.getNumSamples(); i++)
 		{
 			float sample = buffer.getSample(0, i) / 2.f + buffer.getSample(1, i) / 2.f;
-			
+
 			pushNextSampleIntoFifo(sample);
 		}
-
-
-
-		/* Get Output Gain for Meters */
-		rmsLevelOutputLeft.skip(buffer.getNumSamples());
-		rmsLevelOutputRight.skip(buffer.getNumSamples());
-		{
-			const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
-
-			/* If value is ascending, we use instantatneous value.
-			 If value is descending, we smooth value on its way down. */
-
-			if (newValueLeft < rmsLevelOutputLeft.getCurrentValue())
-				rmsLevelOutputLeft.setTargetValue(newValueLeft);
-			else rmsLevelOutputLeft.setCurrentAndTargetValue(newValueLeft);
-
-			
-		}
-
-		{
-			const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
-
-			/* If value is ascending, we use instantatneous value.
-			 If value is descending, we smooth value on its way down. */
-
-			if (newValueRight < rmsLevelOutputRight.getCurrentValue())
-				rmsLevelOutputRight.setTargetValue(newValueRight);
-			else rmsLevelOutputRight.setCurrentAndTargetValue(newValueRight);
-		}
 	}
+
+	/* Get Output Gain for Meters */
+	rmsLevelOutputLeft.skip(buffer.getNumSamples());
+	rmsLevelOutputRight.skip(buffer.getNumSamples());
+	{
+		const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+
+		/* If value is ascending, we use instantatneous value.
+			If value is descending, we smooth value on its way down. */
+
+		if (newValueLeft < rmsLevelOutputLeft.getCurrentValue())
+			rmsLevelOutputLeft.setTargetValue(newValueLeft);
+		else rmsLevelOutputLeft.setCurrentAndTargetValue(newValueLeft);
+	}
+
+	{
+		const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+
+		/* If value is ascending, we use instantatneous value.
+			If value is descending, we smooth value on its way down. */
+
+		if (newValueRight < rmsLevelOutputRight.getCurrentValue())
+			rmsLevelOutputRight.setTargetValue(newValueRight);
+		else rmsLevelOutputRight.setCurrentAndTargetValue(newValueRight);
+	}
+
 }
 
 //==============================================================================
@@ -1014,10 +1024,40 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 														pointRange,							// Range
 														75.f));								// Default Value
 
+	// FFT DISPLAY PREFERENCES ====================================================================================================================
+
+	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_FFT),       // Parameter ID
+                                                        params.at(Names::Show_FFT),       // Parameter Name
+                                                        true));							// Default Value
+
+	sa.clear();
+
+	sa = { "Input", 
+			"Output" };
+
+    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::FFT_Pickoff),         // Parameter ID
+                                                        params.at(Names::FFT_Pickoff),         // Parameter Name
+                                                        sa,                                    
+                                                        1));     
+
     return layout;
 }
 
+void TertiaryAudioProcessor::setFftPickoffPoint(int point)
+{
+	switch (point)
+	{
+	case 0: {fftPickoffPointIsInput = true;
+		DBG("AP INPUT");
+		break; }
 
+	case 1: {fftPickoffPointIsInput = false; 
+		DBG("AP OUTPUT"); 
+		break; }
+	}
+
+
+}
 
 void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
 {

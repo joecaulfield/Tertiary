@@ -113,9 +113,15 @@ struct ScrollLookAndFeel : juce::LookAndFeel_V4
 
 struct InOutLookAndFeel : juce::LookAndFeel_V4
 {
+	InOutLookAndFeel();
+	~InOutLookAndFeel() {};
+
 	void drawLinearSlider(	juce::Graphics& g, int x, int y, int width, int height,
 							float sliderPos, float minSliderPos, float maxSliderPos,
 							const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider) override;
+
+private:
+	juce::Image imageFader;
 };
 
 struct CrossoverLookAndFeel : juce::LookAndFeel_V4

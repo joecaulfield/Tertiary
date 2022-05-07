@@ -5387,6 +5387,9 @@
     <None Include="..\..\Assets\TitleGainControls.png">
       <Filter>Tertiary\Assets</Filter>
     </None>
+    <None Include="..\..\Assets\FaderKnob.png">
+      <Filter>Tertiary\Assets</Filter>
+    </None>
     <None Include="..\..\..\..\&#96;JUCE\modules\juce_audio_devices\native\oboe\CMakeLists.txt">
       <Filter>JUCE Modules\juce_audio_devices\native\oboe</Filter>
     </None>

@@ -32,13 +32,13 @@ private:
     TertiaryAudioProcessor& audioProcessor;
 
 	GlobalControls globalControls{ audioProcessor };
-	Oscilloscope oscilloscope{ audioProcessor, globalControls};						// Instance of Oscilloscope Panel
-	FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };	// Instance of Frequency Response Panel
+	Oscilloscope oscilloscope{ audioProcessor, globalControls};
+	FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
 
 	juce::Label companyTitle;
 	juce::Image imageTitleHeader;
 
-	juce::String version = "1.0";
+	juce::String version = "Beta 0.1";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TertiaryAudioProcessorEditor)
 };

@@ -12,13 +12,15 @@
 #include "../../../PluginProcessor.h"
 #include "../../MyLookAndFeel.h"
 
-struct InputOutputGain : juce::Component, juce::Timer
+struct InputOutputGain : juce::Component, juce::Timer, juce::Slider::Listener
 {
 	InputOutputGain(TertiaryAudioProcessor& p);
 	~InputOutputGain() override;
 
 	void paint(juce::Graphics& g) override;
 	void resized() override;
+
+	void sliderValueChanged(juce::Slider* slider) override;
 
 	void timerCallback() override;
 
@@ -33,7 +35,14 @@ struct InputOutputGain : juce::Component, juce::Timer
 
 	void getLevels();
 
+	float sliderValue;
+
+	juce::Rectangle<float> grillBounds;
+	juce::Rectangle<float> labelBounds;
+
 	juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness);
+
+
 
 private:
 

@@ -10,6 +10,15 @@
   ==============================================================================
 */
 
+/*
+
+TO DO ==========
+
+[1] Slow down the FFT. Look into smoothing the values.
+[2] Pop-Up Menu to Disable RTA
+
+*/
+
 #include "FrequencyResponse.h"
 
 // Constructor
@@ -22,12 +31,54 @@ FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p,
 	forwardFFT(audioProcessor.fftOrder),
 	window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
+
+	using namespace Params;
+	const auto& params = GetParams();
+
+	auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
+	{
+		param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
+		jassert(param != nullptr);                                                                      // Error Checking
+	};
+
+	boolHelper(showFftParameter, Names::Show_FFT);
+
+	mShowFFT = showFftParameter->get();
+
+	// Choice Helper To Attach Choice to Parameter ========
+	auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+	{
+		param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+		jassert(param != nullptr);
+	};
+
+	choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
+
+	pickOffID = fftPickoffParameter->getIndex();
+	updateToggleStates();
+
+	//switch (pickOffID)
+	//{
+	//	case 0: togglePickInput.setToggleState(true, false); break;		// Pre
+	//	case 1: togglePickOutput.setToggleState(true, false); break;	// Post
+	//}
+
 	// Array Maintenance ==========
 	fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
 	fftDrawingPoints.resize(audioProcessor.scopeSize);
 
 	for (int i = 0; i < audioProcessor.scopeSize; i++)
 		fftDrawingPoints.setUnchecked(i, 0);
+
+	// Button Options
+	buttonOptions.setLookAndFeel(&optionsLookAndFeel);
+	buttonOptions.addListener(this);
+	buttonOptions.addMouseListener(this, true);
+	addAndMakeVisible(buttonOptions);
+
+	toggleShowRTA.addListener(this);
+	togglePickInput.addListener(this);
+	togglePickOutput.addListener(this);
 
 	// Linear Slider from 0 to 1
 	sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
@@ -86,6 +137,11 @@ FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p,
 	addMouseListener(this, false);
 }
 
+FrequencyResponse::~FrequencyResponse()
+{
+	buttonOptions.setLookAndFeel(nullptr);
+}
+
 // Make component->parameter attachments
 void FrequencyResponse::makeAttachments()
 {
@@ -121,6 +177,11 @@ void FrequencyResponse::makeAttachments()
 						apvts,
 						params.at(Names::Gain_High_Band),
 						sliderHighGain);
+
+	showFftAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+						audioProcessor.apvts,
+						params.at(Names::Show_FFT),
+						toggleShowRTA);
 }
 
 // Graphics class
@@ -138,7 +199,8 @@ void FrequencyResponse::paint(juce::Graphics& g)
 	drawGridVertical(g);
 	drawGridHorizontal(g);
 
-	paintFFT(g, responseArea);
+	if (mShowFFT)
+		paintFFT(g, responseArea);
 
 	/* If low-band is hovered, draw low-band on top with highlight */
 	if (mLowFocus)
@@ -198,7 +260,12 @@ void FrequencyResponse::paint(juce::Graphics& g)
 		g.drawLine(cursorHG, 3.f);
 	}
 
+	//fadeInOutComponents(g);
+	fadeButtons(g);
+
 	paintBorder(g, juce::Colours::purple, bounds);
+
+
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -405,6 +472,10 @@ void FrequencyResponse::resized()
 	sliderLowGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
 	sliderMidGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
 	sliderHighGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
+
+	/* Place Show-Menu Button */
+	buttonOptions.setSize(100, 25);
+	buttonOptions.setTopLeftPosition(4, 4);
 }
 
 // Methods to call on a timed-basis
@@ -413,7 +484,7 @@ void FrequencyResponse::timerCallback()
 	checkMousePosition();
 
 	updateResponse();
-	fadeInOutComponents();
+	//fadeInOutComponents();
 	fadeCursor();
 	fadeRegions();
 	checkExternalFocus();
@@ -552,25 +623,22 @@ float FrequencyResponse::mapLog2(float freq)
 // Called on Mouse Move
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
-	checkCursorFocus(event);
+	if (!checkMenuFocus(event))
+		checkCursorFocus(event);
 }
 
 // Called on Mouse Enter
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
-	fadeIn = true;
-	checkCursorFocus(event);
+	if (!checkMenuFocus(event))
+		checkCursorFocus(event);
 }
 
 // Called on Mouse Exit
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
-	fadeIn = false;
-
-	auto xM = event.getPosition().getX();
-	auto yM = event.getPosition().getY();
-
-	checkCursorFocus(event);
+	if (!checkMenuFocus(event))
+		checkCursorFocus(event);
 }
 
 // Check to see if mouse is focusing on any cursor for parameter change
@@ -593,16 +661,6 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 	auto x1 = responseArea.getRight();
 	auto y0 = responseArea.getY();
 	auto y1 = responseArea.getBottom();
-
-	// Mouse is out of window, kill all fades
-	if (xM < x0 || xM > x1 || yM < y0 || yM > y1)
-	{
-		fadeRegionLG = false;
-		fadeRegionMG = false;
-		fadeRegionHG = false;
-		fadeInCursorLM = false;
-		fadeInCursorMH = false;
-	}
 
 	// Mouse is on Low-Mid Cursor
 	if (abs(xM - xLM) < xMargin)
@@ -672,7 +730,58 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 		fadeRegionHG = false;
 		fadeInCursorHG = false;
 	}
-	
+
+	// Prevent Control of Params if Cursor is within Shown Options Menu
+
+	//bool	lmCursorIsInMenu{ false },
+	//		mhCursorIsInMenu{ false },
+	//		lgCursorIsInMenu{ false },
+	//		mgCursorIsInMenu{ false },
+	//		hgCursorIsInMenu{ false };
+
+	//// Check if LM Cursor is in Menu
+	//if (cursorLM.getStartX() < buttonBounds.getRight())
+	//	lmCursorIsInMenu = true;
+
+	//// Check if MH Cursor is in Menu
+	//if (cursorMH.getStartX() < buttonBounds.getRight())
+	//	mhCursorIsInMenu = true;
+
+	//// Check if LG Cursor is in Menu
+	//auto lgCenter = cursorLG.getStartX() + cursorLG.getEndX() / 2.f;
+
+	//if (lgCenter < buttonBounds.getRight() && cursorLG.getStartY() < buttonBounds.getBottom())
+	//	lgCursorIsInMenu = true;
+
+	//// Check if MG Cursor is in Menu
+	//auto mgCenter = cursorMG.getStartX() + cursorMG.getEndX() / 2.f;
+
+	//if (mgCenter < buttonBounds.getRight() && cursorMG.getStartY() < buttonBounds.getBottom())
+	//	mgCursorIsInMenu = true;
+
+	//// Check if HG Cursor is in Menu
+	//auto hgCenter = cursorHG.getStartX() + cursorHG.getEndX() / 2.f;
+
+	//if (hgCenter < buttonBounds.getRight() && cursorHG.getStartY() < buttonBounds.getBottom())
+	//	hgCursorIsInMenu = true;
+
+	//if (lmCursorIsInMenu && showMenu)
+	//	fadeInCursorLM = false;
+
+	//if (mhCursorIsInMenu && showMenu)
+	//	fadeInCursorMH = false;
+
+
+	// Mouse is out of window, kill all fades
+	if (xM < x0 || xM > x1 || yM < y0 || yM > y1)
+	{
+		fadeRegionLG = false;
+		fadeRegionMG = false;
+		fadeRegionHG = false;
+		fadeInCursorLM = false;
+		fadeInCursorMH = false;
+	}
+
 	// Establish top-bottom bounds of Dummy Sliders
 	auto sliderTop = responseArea.getY() + juce::jmap(24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())-5;
 	auto sliderBot = responseArea.getY() + juce::jmap(-24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())+5;
@@ -699,25 +808,63 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 
 }
 
-// Fade Components on Mouse Enter
-void FrequencyResponse::fadeInOutComponents()
+bool FrequencyResponse::checkMenuFocus(const juce::MouseEvent& event)
 {
-	if (fadeIn) // If mouse entered... fade Toggles Alpha up
-	{
-		if (fadeAlpha < fadeMax)
-			fadeAlpha += fadeStepUp;
+	auto x = event.getPosition().getX();
+	auto y = event.getPosition().getY();
 
-		if (fadeAlpha > fadeMax)
-			fadeAlpha = fadeMax;
+	bool mouseIsInMenu{ false };
+
+	if (x > buttonBounds.getX() && x < buttonBounds.getRight() &&
+		y > buttonBounds.getY() && y < buttonBounds.getBottom())
+		mouseIsInMenu = true;
+
+	if (buttonOptions.isMouseOverOrDragging() || mouseIsInMenu)
+	{
+		fadeInButton = true;
+		fadeInCursorLM = false;
+		fadeInCursorMH = false;
+		fadeInCursorLG = false;
+		fadeInCursorMG = false;
+		fadeInCursorHG = false;
+		return true;
+	}
+	else
+	{
+		fadeInButton = false;
+		return false;
+	}		
+}
+
+// Fade Components on Mouse Enter
+void FrequencyResponse::fadeButtons(juce::Graphics& g)
+{
+	if (fadeInButton || showMenu) // If mouse entered... fade Toggles Alpha up
+	{
+		if (fadeAlphaButton < fadeMaxButton)
+			fadeAlphaButton += fadeStepUpButton;
+
+		if (fadeAlphaButton > fadeMaxButton)
+			fadeAlphaButton = fadeMaxButton;
 	}
 	else // If mouse exit... fade Toggles Alpha down
 	{
-		if (fadeAlpha > fadeMin)
-			fadeAlpha -= fadeStepDown;
+		if (fadeAlphaButton > fadeMinButton)
+			fadeAlphaButton -= fadeStepDownButton;
 
-		if (fadeAlpha < fadeMin)
-			fadeAlpha = fadeMin;
+		if (fadeAlphaButton < fadeMinButton)
+			fadeAlphaButton = fadeMinButton;
 	}
+
+	g.setColour(juce::Colours::white);
+	g.setOpacity(0.9f);
+	g.fillRoundedRectangle(	buttonBounds.getX(),
+							buttonBounds.getY(),
+							buttonBounds.getWidth(),
+							buttonBounds.getHeight(),
+							2.f);
+
+	buttonOptions.setAlpha(fadeAlphaButton);
 }
 
 // Fade Cursor when within bounds
@@ -887,7 +1034,7 @@ void FrequencyResponse::checkMousePosition()
 		fadeRegionLG = false;
 		fadeRegionMG = false;
 		fadeRegionHG = false;
-		fadeIn = false;
+		fadeInButton = false;
 	}
 }
 
@@ -967,25 +1114,45 @@ void FrequencyResponse::paintFFT(juce::Graphics& g, juce::Rectangle<float> bound
 													0.0f);
 
 		fftDrawingPoints.set(i - 1, startY);
-
-		//g.setColour(juce::Colours::whitesmoke);
-		//g.setOpacity(1.0f);
-		//g.drawLine(startX, bounds.getBottom(), startX, endY, 0.2f);
 	}
 
 	juce::Path f;
 
     f.startNewSubPath(bounds.getX() + 2, bounds.getBottom());
 
-    for (int i = 0; i < fftDrawingPoints.size()-1; i++)
+	int curve = 3;
+
+	float x0{ 0.f }, x1{ 0.f }, x2{ 0.f };
+
+    for (int i = 0; i < fftDrawingPoints.size()-curve-1; i++)
     {
-        float point = juce::jmap(	(float)i, 
+		if (i % curve == 0 && i > 0)
+		{
+			float x0 = juce::jmap(	(float)i-curve, 
 									0.f, 
 									(float)(fftDrawingPoints.size()) - 1.f,
 									2.f, 
 									bounds.getWidth()-2 );
 
-        f.lineTo(bounds.getX() + point, fftDrawingPoints[i] - 2);
+			float x1 = juce::jmap(	(float)i, 
+									0.f, 
+									(float)(fftDrawingPoints.size()) - 1.f,
+									2.f, 
+									bounds.getWidth()-2 );
+
+			float x2 = juce::jmap(	(float)i+ curve,
+									0.f, 
+									(float)(fftDrawingPoints.size()) - 1.f,
+									2.f, 
+									bounds.getWidth()-2 );
+
+			juce::Point<float> point0 = { bounds.getX() + x0, fftDrawingPoints[i - curve] - 2 };
+			juce::Point<float> point1 = { bounds.getX() + x1, fftDrawingPoints[i] - 2 };
+			juce::Point<float> point2 = { bounds.getX() + x2, fftDrawingPoints[i + curve] - 2 };
+
+			f.cubicTo(point0, point1, point2);
+		}
+
     }
 
 	f.lineTo(bounds.getRight(), bounds.getBottom());
@@ -1009,8 +1176,8 @@ void FrequencyResponse::paintFFT(juce::Graphics& g, juce::Rectangle<float> bound
 
 	// Fill FFT Outline 
     g.setColour(juce::Colours::darkgrey);
-    g.setOpacity(1.0f);
-    g.strokePath(f, juce::PathStrokeType(1.0f));
+    g.setOpacity(0.75f);
+    g.strokePath(f, juce::PathStrokeType(0.5f));
 
 }
 
@@ -1022,7 +1189,7 @@ void FrequencyResponse::drawNextFrameOfSpectrum()
 	// Render FFT Data
 	forwardFFT.performFrequencyOnlyForwardTransform(audioProcessor.fftData);
 
-	auto mindB = -100.0f;
+	auto mindB = -60.f;
 	auto maxdB = 0.0f;
 
 	for (int i = 0; i < audioProcessor.scopeSize; ++i)
@@ -1058,4 +1225,104 @@ void FrequencyResponse::drawNextFrameOfSpectrum()
 	}
 
 
+}
+
+void FrequencyResponse::drawToggles(bool showMenu)
+{
+	using namespace juce;
+
+	/* Toggle Menu Visibility Based On Display Params */
+	if (showMenu)
+		buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
+	else
+		buttonBounds.setBounds(0, 0, 0, 0);
+
+	FlexBox flexBox;
+	flexBox.flexDirection = FlexBox::Direction::column;
+	flexBox.flexWrap = FlexBox::Wrap::noWrap;
+
+	auto margin = FlexItem().withHeight(5);
+	auto spacer = FlexItem().withHeight(2.5);
+	auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
+
+	flexBox.items.add(margin);
+	flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
+	flexBox.items.add(spacer);
+	flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
+	flexBox.items.add(margin);
+
+	flexBox.performLayout(buttonBounds);
+
+	toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+	togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+
+	toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+	
+	toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+	togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+
+	toggleShowRTA.setButtonText("Show FFT");
+	togglePickInput.setButtonText("FFT In");
+	togglePickOutput.setButtonText("FFT Out");
+
+	togglePickInput.setRadioGroupId(1);
+	togglePickOutput.setRadioGroupId(1);
+
+	addAndMakeVisible(toggleShowRTA);
+	addAndMakeVisible(togglePickInput);
+	addAndMakeVisible(togglePickOutput);
+}
+
+void FrequencyResponse::buttonClicked(juce::Button* button)
+{
+	if (button == &buttonOptions)
+	{
+		showMenu = !showMenu;
+		drawToggles(showMenu);
+	}
+		
+
+	if (button == &toggleShowRTA)
+	{
+		mShowFFT = toggleShowRTA.getToggleState();
+	}
+		
+	if (button == &togglePickInput || button == &togglePickOutput)
+	{
+		pickOffID = togglePickOutput.getToggleState();
+
+		updateToggleStates();
+	}
+	
+}
+
+void FrequencyResponse::updateToggleStates()
+{
+	// When Pickoff ID Changes,
+	// Update Toggle States
+	// Set Parameter
+
+	switch (pickOffID)
+	{
+		case 0: // Pre
+		{
+			togglePickInput.setToggleState(true, false);
+			togglePickOutput.setToggleState(false, false); break;
+		}
+		case 1: // Post
+		{
+			togglePickOutput.setToggleState(true, false);
+			togglePickInput.setToggleState(false, false); break;
+		}
+	}
+
+	fftPickoffParameter->setValueNotifyingHost(pickOffID);
+
+	audioProcessor.setFftPickoffPoint(pickOffID);
 }

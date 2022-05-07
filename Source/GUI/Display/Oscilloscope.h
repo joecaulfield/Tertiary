@@ -17,19 +17,18 @@
 #include "../../GUI/AllColors.h"
 #include "../UtilityFunctions.h"
 
-struct ScrollPad : juce::Component, juce::MouseListener, juce::Slider::Listener
+struct ScrollPad :	juce::Component, 
+					juce::MouseListener, 
+					juce::Slider::Listener
 {
 public:
 
 	ScrollPad();
 	~ScrollPad();
 
-	//void mouseUp(const juce::MouseEvent& event) override;
 	void mouseDown(const juce::MouseEvent& event) override;
-	//void mouseMove(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override;
 	void mouseDoubleClick(const juce::MouseEvent& event) override;
-	//void mouseDoubleClick(const juce::MouseEvent& event) override;
 
 	void paint(juce::Graphics& g) override;
 	void resized();
@@ -54,7 +53,7 @@ public:
 	float getPoint1() { return point1; }
 	float getPoint2() { return point2; }
 
-	void setZoom(float zoom);
+	//void setZoom(float zoom);
 	float getZoom();
 
 private:
@@ -69,12 +68,10 @@ private:
 
 	bool shouldUpdatePoint1, shouldUpdatePoint2, shouldCheckPanOrZoom;
 
-	//bool isPanning{ false };
-
 	int currentCenter{ 0 };
 	int minWidth{ 80 };
 	int defaultWidth{ 160 };
-	float currentWidth { 100 };	// Rename to currentWidth
+	float currentWidth { 100 };
 	int maxWidth{ 360 };
 
 	float minZoomFactor{ 0.5f };
@@ -83,14 +80,9 @@ private:
 
 
 	int thumbTolerance = 75;
-	//int edgeTolerance = 10;
-
-	//float panScale{ 1 };
 	int zoomScale{ 1 };
-
-	// [*] float zoomIncrement = 20;
 	float zoomIncrement = 10;
-	//float panIncrement = 10;
+
 };
 
 struct Oscilloscope :	juce::Component,
@@ -104,14 +96,11 @@ struct Oscilloscope :	juce::Component,
 	void paint(juce::Graphics& g) override;
 	void paintOverChildren(juce::Graphics& g) override;
 
-	//void drawBorder(juce::Graphics& g);
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds);
 
 	void drawLowLFO (juce::Rectangle<int> bounds);
 	void drawMidLFO (juce::Rectangle<int> bounds);
 	void drawHighLFO(juce::Rectangle<int> bounds);
-
-	void buttonClicked(juce::Button* button) override;
 
 	void drawLFO(	juce::Rectangle<int> bounds,
 					juce::Path &lfoStrokePath,
@@ -124,7 +113,7 @@ struct Oscilloscope :	juce::Component,
 
 	void timerCallback() override;
 
-	void mouseEnter(const juce::MouseEvent& event) override;
+	void mouseEnter(const juce::MouseEvent& event) override {};
 	void mouseExit(const juce::MouseEvent& event) override;
 	void mouseDown(const juce::MouseEvent& event) override;
 	void mouseUp(const juce::MouseEvent& event) override;
@@ -166,7 +155,7 @@ struct Oscilloscope :	juce::Component,
 	/*	Amount of not-shown pixels in the quarter-note 
 	that overhangs the edge of the screen.
 	Ignores display shift and assumes centered pan.	*/
-	float playBackOffset{ 0.f };
+	//float playBackOffset{ 0.f };
 	//float playBackOffsetLeft{ 0.f };
 	//float playBackOffsetRight{ 0.f };
 
@@ -203,7 +192,7 @@ struct Oscilloscope :	juce::Component,
 
 	void drawStackedScope();
 
-	void drawToggles(bool showMenu);
+
 	void setToggleEnable(bool enabled);
 	void drawSliders() {};
 	void fadeInOutComponents(juce::Graphics& g);
@@ -213,11 +202,18 @@ struct Oscilloscope :	juce::Component,
 
 	TertiaryAudioProcessor& audioProcessor;
 	GlobalControls& globalControls;
-
 	ScrollLookAndFeel scrollLookAndFeel;
+	
+
+
+	/* Options Menu =================================== */
+
 	ButtonOptionsLookAndFeel optionsLookAndFeel;
-
-
+	juce::TextButton buttonOptions;
+	juce::Rectangle<float> buttonBounds;
+	bool showMenu{ false };
+	void drawToggles(bool showMenu);
+	void buttonClicked(juce::Button* button) override;
 	juce::ToggleButton	toggleShowLow, 
 						toggleShowMid, 
 						toggleShowHigh, 
@@ -225,19 +221,27 @@ struct Oscilloscope :	juce::Component,
 						toggleShowCursor,
 						toggleShowPlayhead;
 
-	juce::TextButton buttonOptions;
-
-	//juce::Slider sliderScroll;
-	ScrollPad sliderScroll;
-
-	bool updateLfoDisplay{ true };
-
 	juce::AudioParameterBool* showLowBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showMidBand{ nullptr };       // Pointer to the APVTS
 	juce::AudioParameterBool* showHighBand{ nullptr };      // Pointer to the APVTS
 	juce::AudioParameterBool* stackBands{ nullptr };        // Pointer to the APVTS
 	juce::AudioParameterBool* showCursor{ nullptr };        // Pointer to the APVTS
 	juce::AudioParameterBool* showPlayhead{ nullptr };      // Pointer to the APVTS
+
+	using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+
+	std::unique_ptr<buttonAttachment>	showLowAttachment,
+										showMidAttachment,
+										showHighAttachment,
+										stackBandsAttachment,
+										showCursorAttachment,
+										showPlayheadAttachment;
+
+
+	ScrollPad sliderScroll;
+
+	bool updateLfoDisplay{ true };
+
 
 	//juce::AudioParameterFloat* displayPhase{ nullptr };
 
@@ -249,7 +253,7 @@ private:
 	LFO& midLFO;
 	LFO& highLFO;
 
-	bool showMenu{ false };
+
 
 	int timerCounter = 0;
 
@@ -262,14 +266,7 @@ private:
 	juce::Path lowPathFill, midPathFill, highPathFill;
 	juce::Image lowImage, midImage, highImage;
 
-	using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
-	std::unique_ptr<buttonAttachment>	showLowAttachment,
-										showMidAttachment,
-										showHighAttachment,
-										stackBandsAttachment,
-										showCursorAttachment,
-										showPlayheadAttachment;
 
 	using sliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
@@ -288,7 +285,7 @@ private:
 
 	float sampleRate;
 
-	juce::Rectangle<float> buttonBounds;
+	
 
 	juce::Line<float> cursor;
 	bool cursorDrag{ false };

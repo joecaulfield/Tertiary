@@ -74,7 +74,10 @@ namespace Params    // Mapping between Parameter Names and Unique ID's
 		Cursor_Position,
 
 		Scope_Point1,
-		Scope_Point2
+		Scope_Point2,
+
+		Show_FFT,
+		FFT_Pickoff
 	};
 
 	inline const std::map<Names, juce::String>& GetParams()
@@ -141,6 +144,9 @@ namespace Params    // Mapping between Parameter Names and Unique ID's
 
 			{Scope_Point1,				"Scope Point 1"},
 			{Scope_Point2,				"Scope Point 2"},
+
+			{Show_FFT,					"Show FFT"},
+			{FFT_Pickoff,				"FFT Pickoff Point" },
 		};
 
 		return params;

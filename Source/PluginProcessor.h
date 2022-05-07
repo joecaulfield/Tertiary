@@ -410,6 +410,8 @@ public:
 
     void parameterChanged(const juce::String& parameterID, float newValue);
 
+	void setFftPickoffPoint(int point);
+
     APVTS apvts{    *this,                                  // Audio Processor
                     nullptr,                                // Undo Manager
                     "Parameters",                           // Identifier &valueTreeType
@@ -424,6 +426,10 @@ public:
 
 	bool rateChanged{ true };
 	bool multChanged{ true };
+
+	bool fftPickoffPointIsInput{ false };
+
+	
 
 	float oldMultLow{ 0.f }, oldMultMid{ 0.f }, oldMultHigh{ 0.f };
 	float multLow{ 1.f }, multMid{ 1.f }, multHigh{ 1.f };

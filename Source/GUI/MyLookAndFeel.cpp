@@ -844,6 +844,11 @@ void ScrollLookAndFeel::drawLinearSlider(	juce::Graphics& g, int x, int y, int w
 
 // IN/OUT METER SLIDER ===========================================================
 
+InOutLookAndFeel::InOutLookAndFeel()
+{
+	imageFader = juce::ImageCache::getFromMemory(BinaryData::FaderKnob_png, BinaryData::FaderKnob_pngSize);
+}
+
 void InOutLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
 	float sliderPos, float minSliderPos, float maxSliderPos,
 	const juce::Slider::SliderStyle sliderStyle, juce::Slider& slider)
@@ -857,11 +862,11 @@ void InOutLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 
 	// Draw Track & Fader
 	auto faderWidth = 30;
-	auto faderHeight = 15;
+	auto faderHeight = 60;
 
 	auto sliderPosScaled = (sliderPos - bounds.getY()) / bounds.getHeight();
 
-	auto faderRange = juce::jmap(sliderPosScaled, bounds.getY() + 10, bounds.getBottom() - 10);
+	auto faderRange = juce::jmap(sliderPosScaled, bounds.getY() + 25, bounds.getBottom() - 25);
 
 	juce::Path track;
 	track.startNewSubPath(bounds.getCentreX(), bounds.getY() + 10);
@@ -870,34 +875,31 @@ void InOutLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
 	g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
 												juce::PathStrokeType::EndCapStyle::rounded));
 
-	juce::Rectangle<float> fader;
-	fader.setBounds(	bounds.getCentreX() - faderWidth/2.f, 
-						faderRange - faderHeight / 2.f,
-						faderWidth, faderHeight);
-	
-	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(1.5f));
-	g.setOpacity(0.85f);
-	g.fillRoundedRectangle(fader, 3.f);
+	juce::Rectangle<float> faderBounds;
+	faderBounds.setBounds(	bounds.getCentreX() - faderWidth/2.f,
+							faderRange - faderHeight / 2.f,
+							faderWidth, faderHeight);
 
-	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.5f));
-	g.drawRoundedRectangle(fader, 3.f, 1.f);
+	// Draw the Title
+	g.drawImage(imageFader, faderBounds.toFloat());
 
 	// Build dB Value String
 
-	float value;
-	juce::String valueString;
+	//float value;
+	//juce::String valueString;
 
-	value = juce::jmap(sliderPosScaled, 24.f, -24.f);
+	//value = juce::jmap(sliderPosScaled, 24.f, -24.f);
 
-	if (value > 0.f)
-		valueString = "+";
+	//if (value > 0.f)
+	//	valueString = "+";
 
-	valueString = valueString << juce::String(value);
-		
-	g.setColour(juce::Colours::white);
-	g.setFont(15);
-	g.drawFittedText(valueString, fader.reduced(1,3).toNearestInt(), juce::Justification::centred, 1);
+	//valueString = valueString << juce::String(value);
+	//	
+	//g.setColour(juce::Colours::white);
+	//g.setFont(15);
+	//g.drawFittedText(valueString, faderBounds.reduced(1,3).toNearestInt(), juce::Justification::centred, 1);
 }
+
 
 // CROSSOVER SLIDER ==============================================================
 

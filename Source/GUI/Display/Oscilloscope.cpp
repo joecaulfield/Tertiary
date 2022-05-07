@@ -325,12 +325,16 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	// Update Scroll Points
 	
 	buttonOptions.setLookAndFeel(&optionsLookAndFeel);
+	buttonOptions.addListener(this);
+	buttonOptions.addMouseListener(this, true);
+	addAndMakeVisible(buttonOptions);
+	//buttonOptions.setButtonText("Options");
 
 	addAndMakeVisible(sliderScroll);
-	addAndMakeVisible(buttonOptions);
 
-	buttonOptions.setButtonText("Options");
-	buttonOptions.addListener(this);
+
+
+	
 
 	toggleShowLow.addListener(this);
 	toggleShowMid.addListener(this);
@@ -342,7 +346,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 
 	sliderScroll.addMouseListener(this, true);
-	buttonOptions.addMouseListener(this, true);
+
 
 	sampleRate = audioProcessor.getSampleRate();
 	makeAttachments();
@@ -376,8 +380,6 @@ Oscilloscope::~Oscilloscope()
 // Called on component resize
 void Oscilloscope::resized()
 {
-	//drawToggles();
-	
 	auto bounds = getLocalBounds();
 	bounds.reduce(4, 0);		// To account for in-set border
 	bounds.removeFromBottom(5); // To account for in-set border
@@ -389,11 +391,14 @@ void Oscilloscope::resized()
 	float p1 = scopePoint1Param->get() / 100.f * (float)sliderScroll.getMaxWidth();
 	float p2 = scopePoint2Param->get() / 100.f * (float)sliderScroll.getMaxWidth();
 
+	/* Place Show-Menu Button */
 	buttonOptions.setSize(100, 25);
 	buttonOptions.setTopLeftPosition(4,4);
 
+	/* Update ScrollPad with Loaded Points */
 	sliderScroll.initializePoints(x + p1, x + p2);
 
+	/* Update Band Display Regions Based on Params */
 	updateRegions();
 }
 
@@ -519,7 +524,6 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 
 	auto bounds = getLocalBounds().toFloat();
 
-
 	paintBorder(g, juce::Colours::purple, bounds);
 }
 
@@ -527,6 +531,8 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
 	using namespace AllColors::OscilloscopeColors;
+
+	float oldBeatSpacing = beatSpacing;
 
 	// DRAW VERTICAL LINES =============================
 	juce::Line<float> verticalAxis;
@@ -614,6 +620,11 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 
 		onScreenNumBeatsLeftFromCenter = (c - leastOnscreenLeftGridLine) / beatSpacing;
 		onScreenNumBeatsRightFromCenter = (greatestOnscreenRightGridLine - c) / beatSpacing;
+
+
+		// If zoom changes, update the LFO display
+		if (oldBeatSpacing != beatSpacing)
+			updateLfoDisplay = true;
 	}
 
 	g.setColour(juce::Colours::lightgrey);
@@ -671,6 +682,8 @@ void Oscilloscope::timerCallback()
 	updatePreferences();
 	updateRegions();
 
+	repaint();
+
 	if (checkIfLfoHasChanged(lowLFO) || 
 		checkIfLfoHasChanged(midLFO) ||
 		checkIfLfoHasChanged(highLFO) ||
@@ -695,7 +708,7 @@ void Oscilloscope::timerCallback()
 
 	checkMousePosition();
 	checkFocus();
-	repaint();
+
 	getPlayheadPosition();
 
 }
@@ -1019,6 +1032,7 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 
 			// Match Width of 1x Multiplier to Width of One Quarter-Note
 			auto increment = scalar * waveTable.size() / beatSpacing;
+			DBG("LFO BS = " << beatSpacing);
 
 			// Index sweeps through WaveTable Array
 			float index = fmod(i * increment + mRelativePhase, waveTable.size());
@@ -1123,15 +1137,11 @@ void Oscilloscope::drawToggles(bool showMenu)
 {
 	using namespace juce;
 
-
+	/* Toggle Menu Visibility Based On Display Params */
 	if (showMenu)
-	{
 		buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 150);
-		//buttonBounds.reduce(3, 3);
-	}
 	else
 		buttonBounds.setBounds(0, 0, 0, 0);
-
 
 	FlexBox flexBox;
 	flexBox.flexDirection = FlexBox::Direction::column;
@@ -1247,10 +1257,10 @@ void Oscilloscope::setToggleEnable(bool enabled)
 	toggleShowPlayhead.setEnabled(enabled);
 }
 
-// On mouse-enter, fade in view-menu unless dragging cursor
-void Oscilloscope::mouseEnter(const juce::MouseEvent& event)
-{
-}
+//// On mouse-enter, fade in view-menu unless dragging cursor
+//void Oscilloscope::mouseEnter(const juce::MouseEvent& event)
+//{
+//}
 
 // On mouse exit, fade out view-menu
 void Oscilloscope::mouseExit(const juce::MouseEvent& event)
@@ -1400,6 +1410,9 @@ void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 			scopeCursorParam->setValueNotifyingHost(dragX);
 		}
 	}
+
+	if (sliderScroll.isMouseOver())
+		updateLfoDisplay = true;
 
 }
 

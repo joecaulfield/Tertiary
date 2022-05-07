@@ -17,6 +17,7 @@ InputOutputGain::InputOutputGain(TertiaryAudioProcessor& p) :
 
 	sliderGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
 	sliderGain.setLookAndFeel(&inOutLookAndFeel);
+	sliderGain.addListener(this);
 	addAndMakeVisible(sliderGain);
 
 	startTimerHz(60);
@@ -34,18 +35,32 @@ void InputOutputGain::paint(juce::Graphics& g)
 
 	// Fill Background Gradient (LED's Off)
 	g.setGradientFill(ledOffGradient);
-	g.fillRect(bounds);
+	g.fillRect(grillBounds);
 
 	// DRAW THE LEFT & RIGHT METER
 	g.setGradientFill(ledOnGradient);
 	g.fillRect(leftBounds);
 	g.fillRect(rightBounds);
 
-	// Draw Left & Right Grills
-	juce::Rectangle<float> grillBounds = {	bounds.getX(), bounds.getY(),
-											bounds.getWidth(), bounds.getHeight() };
+	// Draw the Slider Value Background
+	g.setColour(juce::Colours::black);
+	g.fillRect(labelBounds.reduced(1,1));
+
+	juce::String valueString;
+
+	if (sliderValue > 0.f)
+		valueString = "+";
+
+	valueString = valueString << juce::String(sliderValue);
+
+	if (sliderValue == 0)
+		valueString = valueString << " dB";
 
 	g.drawImage(grill, grillBounds);
+
+	g.setColour(juce::Colours::white);
+	g.setFont(13);
+	g.drawFittedText(valueString, labelBounds.toNearestInt(), juce::Justification::centred, 1);
 					
 }
 
@@ -53,12 +68,17 @@ void InputOutputGain::resized()
 {
 	auto bounds = getLocalBounds().toFloat();
 
+	grillBounds = {	bounds.getX(), bounds.getY(),
+					bounds.getWidth(), bounds.getHeight() - 15};
+
+	labelBounds = { bounds.getX(), grillBounds.getBottom(), bounds.getWidth(), 15 };
+
 	// Place The Slider ===========================================================
 	sliderGain.setSize(getWidth(), getHeight() * 0.9f);
 	sliderGain.setCentreRelative(0.5f, 0.5f);
 
-	ledOffGradient = makeMeterGradient(bounds, 0.75f);
-	ledOnGradient = makeMeterGradient(bounds, 2.5f);
+	ledOffGradient = makeMeterGradient(grillBounds, 0.75f);
+	ledOnGradient = makeMeterGradient(grillBounds, 2.5f);
 
 	// Draw The Grill Image =======================================================
 	drawGrill(bounds);
@@ -108,10 +128,11 @@ void InputOutputGain::getLevels()
 		rightLevel = 0.f;
 	}
 
-	auto bounds = getLocalBounds().toFloat();
+	//auto bounds = getLocalBounds().toFloat();
+	auto bounds = grillBounds;
 
-	leftLevelPixel = bounds.getHeight() * juce::jmap(leftLevel, -60.f, 6.f, 0.f, 1.f);
-	rightLevelPixel = bounds.getHeight() * juce::jmap(rightLevel, -60.f, 6.f, 0.f, 1.f);
+	leftLevelPixel = bounds.getHeight() * juce::jmap(leftLevel, -60.f, 0.f, 0.f, 1.f);
+	rightLevelPixel = bounds.getHeight() * juce::jmap(rightLevel, -60.f, 0.f, 0.f, 1.f);
 
 	for (int i = ledThresholds.size()-1; i >= 0; i--)
 	{
@@ -194,4 +215,9 @@ void InputOutputGain::drawGrill(juce::Rectangle<float> bounds)
 		if (ledThresholds[i] == ledThresholds[i + 1])
 			ledThresholds.remove(i + 1);
 	}
+}
+
+void InputOutputGain::sliderValueChanged(juce::Slider* slider)
+{
+	sliderValue = slider->getValue();
 }

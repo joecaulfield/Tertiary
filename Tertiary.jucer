@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               cppLanguageStandard="17" companyName="Joe Caulfield Engineering"
               companyWebsite="JoeCaulfieldEngineering.com" companyEmail="JPC.FOH@gmail.com"
-              pluginDesc="Multiband Tremolo">
+              pluginDesc="Multiband Tremolo" pluginFormats="buildAAX,buildAU,buildAUv3,buildStandalone,buildVST3">
   <MAINGROUP id="gAXMC9" name="Tertiary">
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="VGNRlz" name="Params.cpp" compile="1" resource="0" file="Source/DSP/Params.cpp"/>
@@ -92,6 +92,7 @@
             file="Assets/TitleCrossover.png"/>
       <FILE id="smUVQ0" name="TitleGainControls.png" compile="0" resource="1"
             file="Assets/TitleGainControls.png"/>
+      <FILE id="u4ZRAB" name="FaderKnob.png" compile="0" resource="1" file="Assets/FaderKnob.png"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
