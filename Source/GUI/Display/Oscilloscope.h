@@ -159,7 +159,7 @@ struct Oscilloscope :	juce::Component,
 	//float playBackOffsetLeft{ 0.f };
 	//float playBackOffsetRight{ 0.f };
 
-	// Number of Full-Beats Which Fit Into Display
+	// Pixel-Width of One Complete On-Screen Beat
 	float beatSpacing{ 1.f };
 
 	/*Number of Quarter Notes Shown In Display - Including One Overhanging QN*/

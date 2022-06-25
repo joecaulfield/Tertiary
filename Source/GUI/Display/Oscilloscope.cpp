@@ -332,10 +332,6 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	addAndMakeVisible(sliderScroll);
 
-
-
-	
-
 	toggleShowLow.addListener(this);
 	toggleShowMid.addListener(this);
 	toggleShowHigh.addListener(this);
@@ -343,10 +339,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	addMouseListener(this, true);
 
-
-
 	sliderScroll.addMouseListener(this, true);
-
 
 	sampleRate = audioProcessor.getSampleRate();
 	makeAttachments();
@@ -468,36 +461,51 @@ void Oscilloscope::paint(juce::Graphics& g)
 
 	// Draw in order so that focus is on top
 
-	// DRAW & FILL LOW REGION
-	g.setGradientFill(mLowBypass ? WAVEFORM_BYPASS_GRADIENT(lowRegion.toFloat()) : WAVEFORM_LOW_GRADIENT(lowRegion.toFloat()));
-	g.setOpacity(mLowFocus ? 0.95 : 0.85);
-	g.fillPath(lowPathFill);
+	
+	/* Draw & Fill Low-Region */
+	if (mShowLowBand)
+	{
+		g.setGradientFill(mLowBypass ? WAVEFORM_BYPASS_GRADIENT(lowRegion.toFloat()) : WAVEFORM_LOW_GRADIENT(lowRegion.toFloat()));
+		g.setOpacity(mLowFocus ? 0.95f : 0.85f);
+		g.fillPath(lowPathFill);
 
-	g.setColour(mLowBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_LOW());
-	g.setOpacity(mLowFocus ? 1.f : 0.85f);
-	g.strokePath(lowPath, mLowFocus?	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
-										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+		g.setColour(mLowBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_LOW());
+		g.setOpacity(mLowFocus ? 1.f : 0.85f);
+		g.strokePath(lowPath, mLowFocus?	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+											juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+	}
 
-	// DRAW & FILL MID REGION
-	g.setGradientFill(mMidBypass ? WAVEFORM_BYPASS_GRADIENT(midRegion.toFloat()) : WAVEFORM_MID_GRADIENT(midRegion.toFloat()));
-	g.setOpacity(mMidFocus ? 0.95 : 0.85);
-	g.fillPath(midPathFill);
+	/* Draw & Fill Mid-Region */
+	if (mShowMidBand)
+	{
+		g.setGradientFill(mMidBypass ? WAVEFORM_BYPASS_GRADIENT(midRegion.toFloat()) : WAVEFORM_MID_GRADIENT(midRegion.toFloat()));
+		g.setOpacity(mMidFocus ? 0.95f : 0.85f);
+		g.fillPath(midPathFill);
 
-	g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
-	g.setOpacity(mMidFocus ? 1.f : 0.85f);
-	g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
-										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+		g.setColour(mMidBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_MID());
+		g.setOpacity(mMidFocus ? 1.f : 0.85f);
+		g.strokePath(midPath, mMidFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+											juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));	
+	}
+
+	/* Draw & Fill High-Region */
+	if (mShowHighBand)
+	{
+		g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
+		g.setOpacity(mHighFocus ? 0.95f : 0.85f);
+		g.fillPath(highPathFill);
+
+		g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
+		g.setOpacity(mHighFocus ? 1.f : 0.85f);
+		g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
+											juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+	}
 
 
-	// DRAW & FILL HIGH REGION
-	g.setGradientFill(mHighBypass ? WAVEFORM_BYPASS_GRADIENT(highRegion.toFloat()) : WAVEFORM_HIGH_GRADIENT(highRegion.toFloat()));
-	g.setOpacity(mHighFocus ? 0.95 : 0.85);
-	g.fillPath(highPathFill);
 
-	g.setColour(mHighBypass ? REGION_BORDER_COLOR_BYPASS() : REGION_BORDER_COLOR_HIGH());
-	g.setOpacity(mHighFocus ? 1.f : 0.85f);
-	g.strokePath(highPath, mHighFocus? 	juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) : 
-										juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
+
+
+
 
 	// DRAW THE MOVING PLAYHEAD
 	if (mShowPlayhead && !panOrZoomChanging)
@@ -702,15 +710,9 @@ void Oscilloscope::timerCallback()
 		updateLfoDisplay = false;
 	}
 
-	
-	
-	
-
 	checkMousePosition();
 	checkFocus();
-
 	getPlayheadPosition();
-
 }
 
 bool Oscilloscope::checkIfLfoHasChanged(LFO& lfo)
@@ -990,6 +992,13 @@ void Oscilloscope::drawStackedScope()
 	highRegion.reduce(0, 3);
 }
 
+
+
+
+
+
+
+
 /* Generate paths for LFO when new information is available */
 void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 							juce::Path &lfoStrokePath, 
@@ -1000,10 +1009,13 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 {
 	using namespace juce;
 
+	/* Vertical Midpoint of Drawing Region */
 	float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);
 
+	/* Add 3px Vertical Margin */
 	bounds.reduce(0, 3);
 
+	/* Clear Previous Path Data */
 	lfoFillPath.clear();
 	lfoStrokePath.clear();
 
@@ -1017,7 +1029,7 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 			bool sync = lfo.isSyncedToHost();
 
 			// Scale WaveTable by Multiplier, or by Rate, but not Both
-			float scalar;
+			float scalar{ 1.f };
 
 			if (sync)
 				scalar = lfo.getWaveMultiplier();
@@ -1032,7 +1044,6 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 
 			// Match Width of 1x Multiplier to Width of One Quarter-Note
 			auto increment = scalar * waveTable.size() / beatSpacing;
-			DBG("LFO BS = " << beatSpacing);
 
 			// Index sweeps through WaveTable Array
 			float index = fmod(i * increment + mRelativePhase, waveTable.size());
@@ -1044,19 +1055,28 @@ void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
 			float displayOffsetStart = bounds.getX() + bounds.getCentreX() - paintAreaWidth;
 
 			// Incorporate Pan Shift
-			float point = displayOffsetStart + mDisplayPhase;
+			int point = displayOffsetStart + mDisplayPhase;
 
-			if (i == 0)
+			/* Of the calculated points, only render those which will be onscreen */
+			if (point + i == bounds.getX())
 			{
-				lfoStrokePath.startNewSubPath(point, y);
-				lfoFillPath.startNewSubPath(point, midY);
-				lfoFillPath.lineTo(point, y);
+				lfoStrokePath.startNewSubPath(bounds.getX(), y);
+				lfoFillPath.startNewSubPath(bounds.getX(), midY);
+				lfoFillPath.lineTo(bounds.getX(), y);
 			}
-			else 
+
+			if (point + i > bounds.getX() && point + i < bounds.getRight())
 			{
 				lfoStrokePath.lineTo(point + i, y);
 				lfoFillPath.lineTo(point + i, y);
 			}
+
+			if (point + i == bounds.getRight())
+			{
+				lfoFillPath.lineTo(bounds.getRight(), y);
+				lfoFillPath.lineTo(bounds.getRight(), midY);
+			}
+
 		}
 	}
 }
@@ -1315,6 +1335,8 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 
 	scopePoint1Param->setValueNotifyingHost(p1);
 	scopePoint2Param->setValueNotifyingHost(p2);
+
+	panOrZoomChanging = false;
 
 }
 

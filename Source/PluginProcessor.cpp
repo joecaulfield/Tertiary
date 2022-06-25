@@ -238,7 +238,7 @@ void TertiaryAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     spec.numChannels = getTotalNumOutputChannels(); // Define the Maximum Number of Channels the Comp will use
     spec.sampleRate = sampleRate;                   // Define the Sample Rate
 
-	lastSampleRate = getSampleRate();
+	//lastSampleRate = getSampleRate();
 
     inputGain.prepare(spec);    // Pass spec information into Input Gain
     outputGain.prepare(spec);   // Pass spec information into Output Gain
@@ -304,12 +304,12 @@ void TertiaryAudioProcessor::updateState()
 {
 	auto sampleRate = getSampleRate();
 
-	// Update Input Gain Params
+	// Update Input & Output Gain Params
 	inputGain.setGainDecibels(inputGainParam->get());
 	outputGain.setGainDecibels(outputGainParam->get());
 
 	// Update Tremolo Params
-	for (auto& trem : tremolos)                         // Update Tremolo Settings In One Pass
+	for (auto& trem : tremolos)
 		trem.updateTremoloSettings();
 
 	// Check for Changes to Waveshape, and Update Wave Display
@@ -375,10 +375,6 @@ void TertiaryAudioProcessor::updateState()
 			hitPlay = true;
 			setLatchStop = false;
 
-			// Print Header
-			//myFile.open("testWrite.txt", std::ios::out);
-			//myFile << "\n\n\n\n\n#\tPlayhead\tPhase L\tVal L\tPhase M\tVal M\tPhase H\tVal H\n";
-
 			resetPhase(lowLFO);
 			resetPhase(midLFO);
 			resetPhase(highLFO);
@@ -430,22 +426,21 @@ void TertiaryAudioProcessor::resetPhase(LFO& lfo)
 
 		//lfo.phase = fmod(playPosition * lfo.getWaveMultiplier(), lfo.getWaveMultiplier()) * lfo.waveTableMapped.size();
 	}
-	//else if (!hostInfo.isPlaying && lfo.isSyncedToHost())
-	//{
-	//	// Need way to sync LFO's together when there's no playhead moving
-	//	if (lowLFO.isSyncedToHost())
-	//		lfo.phase = lowLFO.phase;
-	//	else if (midLFO.isSyncedToHost())
-	//		lfo.phase = midLFO.phase;
-	//	else if (highLFO.isSyncedToHost())
-	//		lfo.phase = highLFO.phase;
-	//}
+	else if (!hostInfo.isPlaying && lfo.isSyncedToHost())
+	{
+		// Need way to sync LFO's together when there's no playhead moving
+		if (lowLFO.isSyncedToHost())
+			lfo.phase = lowLFO.phase;
+		else if (midLFO.isSyncedToHost())
+			lfo.phase = midLFO.phase;
+		else if (highLFO.isSyncedToHost())
+			lfo.phase = highLFO.phase;
+	}
 
 }
 
 void TertiaryAudioProcessor::splitBands(const juce::AudioBuffer<float>& inputBuffer)
 {
-
 	// Copy incoming audio into all filter buffers
     for (auto& fb : filterBuffers)
         fb = inputBuffer;
@@ -503,19 +498,27 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 		}
 	}
 
-	/* Get Input Gains for Meters */
+
+	/* Get Input Gains for Meters ======================================================================================================================== */
 	rmsLevelInputLeft.skip(buffer.getNumSamples());
-	rmsLevelInputRight.skip(buffer.getNumSamples());
+
+	/* Check for Mono or Stereo */
+	if (totalNumInputChannels > 1)
+		rmsLevelInputRight.skip(buffer.getNumSamples());
+
 	{
 		const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
 
 		/* If value is ascending, we use instantatneous value.
-		 If value is descending, we smooth value on its way down. */
+			If value is descending, we smooth value on its way down. */
+
 		if (newValueLeft < rmsLevelInputLeft.getCurrentValue())
 			rmsLevelInputLeft.setTargetValue(newValueLeft);
 		else rmsLevelInputLeft.setCurrentAndTargetValue(newValueLeft);
 	}
 
+	/* Check for Mono or Stereo */
+	if (totalNumInputChannels > 1)
 	{
 		const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
 
@@ -526,59 +529,66 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 			rmsLevelInputRight.setTargetValue(newValueRight);
 		else rmsLevelInputRight.setCurrentAndTargetValue(newValueRight);
 	}
+	else
+		rmsLevelInputRight = rmsLevelInputLeft;
+	/* Get Input Gains for Meters ======================================================================================================================== */
+
+
 
 	// APPLY CROSSOVER =====
 	splitBands(buffer);
 
 	// Apply Tremolo Gains
-	auto* lowWriteL = filterBuffers[0].getWritePointer(0);
-	auto* lowWriteR = filterBuffers[0].getWritePointer(1);
-
-	auto* midWriteL = filterBuffers[1].getWritePointer(0);
-	auto* midWriteR = filterBuffers[1].getWritePointer(1);
-
-	auto* highWriteL = filterBuffers[2].getWritePointer(0);
-	auto* highWriteR = filterBuffers[2].getWritePointer(1);
 
 	for (int sample = 0; sample < filterBuffers[0].getNumSamples(); ++sample)
 	{
 
+		/* Index = Current Position in the Given WaveTable.
+		'lfo.Phase' should be renamed to 'index' or 'lfoIndex'.
+		Apply a single offset based on the Relative Phase Shift.*/
 		int lowIndex = fmod((lowLFO.phase + lowLFO.mRelativePhase), (float)lowLFO.waveTableMapped.size());
 		int midIndex = fmod((midLFO.phase + midLFO.mRelativePhase), (float)midLFO.waveTableMapped.size());
 		int highIndex = fmod((highLFO.phase + highLFO.mRelativePhase), (float)highLFO.waveTableMapped.size());
 
+		/* LFO Instantaneous Amplitude, usd to Modulate Input Signal */
 		float mGainLowLFO = lowLFO.waveTableMapped[lowIndex];
 		float mGainMidLFO = midLFO.waveTableMapped[midIndex];
 		float mGainHighLFO = highLFO.waveTableMapped[highIndex];
 
+		/* Update the LFO's Phase (Index) */
 		lowLFO.phase = fmod((lowLFO.phase + lowLFO.increment), lowLFO.waveTableMapped.size());
 		midLFO.phase = fmod((midLFO.phase + midLFO.increment), midLFO.waveTableMapped.size());
 		highLFO.phase = fmod((highLFO.phase + highLFO.increment), highLFO.waveTableMapped.size());
 
+		/* Amplitude Modulation on Lows */
 		if (!lowBandTrem.bypass->get())
 		{
-			lowWriteL[sample] *= mGainLowLFO;
-			lowWriteR[sample] *= mGainLowLFO;
+			for (int i = 0; i < totalNumInputChannels; i++) {
+				filterBuffers[0].getWritePointer(i)[sample] *= mGainLowLFO; }
 		}
 
+		/* Amplitude Modulation on Mids */
 		if (!midBandTrem.bypass->get())
 		{
-			midWriteL[sample] *= mGainMidLFO;
-			midWriteR[sample] *= mGainMidLFO;
+			for (int i = 0; i < totalNumInputChannels; i++) {
+				filterBuffers[1].getWritePointer(i)[sample] *= mGainMidLFO; }
 		}
 
+		/* Amplitude Modulation on Highs */
 		if (!highBandTrem.bypass->get())
 		{
-			highWriteL[sample] *= mGainHighLFO;
-			highWriteR[sample] *= mGainHighLFO;
+			for (int i = 0; i < totalNumInputChannels; i++)	{
+				filterBuffers[2].getWritePointer(i)[sample] *= mGainHighLFO; }
 		}
 	}
 
+	/* Apply Individual Band Gains on Lows, Mids, Highs */
 	for (size_t i = 0; i < filterBuffers.size(); ++i)   // size_t is an unsigned int that is the result of the sizeof operator
 	{
-		applyGain(filterBuffers[i], tremolos[i].bandGain);  // Apply individual band gains to Lows, Mids, Highs
+		applyGain(filterBuffers[i], tremolos[i].bandGain);
 	}
-		
+
+
 	auto numSamples = buffer.getNumSamples();
 	auto numChannels = buffer.getNumChannels();
 
@@ -636,15 +646,27 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 	{
 		for (int i = 0; i < buffer.getNumSamples(); i++)
 		{
-			float sample = buffer.getSample(0, i) / 2.f + buffer.getSample(1, i) / 2.f;
+			float sample = 0.f;
+
+			for (int channel = 0; i < buffer.getNumChannels(); i++)
+			{
+				sample = buffer.getSample(channel, i) / 2.f;
+			}
 
 			pushNextSampleIntoFifo(sample);
 		}
 	}
 
-	/* Get Output Gain for Meters */
+
+
+
+	/* Get Output Gains for Meters ======================================================================================================================== */
 	rmsLevelOutputLeft.skip(buffer.getNumSamples());
-	rmsLevelOutputRight.skip(buffer.getNumSamples());
+
+	/* Check for Mono or Stereo */
+	if (totalNumInputChannels > 1)
+		rmsLevelOutputRight.skip(buffer.getNumSamples());
+
 	{
 		const auto newValueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
 
@@ -656,7 +678,8 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 		else rmsLevelOutputLeft.setCurrentAndTargetValue(newValueLeft);
 	}
 
-	{
+	/* Check for Mono or Stereo */
+	if (totalNumInputChannels > 1) {
 		const auto newValueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
 
 		/* If value is ascending, we use instantatneous value.
@@ -666,6 +689,9 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 			rmsLevelOutputRight.setTargetValue(newValueRight);
 		else rmsLevelOutputRight.setCurrentAndTargetValue(newValueRight);
 	}
+	else
+		rmsLevelOutputRight = rmsLevelOutputLeft;
+	/* Get Output Gains for Meters ======================================================================================================================== */
 
 }
 
@@ -717,10 +743,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
     // INPUT & OUTPUT GAIN
 
-    auto gainRange = NormalisableRange<float> ( -24.f,                                          // Start
-                                                24.f,                                           // Stop
-                                                0.5f,                                           // Step Size
-                                                1.f);                                           // Skew 
+    auto gainRange = NormalisableRange<float> ( -24.f,  // Start
+                                                24.f,   // Stop
+                                                0.5f,   // Step Size
+                                                1.f);   // Skew 
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Input_Gain),   // Parameter ID
                                                         params.at(Names::Input_Gain),   // Parameter Name
@@ -766,10 +792,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
     // LFO DEPTH PARAMETER ====================================================================================================================
 
-    auto depthRange = NormalisableRange<float> (    0,                                          // Start
-                                                    100,                                        // Stop
-                                                    0.5f,                                       // Step Size
-                                                    1.f);                                       // Skew
+    auto depthRange = NormalisableRange<float> (    0,		// Start
+                                                    100,    // Stop
+                                                    0.5f,   // Step Size
+                                                    1.f);   // Skew
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Depth_Low_LFO),        // Parameter ID
                                                         params.at(Names::Depth_Low_LFO),        // Parameter Name
@@ -788,10 +814,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
     // LFO SYMMETRY PARAMETER ====================================================================================================================
 
-    auto symmetryRange = NormalisableRange<float> ( 12.5,                                       // Start
-                                                    87.5,                                       // Stop
-                                                    0.5f,                                       // Step Size
-                                                    1.f);                                       // Skew
+    auto symmetryRange = NormalisableRange<float> ( 12.5,	// Start
+                                                    87.5,	// Stop
+                                                    0.5f,	// Step Size
+                                                    1.f);	// Skew
 
     layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Symmetry_Low_LFO),     // Parameter ID
                                                         params.at(Names::Symmetry_Low_LFO),     // Parameter Name
@@ -1045,18 +1071,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
 void TertiaryAudioProcessor::setFftPickoffPoint(int point)
 {
-	switch (point)
-	{
-	case 0: {fftPickoffPointIsInput = true;
-		DBG("AP INPUT");
-		break; }
+	//switch (point)
+	//{
+	//case 0: {fftPickoffPointIsInput = true;
+	//	DBG("AP INPUT");
+	//	break; }
 
-	case 1: {fftPickoffPointIsInput = false; 
-		DBG("AP OUTPUT"); 
-		break; }
-	}
-
-
+	//case 1: {fftPickoffPointIsInput = false; 
+	//	DBG("AP OUTPUT"); 
+	//	break; }
+	//}
 }
 
 void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)

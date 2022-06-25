@@ -38,7 +38,7 @@ private:
 	juce::Label companyTitle;
 	juce::Image imageTitleHeader;
 
-	juce::String version = "Beta 0.1";
+	juce::String version = "Beta 0.2";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TertiaryAudioProcessorEditor)
 };

@@ -99,9 +99,10 @@
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="Tertiary2022" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="TertiaryRelease2022" enablePluginBinaryCopyStep="1"
-                       vst3BinaryLocation="C:\Program Files\Common Files\VST3\Build"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="TertiaryDBG" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Program Files\Common Files\VST3"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="TertiaryRLS" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Program Files\Common Files\VST3\"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../&#96;JUCE/modules"/>

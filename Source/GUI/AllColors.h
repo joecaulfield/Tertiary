@@ -89,7 +89,7 @@ namespace AllColors
 		inline ColourGradient BASIC_SLIDER_GRADIENT_MID(Rectangle<float> bounds)
 		{
 			float p1 = 0.33f;
-			float p2 = 0.66;
+			float p2 = 0.66f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1(),
 											bounds.getCentreX(), bounds.getBottom(),
@@ -221,7 +221,7 @@ namespace AllColors
 		{
 			float p1 = 0.25f;
 			float p2 = 0.25f;
-			float p3 = 0.75f;
+			//float p3 = 0.75f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_LOW_1(),
 											bounds.getBottomLeft(),
@@ -713,7 +713,7 @@ namespace AllColors
 		inline ColourGradient MID_REGION_GRADIENT(Rectangle<float> bounds)
 		{
 			float p1 = 0.33f;
-			float p2 = 0.66;
+			float p2 = 0.66f;
 
 			auto gradient = ColourGradient(	BandColors::GRADIENT_MID_1(),
 											bounds.getCentreX(), bounds.getBottom(),

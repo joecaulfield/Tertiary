@@ -54,6 +54,9 @@ struct LFO
     juce::Array<float> waveTableMapped;                     // Mapped copy of waveTable so that max is always 1.0
 	juce::Array<float> waveTableDisplayScaled;				// For Display: Scale Time by 2, Shift by Quarter-Wave
 	juce::Array<float> waveTableDisplay;					// For Display: Map Amplitudes to -/+ 0.5
+	int wtScalar{ 4 };
+
+
 
     float increment = 1.f;		// Amount By Which To Increment In LFO Cycle
     float phase = 0.f;			// Current Position In LFO Cycle
@@ -72,24 +75,24 @@ struct LFO
 
 	void initializeLFO(double sampleRate)
 	{
-		waveTable.resize(sampleRate);   // Initialize Wavetable
-		waveTable.clearQuick();         // Initialize Wavetbale
+		waveTable.resize(sampleRate / wtScalar);		// Initialize Wavetable
+		waveTable.clearQuick();						// Initialize Wavetbale
 
-		waveTableMapped.resize(sampleRate);	// Initialize Wavetable
-		waveTableMapped.clearQuick();		// Initialize Wavetbale
+		waveTableMapped.resize(sampleRate / wtScalar);	// Initialize Wavetable
+		waveTableMapped.clearQuick();					// Initialize Wavetbale
 
-		waveTableDisplayScaled.resize(sampleRate);	// Initialize Wavetable
-		waveTableDisplayScaled.clearQuick();        // Initialize Wavetbale
+		//waveTableDisplayScaled.resize(sampleRate / wtScalar);	// Initialize Wavetable
+		//waveTableDisplayScaled.clearQuick();				// Initialize Wavetbale
 
-		waveTableDisplay.resize(sampleRate);	// Initialize Wavetable
-		waveTableDisplay.clearQuick();			// Initialize Wavetbale
+		//waveTableDisplay.resize(sampleRate / wtScalar);	// Initialize Wavetable
+		//waveTableDisplay.clearQuick();					// Initialize Wavetbale
 	}
 
     void updateLFO(double sampleRate, double hostBPM)
     {
         getWaveShape(sampleRate);
         getTempo(hostBPM, sampleRate);
-		getWaveShapeDisplay();
+		//getWaveShapeDisplay();
     }
 
 
@@ -121,20 +124,22 @@ struct LFO
         }
 
 		if (syncToHost->get())  // LFO rate is BPM * Rhythm
-			increment = (mHostBPM / 60.0f) * mMultiplier;	// Converting 
+			increment = (mHostBPM / (60.0f*wtScalar)) * mMultiplier;	// Converting 
 		else
-			increment = mRate;
+			increment = mRate / wtScalar;
 
     }
 
-	/*Generates the wavetable synthesis*/
+	/* Generates the LFO wavetable.  
+	Size of this wavetable array has no impact on LFO frequency. 
+	Only sample resolution. */
 
     void getWaveShape(double sampleRate)
     {
-
         using namespace juce;
 
-		auto waveTableSize = sampleRate;
+		auto waveTableSize = sampleRate / wtScalar;
+		//auto waveTableSize1 = waveTable.size();
 
 		// Get the Waveshape Index
         mWaveshapeID = waveshape->getIndex();
@@ -323,6 +328,7 @@ struct LFO
         }
 
     }
+
 
 	juce::Array<float> getWaveShapeDisplay() {return waveTable; }
 
