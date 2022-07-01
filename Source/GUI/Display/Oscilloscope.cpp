@@ -328,7 +328,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	
 	buttonOptions.setLookAndFeel(&optionsLookAndFeel);
 	buttonOptions.addListener(this);
-	buttonOptions.addMouseListener(this, true);
+	//buttonOptions.addMouseListener(this, true);
 	addAndMakeVisible(buttonOptions);
 	//buttonOptions.setButtonText("Options");
 

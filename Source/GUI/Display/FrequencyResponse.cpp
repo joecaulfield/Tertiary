@@ -25,9 +25,9 @@ TO DO ==========
 FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p, 
 										juce::AudioProcessorValueTreeState& apv, 
 										GlobalControls& gc)
-	: audioProcessor(p), 
-	apvts(apv), 
-	globalControls(gc), 
+	: audioProcessor(p),
+	globalControls(gc),
+    apvts(apv),
 	forwardFFT(audioProcessor.fftOrder),
 	window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
@@ -134,7 +134,7 @@ FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p,
 
 	updateResponse();
 	startTimerHz(60);
-	addMouseListener(this, false);
+	//addMouseListener(this, false);
 }
 
 FrequencyResponse::~FrequencyResponse()

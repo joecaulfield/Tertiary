@@ -17,8 +17,7 @@
 #include "../../GUI/AllColors.h"
 #include "../UtilityFunctions.h"
 
-struct ScrollPad :	juce::Component, 
-					juce::MouseListener, 
+struct ScrollPad :	juce::Component,
 					juce::Slider::Listener
 {
 public:
@@ -31,11 +30,11 @@ public:
 	void mouseDoubleClick(const juce::MouseEvent& event) override;
 
 	void paint(juce::Graphics& g) override;
-	void resized();
+	void resized() override;
 
 	juce::Slider slider;
 
-	void sliderValueChanged(juce::Slider* slider) {};
+	void sliderValueChanged(juce::Slider* slider) override {};
 
 	void calculateZoomFactor();
 
@@ -86,8 +85,7 @@ private:
 };
 
 struct Oscilloscope :	juce::Component,
-						juce::Timer, 
-						juce::MouseListener,
+						juce::Timer,
 						juce::Button::Listener
 {
 	Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc);

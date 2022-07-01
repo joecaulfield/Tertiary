@@ -14,7 +14,7 @@
 #include "../../../DSP/Params.h"
 #include "../../MyLookAndFeel.h"
 
-struct WaveBar : juce::Component, juce::Timer, juce::MouseListener, juce::Slider::Listener
+struct WaveBar : juce::Component, juce::Timer, juce::Slider::Listener
 {
 	WaveBar();
 	~WaveBar() override;
@@ -28,7 +28,7 @@ struct WaveBar : juce::Component, juce::Timer, juce::MouseListener, juce::Slider
 	void mouseEnter(const juce::MouseEvent& event) override;
 	void mouseExit(const juce::MouseEvent& event) override;
 
-	void sliderValueChanged(juce::Slider* slider) {};
+	void sliderValueChanged(juce::Slider* slider) override {};
 
 	juce::ToggleButton toggleInvert;
 	juce::Slider sliderWave;

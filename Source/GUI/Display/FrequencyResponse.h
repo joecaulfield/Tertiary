@@ -17,7 +17,6 @@
 
 struct FrequencyResponse :	juce::Component,
 							juce::Timer,
-							juce::MouseListener,
 							juce::Slider::Listener,
 							juce::Button::Listener
 {

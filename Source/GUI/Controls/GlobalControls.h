@@ -10,10 +10,10 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include "Wave\WaveControls.h"
-#include "Timing\TimingControls.h"
-#include "Gain\GainControls.h"
-#include "Gain\InputOutputGain.h"
+#include "Wave/WaveControls.h"
+#include "Timing/TimingControls.h"
+#include "Gain/GainControls.h"
+#include "Gain/InputOutputGain.h"
 #include "CrossoverControls.h"
 #include "../../../Source/PluginProcessor.h"
 #include "../../GUI/AllColors.h"
@@ -24,7 +24,7 @@ struct GlobalControls : juce::Component
 	GlobalControls(TertiaryAudioProcessor& p);
 
 	void paint(juce::Graphics& g) override;
-	void paintOverChildren(juce::Graphics& g);
+	void paintOverChildren(juce::Graphics& g) override;
 	void resized() override;
 
 	void makeAttachments();

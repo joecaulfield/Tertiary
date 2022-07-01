@@ -16,7 +16,7 @@
 #include "../../../DSP/Params.h"
 #include "../../MyLookAndFeel.h"
 
-struct TimingBar : juce::Component, juce::Timer, juce::MouseListener, juce::Slider::Listener, juce::Button::Listener
+struct TimingBar : juce::Component, juce::Timer, juce::Slider::Listener, juce::Button::Listener
 {
 	TimingBar();
 	~TimingBar() override;
@@ -31,7 +31,7 @@ struct TimingBar : juce::Component, juce::Timer, juce::MouseListener, juce::Slid
 	void fadeInOut() {};
 
 	void buttonClicked(juce::Button* button) override;
-	void sliderValueChanged(juce::Slider* slider) {};
+	void sliderValueChanged(juce::Slider* slider) override {};
 
 	juce::ToggleButton toggleSync;
 	juce::Slider sliderMultuplier;

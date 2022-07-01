@@ -40,7 +40,7 @@ struct InputOutputGain : juce::Component, juce::Timer, juce::Slider::Listener
 	juce::Rectangle<float> grillBounds;
 	juce::Rectangle<float> labelBounds;
 
-	juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness);
+	juce::ColourGradient makeMeterGradient(juce::Rectangle<float> bounds, float brightness);
 
 
 

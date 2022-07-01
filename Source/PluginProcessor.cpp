@@ -153,7 +153,7 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
 	apvts.addParameterListener(params.at(Names::Cursor_Position), this);
 	apvts.addParameterListener(params.at(Names::Scope_Point1), this);
 	apvts.addParameterListener(params.at(Names::Scope_Point2), this);
-
+    
     // Set Crossover Types
     LP1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
     HP1.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
@@ -665,7 +665,7 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 
 
 
-	/* Get Output Gains for Meters ======================================================================================================================== */
+	/* Get Output Gains for Meters ========================================================================================================== */
 	rmsLevelOutputLeft.skip(buffer.getNumSamples());
 
 	/* Check for Mono or Stereo */
@@ -753,19 +753,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                 0.5f,   // Step Size
                                                 1.f);   // Skew 
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Input_Gain),   // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Input_Gain),1},   // Parameter ID
                                                         params.at(Names::Input_Gain),   // Parameter Name
                                                         gainRange,                      // Range
                                                         0));                            // Default Value
 
     // CROSSOVER FREQUENCIES PARAMETER ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Low_Mid_Crossover_Freq),       // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Low_Mid_Crossover_Freq),1},       // Parameter ID
                                                         params.at(Names::Low_Mid_Crossover_Freq),       // Parameter Name
                                                         NormalisableRange<float> (20, 20000, 1, 0.3f),     // Range
                                                         500));                                          // Default Value
                                                         
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Mid_High_Crossover_Freq),      // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Mid_High_Crossover_Freq),1},      // Parameter ID
                                                         params.at(Names::Mid_High_Crossover_Freq),      // Parameter Name
                                                         NormalisableRange<float> (20, 20000, 1, 0.5f),	// Range
                                                         1000));                                         // Default Value
@@ -780,17 +780,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
             "Lumps", 
             "Humps" };
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Wave_Low_LFO),         // Parameter ID
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Wave_Low_LFO),1},         // Parameter ID
                                                         params.at(Names::Wave_Low_LFO),         // Parameter Name
                                                         sa,                                     // Range
                                                         4));                                    // INDEX of Default Value
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Wave_Mid_LFO),         // Parameter ID
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Wave_Mid_LFO),1},         // Parameter ID
                                                         params.at(Names::Wave_Mid_LFO),         // Parameter Name
                                                         sa,                                     // Range
                                                         4));                                    // INDEX of Default Value
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Wave_High_LFO),        // Parameter ID
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Wave_High_LFO),1},        // Parameter ID
                                                         params.at(Names::Wave_High_LFO),        // Parameter Name
                                                         sa,                                     // Range
                                                         4));                                    // INDEX of Default Value
@@ -802,17 +802,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                     0.5f,   // Step Size
                                                     1.f);   // Skew
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Depth_Low_LFO),        // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Depth_Low_LFO),1},        // Parameter ID
                                                         params.at(Names::Depth_Low_LFO),        // Parameter Name
                                                         depthRange,                             // Range
                                                         75));                                   // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Depth_Mid_LFO),        // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Depth_Mid_LFO),1},        // Parameter ID
                                                         params.at(Names::Depth_Mid_LFO),        // Parameter Name
                                                         depthRange,                             // Range
                                                         75));                                   // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Depth_High_LFO),        // Parameter ID
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Depth_High_LFO),1},        // Parameter ID
                                                         params.at(Names::Depth_High_LFO),        // Parameter Name
                                                         depthRange,                             // Range
                                                         75));                                   // Default Value
@@ -824,70 +824,70 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                     0.5f,	// Step Size
                                                     1.f);	// Skew
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Symmetry_Low_LFO),     // Parameter ID
-                                                        params.at(Names::Symmetry_Low_LFO),     // Parameter Name
-                                                        symmetryRange,                          // Range
-                                                        50));                                   // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Symmetry_Low_LFO), 1},     // Parameter ID, Version Hint
+                                                        params.at(Names::Symmetry_Low_LFO),                     // Parameter Name
+                                                        symmetryRange,                                          // Range
+                                                        50));                                                   // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Symmetry_Mid_LFO),     // Parameter ID
-                                                        params.at(Names::Symmetry_Mid_LFO),     // Parameter Name
-                                                        symmetryRange,                          // Range
-                                                        50));                                   // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Symmetry_Mid_LFO),1},  // Parameter ID & Hint
+                                                        params.at(Names::Symmetry_Mid_LFO),                 // Parameter Name
+                                                        symmetryRange,                                      // Range
+                                                        50));                                               // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Symmetry_High_LFO),    // Parameter ID
-                                                        params.at(Names::Symmetry_High_LFO),    // Parameter Name
-                                                        symmetryRange,							// Range
-                                                        50));                                   // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Symmetry_High_LFO),1}, // Parameter ID & Hint
+                                                        params.at(Names::Symmetry_High_LFO),                // Parameter Name
+                                                        symmetryRange,							            // Range
+                                                        50));                                               // Default Value
 
     // LFO INVERT PARAMETER ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Invert_Low_LFO),       // Parameter ID
-                                                        params.at(Names::Invert_Low_LFO),       // Parameter Name
-                                                        false));								// Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Invert_Low_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Invert_Low_LFO),                   // Parameter Name
+                                                        false));								            // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Invert_Mid_LFO),       // Parameter ID
-                                                        params.at(Names::Invert_Mid_LFO),       // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Invert_Mid_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Invert_Mid_LFO),                   // Parameter Name
+                                                        false));                                            // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Invert_High_LFO),      // Parameter ID
-                                                        params.at(Names::Invert_High_LFO),      // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Invert_High_LFO),1},   // Parameter ID & Hint
+                                                        params.at(Names::Invert_High_LFO),                  // Parameter Name
+                                                        false));                                            // Default Value
 
     // LFO SYNC PARAMETER ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Sync_Low_LFO),         // Parameter ID
-                                                        params.at(Names::Sync_Low_LFO),         // Parameter Name
-                                                        true));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Sync_Low_LFO),1},  // Parameter ID & Hint
+                                                        params.at(Names::Sync_Low_LFO),                 // Parameter Name
+                                                        true));                                         // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Sync_Mid_LFO),         // Parameter ID
-                                                        params.at(Names::Sync_Mid_LFO),         // Parameter Name
-                                                        true));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Sync_Mid_LFO), 1}, // Parameter ID & Hint
+                                                        params.at(Names::Sync_Mid_LFO),                 // Parameter Name
+                                                        true));                                         // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Sync_High_LFO),        // Parameter ID
-                                                        params.at(Names::Sync_High_LFO),        // Parameter Name
-                                                        true));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Sync_High_LFO), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Sync_High_LFO),                    // Parameter Name
+                                                        true));                                             // Default Value
 
     // LFO RATE PARAMETER ====================================================================================================================
 
-    auto rateRange = NormalisableRange<float> ( 0.5f,											// Start
-                                                12.5f,                                           // Stop
-                                                0.25f,											// Step Size
-                                                1.f);                                           // Skew
+    auto rateRange = NormalisableRange<float> ( 0.5f,   // Start
+                                                12.5f,  // Stop
+                                                0.25f,  // Step Size
+                                                1.f);   // Skew
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_Low_LFO),         // Parameter ID
-                                                        params.at(Names::Rate_Low_LFO),         // Parameter Name
-                                                        rateRange,                              // Range
-                                                        3.f));                                 // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Rate_Low_LFO),1},  // Parameter ID & Hint
+                                                        params.at(Names::Rate_Low_LFO),                 // Parameter Name
+                                                        rateRange,                                      // Range
+                                                        3.f));                                          // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_Mid_LFO),         // Parameter ID
-                                                        params.at(Names::Rate_Mid_LFO),         // Parameter Name
-                                                        rateRange,                              // Range
-                                                        3.f));                                 // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Rate_Mid_LFO),1},  // Parameter ID & Hint
+                                                        params.at(Names::Rate_Mid_LFO),                 // Parameter Name
+                                                        rateRange,                                      // Range
+                                                        3.f));                                          // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Rate_High_LFO),         // Parameter ID
-                                                        params.at(Names::Rate_High_LFO),         // Parameter Name
-                                                        rateRange,                              // Range
-                                                        3.f));                                 // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Rate_High_LFO), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Rate_High_LFO),                    // Parameter Name
+                                                        rateRange,                                          // Range
+                                                        3.f));                                              // Default Value
 
     // LFO MULTIPLIER PARAMETER ====================================================================================================================
 
@@ -902,132 +902,133 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
             "1/8 Note Triplet", 
             "1/16 Note"};
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Multiplier_Low_LFO),   // Parameter ID
-                                                        params.at(Names::Multiplier_Low_LFO),   // Parameter Name
-                                                        sa,                                     // Range
-                                                        1));                                    // INDEX of Default Value
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Multiplier_Low_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Multiplier_Low_LFO),                   // Parameter Name
+                                                        sa,                                                     // Range
+                                                        1));                                                    // INDEX of Default
+    
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Multiplier_Mid_LFO),   // Parameter ID
-                                                        params.at(Names::Multiplier_Mid_LFO),   // Parameter Name
-                                                        sa,                                     // Range
-                                                        1));                                    // INDEX of Default Value
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Multiplier_Mid_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Multiplier_Mid_LFO),                   // Parameter Name
+                                                        sa,                                                     // Range
+                                                        1));                                                    // INDEX of Default Value
 
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::Multiplier_High_LFO),  // Parameter ID
-                                                        params.at(Names::Multiplier_High_LFO),  // Parameter Name
-                                                        sa,                                     // Range
-                                                        1));                                    // INDEX of Default Value
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Multiplier_High_LFO),1},   // Parameter ID & Hint
+                                                        params.at(Names::Multiplier_High_LFO),                  // Parameter Name
+                                                        sa,                                                     // Range
+                                                        1));                                                    // INDEX of Default Value
 
     // LFO RELATIVE PHASE PARAMETER ============================================================================================================
 
-    auto relativePhaseRange = NormalisableRange<float> (    -180,                               // Start
-                                                            180,                                // Stop
-                                                            1,                                  // Step Size
-                                                            1.f);                               // Skew
+    auto relativePhaseRange = NormalisableRange<float> (    -180,   // Start
+                                                            180,    // Stop
+                                                            1,      // Step Size
+                                                            1.f);   // Skew
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Relative_Phase_Low_LFO),   // Parameter ID
-                                                        params.at(Names::Relative_Phase_Low_LFO),   // Parameter Name
-                                                        relativePhaseRange,                         // Range
-                                                        0));                                        // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Relative_Phase_Low_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Relative_Phase_Low_LFO),                   // Parameter Name
+                                                        relativePhaseRange,                                         // Range
+                                                        0));                                                        // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Relative_Phase_Mid_LFO),   // Parameter ID
-                                                        params.at(Names::Relative_Phase_Mid_LFO),   // Parameter Name
-                                                        relativePhaseRange,                         // Range
-                                                        0));                                        // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Relative_Phase_Mid_LFO),1},    // Parameter ID & Hint
+                                                        params.at(Names::Relative_Phase_Mid_LFO),                   // Parameter Name
+                                                        relativePhaseRange,                                         // Range
+                                                        0));                                                        // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Relative_Phase_High_LFO),  // Parameter ID
-                                                        params.at(Names::Relative_Phase_High_LFO),  // Parameter Name
-                                                        relativePhaseRange,                         // Range
-                                                        0));                                        // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Relative_Phase_High_LFO), 1},  // Parameter ID & Hint
+                                                        params.at(Names::Relative_Phase_High_LFO),                  // Parameter Name
+                                                        relativePhaseRange,                                         // Range
+                                                        0));                                                        // Default Value
 
     // BYPASS PARAMETER ====================================================================================================================
      
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Bypass_Low_Band),      // Parameter ID
-                                                        params.at(Names::Bypass_Low_Band),      // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Bypass_Low_Band), 1},  // Parameter ID & Hint
+                                                        params.at(Names::Bypass_Low_Band),                  // Parameter Name
+                                                        false));                                            // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Bypass_Mid_Band),      // Parameter ID
-                                                        params.at(Names::Bypass_Mid_Band),      // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Bypass_Mid_Band), 1},  // Parameter ID & Hint
+                                                        params.at(Names::Bypass_Mid_Band),                  // Parameter Name
+                                                        false));                                            // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Bypass_High_Band),     // Parameter ID
-                                                        params.at(Names::Bypass_High_Band),     // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Bypass_High_Band),1},  // Parameter ID & Hint
+                                                        params.at(Names::Bypass_High_Band),                 // Parameter Name
+                                                        false));                                            // Default Value
 
 
     // MUTE PARAMETER ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Mute_Low_Band),        // Parameter ID
-                                                        params.at(Names::Mute_Low_Band),        // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Mute_Low_Band), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Mute_Low_Band),                    // Parameter Name
+                                                        false));                                            // Default Value
                                                                             
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Mute_Mid_Band),        // Parameter ID
-                                                        params.at(Names::Mute_Mid_Band),        // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Mute_Mid_Band), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Mute_Mid_Band),                    // Parameter Name
+                                                        false));                                            // Default Value
                                                                          
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Mute_High_Band),       // Parameter ID
-                                                        params.at(Names::Mute_High_Band),       // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Mute_High_Band), 1},   // Parameter ID & Hint
+                                                        params.at(Names::Mute_High_Band),                   // Parameter Name
+                                                        false));                                            // Default Value
 
     // SOLO PARAMETER ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Solo_Low_Band),        // Parameter ID
-                                                        params.at(Names::Solo_Low_Band),        // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Solo_Low_Band),1}, // Parameter ID & Hint
+                                                        params.at(Names::Solo_Low_Band),                // Parameter Name
+                                                        false));                                        // Default Value
                                                                          
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Solo_Mid_Band),        // Parameter ID
-                                                        params.at(Names::Solo_Mid_Band),        // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Solo_Mid_Band), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Solo_Mid_Band),                    // Parameter Name
+                                                        false));                                            // Default Value
 
-    layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Solo_High_Band),       // Parameter ID
-                                                        params.at(Names::Solo_High_Band),       // Parameter Name
-                                                        false));                                // Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Solo_High_Band), 1},   // Parameter ID & Hint
+                                                        params.at(Names::Solo_High_Band),                   // Parameter Name
+                                                        false));                                            // Default Value
 
     // OUTPUT GAINS ====================================================================================================================
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Gain_Low_Band),        // Parameter ID
-                                                        params.at(Names::Gain_Low_Band),        // Parameter Name
-                                                        gainRange,                              // Range
-                                                        0));                                    // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Gain_Low_Band),1}, // Parameter ID & Hint
+                                                        params.at(Names::Gain_Low_Band),                // Parameter Name
+                                                        gainRange,                                      // Range
+                                                        0));                                            // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Gain_Mid_Band),        // Parameter ID
-                                                        params.at(Names::Gain_Mid_Band),        // Parameter Name
-                                                        gainRange,                              // Range
-                                                        0));                                    // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Gain_Mid_Band), 1},    // Parameter ID & Hint
+                                                        params.at(Names::Gain_Mid_Band),                    // Parameter Name
+                                                        gainRange,                                          // Range
+                                                        0));                                                // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Gain_High_Band),       // Parameter ID
-                                                        params.at(Names::Gain_High_Band),       // Parameter Name
-                                                        gainRange,                              // Range
-                                                        0));                                    // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Gain_High_Band), 1},   // Parameter ID & Hint
+                                                        params.at(Names::Gain_High_Band),                   // Parameter Name
+                                                        gainRange,                                          // Range
+                                                        0));                                                // Default Value
 
-    layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Output_Gain),          // Parameter ID
-                                                        params.at(Names::Output_Gain),          // Parameter Name
-                                                        gainRange,                              // Range
-                                                        0));                                    // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Output_Gain), 1},  // Parameter ID & Hint
+                                                        params.at(Names::Output_Gain),                  // Parameter Name
+                                                        gainRange,                                      // Range
+                                                        0));                                            // Default Value
 
 	// OSCILLOSCOPE DISPLAY PREFERENCES ====================================================================================================================
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Low_Scope),       // Parameter ID
-                                                        params.at(Names::Show_Low_Scope),       // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Low_Scope), 1},   // Parameter ID & Hint
+                                                        params.at(Names::Show_Low_Scope),                   // Parameter Name
                                                         true));  
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Mid_Scope),       // Parameter ID
-                                                        params.at(Names::Show_Mid_Scope),       // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Mid_Scope),1},    // Parameter ID & Hint
+                                                        params.at(Names::Show_Mid_Scope),                   // Parameter Name
                                                         true));  
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_High_Scope),      // Parameter ID
-														params.at(Names::Show_High_Scope),      // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_High_Scope), 1},  // Parameter ID & Hint
+														params.at(Names::Show_High_Scope),                  // Parameter Name
 														true));  
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Stack_Bands_Scope),	// Parameter ID
-														params.at(Names::Stack_Bands_Scope),    // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Stack_Bands_Scope),1}, // Parameter ID & Hint
+														params.at(Names::Stack_Bands_Scope),                // Parameter Name
 														true));  
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Cursor_Scope),	// Parameter ID
-														params.at(Names::Show_Cursor_Scope),    // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Cursor_Scope),1}, // Parameter ID & Hint
+														params.at(Names::Show_Cursor_Scope),                // Parameter Name
 														true)); 
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_Playhead_Scope),	// Parameter ID
-														params.at(Names::Show_Playhead_Scope),  // Parameter Name
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Playhead_Scope),1},   // Parameter ID & Hint
+														params.at(Names::Show_Playhead_Scope),                  // Parameter Name
 														true)); 
 
 	auto cursorRange = NormalisableRange<float> (0.f,	// Start
@@ -1035,41 +1036,39 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                 0.0001,	// Step Size
                                                 1.f);	// Skew 
 
-	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Cursor_Position),	// Parameter ID
-														params.at(Names::Cursor_Position),  // Parameter Name
-														cursorRange,                        // Range
-														0.5f));                             // Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Cursor_Position),1},   // Parameter ID & Hint
+														params.at(Names::Cursor_Position),                  // Parameter Name
+														cursorRange,                                        // Range
+														0.5f));                                             // Default Value
 
 	auto pointRange = NormalisableRange<float> ( 0,		// Start
                                                 100.f,	// Stop
                                                 1.f,	// Step Size
                                                 1.f);	// Skew 
 
-	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Scope_Point1),		// Parameter ID
-														params.at(Names::Scope_Point1),     // Parameter Name
-														pointRange,                        // Range
-														25.f));							// Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Scope_Point1),1},  // Parameter ID & Hint
+														params.at(Names::Scope_Point1),                 // Parameter Name
+														pointRange,                                     // Range
+														25.f));							                // Default Value
 
-	layout.add(std::make_unique<AudioParameterFloat>(   params.at(Names::Scope_Point2),		// Parameter ID
-														params.at(Names::Scope_Point2),		// Parameter Name
-														pointRange,							// Range
-														75.f));								// Default Value
+    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Scope_Point2),1},  // Parameter ID & Hint
+														params.at(Names::Scope_Point2),		            // Parameter Name
+														pointRange,							            // Range
+														75.f));								            // Default Value
 
 	// FFT DISPLAY PREFERENCES ====================================================================================================================
 
-	layout.add(std::make_unique<AudioParameterBool>(    params.at(Names::Show_FFT),       // Parameter ID
-                                                        params.at(Names::Show_FFT),       // Parameter Name
-                                                        true));							// Default Value
+    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_FFT), 1}, // Parameter ID & Hint
+                                                        params.at(Names::Show_FFT),                 // Parameter Name
+                                                        true));							            // Default Value
 
 	sa.clear();
+	sa = { "Input", "Output" };
 
-	sa = { "Input", 
-			"Output" };
-
-    layout.add(std::make_unique<AudioParameterChoice>(  params.at(Names::FFT_Pickoff),         // Parameter ID
-                                                        params.at(Names::FFT_Pickoff),         // Parameter Name
+    layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::FFT_Pickoff), 1},  // Parameter ID & Hint
+                                                        params.at(Names::FFT_Pickoff),                  // Parameter Name
                                                         sa,                                    
-                                                        1));     
+                                                        1));
 
     return layout;
 }

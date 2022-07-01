@@ -15,7 +15,7 @@
 #include "../../../DSP/Params.h"
 #include "../../MyLookAndFeel.h"
 
-struct GainBar : juce::Component, juce::Timer, juce::MouseListener, juce::Button::Listener
+struct GainBar : juce::Component, juce::Timer, juce::Button::Listener
 {
 	GainBar();
 	~GainBar() override;
