@@ -15,11 +15,11 @@
 #include "../../PluginProcessor.h"
 #include "../../GUI/Controls/GlobalControls.h"
 
-struct FrequencyResponse : juce::Component,
-	juce::Timer,
-	juce::MouseListener,
-	juce::Slider::Listener,
-	juce::Button::Listener
+struct FrequencyResponse :	juce::Component,
+							juce::Timer,
+							juce::MouseListener,
+							juce::Slider::Listener,
+							juce::Button::Listener
 {
 
 	FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
@@ -129,11 +129,9 @@ private:
 
 	juce::Rectangle<float> responseArea;
 
-	juce::Array<float> freqs {
-		20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000 };
+	juce::Array<float> freqs { 20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000 };
 
-	juce::Array<float> gain {
-		-30, -24, -18, -12, -6, 0, 6, 12, 18, 24, 30 };
+	juce::Array<float> gain { -30, -24, -18, -12, -6, 0, 6, 12, 18, 24, 30 };
 
 	juce::Slider	sliderLowMidCutoff,
 					sliderMidHighCutoff,

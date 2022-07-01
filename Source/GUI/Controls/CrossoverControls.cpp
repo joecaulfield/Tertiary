@@ -165,26 +165,26 @@ void CrossoverControls::updateStringText()
 
 	// Abbreviate Values In The Kilohertz
 	if (sliderLowMidCutoff.getValue() <= 999.f)
-		stringLM = (juce::String)sliderLowMidCutoff.getValue() << " Hz";
+		stringLM = (juce::String)sliderLowMidCutoff.getValue() + " Hz";
 	else
 	{
 		auto num = sliderLowMidCutoff.getValue();
 		num /= 10.f;
 		num = juce::roundFloatToInt(num);
 		num /= 100.f;
-		stringLM = (juce::String)(num) << " kHz";
+		stringLM = (juce::String)(num) + " kHz";
 	}
 
 	
 	if (sliderMidHighCutoff.getValue() <= 999.f)
-		stringMH = (juce::String)sliderMidHighCutoff.getValue() << " Hz";
+		stringMH = (juce::String)sliderMidHighCutoff.getValue() + " Hz";
 	else
 	{
 		auto num = sliderMidHighCutoff.getValue();
 		num /= 10.f;
 		num = juce::roundFloatToInt(num);
 		num /= 100.f;
-		stringMH = (juce::String)(num) << " kHz";
+		stringMH = (juce::String)(num) + " kHz";
 	}
 
 

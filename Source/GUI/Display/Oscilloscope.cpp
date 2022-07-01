@@ -290,6 +290,8 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	globalControls(gc)
 {
 
+	//openGLContext.attachTo(*this);
+
 	using namespace Params;             // Create a Local Reference to Parameter Mapping
 	const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
@@ -523,28 +525,27 @@ void Oscilloscope::paint(juce::Graphics& g)
 	fadeInOutComponents(g);
 }
 
-// Graphics class which covers components
+/* Paint on top of child components */
 void Oscilloscope::paintOverChildren(juce::Graphics& g)
 {
 	using namespace juce;
 
-	using namespace AllColors::OscilloscopeColors;
-
 	auto bounds = getLocalBounds().toFloat();
 
+	/* Draw window border */
 	paintBorder(g, juce::Colours::purple, bounds);
 }
 
-// Draw the gridlines within the corresponding region
+/* Draws the axes and grid-lines for corresponding LFO, based on tempo and zoom/pan scaling */
 void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
 	using namespace AllColors::OscilloscopeColors;
 
+	/* Used to store current beat spacing, to detect a change based on new beat spacing */
 	float oldBeatSpacing = beatSpacing;
 
 	// DRAW VERTICAL LINES =============================
 	juce::Line<float> verticalAxis;
-	//auto numLines = 2;
 
 	// Convert Zoom Factor to Int
 	// Represents Number of Full Quarter-Notes to be Shown
@@ -552,6 +553,7 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 
 	g.setColour(juce::Colours::lightgrey);
 
+	/* If all bands are stacked (overlayed), apply a transparency */
 	if (mStackAllBands)
 		g.setOpacity(0.35f);
 	else
@@ -699,13 +701,13 @@ void Oscilloscope::timerCallback()
 	{
 
 		waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
-		drawLFO(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
+		generateLFOPathForDrawing(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
 
 		waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
-		drawLFO(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
+		generateLFOPathForDrawing(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
 
 		waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
-		drawLFO(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
+		generateLFOPathForDrawing(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
 
 		updateLfoDisplay = false;
 	}
@@ -1000,12 +1002,12 @@ void Oscilloscope::drawStackedScope()
 
 
 /* Generate paths for LFO when new information is available */
-void Oscilloscope::drawLFO(	juce::Rectangle<int> bounds,
-							juce::Path &lfoStrokePath, 
-							juce::Path &lfoFillPath,
-							juce::Array<float> &waveTable,
-							bool showBand,
-							LFO lfo)
+void Oscilloscope::generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
+												juce::Path &lfoStrokePath, 
+												juce::Path &lfoFillPath,
+												juce::Array<float> &waveTable,
+												bool showBand,
+												LFO lfo)
 {
 	using namespace juce;
 

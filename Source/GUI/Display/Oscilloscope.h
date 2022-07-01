@@ -43,7 +43,7 @@ public:
 	void updatePoints(int x1, int y1);
 	void makeDefaultPoints();
 
-	void setCenter(float panPercentage);
+	//void setCenter(float panPercentage);
 	float getCenter();
 
 	int getMaxWidth(){ return maxWidth; }
@@ -93,24 +93,27 @@ struct Oscilloscope :	juce::Component,
 	Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc);
 	~Oscilloscope() override;
 
+	/* Paint the graphics */
 	void paint(juce::Graphics& g) override;
+
+	/* Paint on top of child components */
 	void paintOverChildren(juce::Graphics& g) override;
 
+	/* Draws the axes and grid-lines for corresponding LFO, based on tempo and zoom/pan scaling */
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds);
 
-	void drawLowLFO (juce::Rectangle<int> bounds);
-	void drawMidLFO (juce::Rectangle<int> bounds);
-	void drawHighLFO(juce::Rectangle<int> bounds);
+	/* Generate paths for LFO when new information is available */
+	void generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
+									juce::Path &lfoStrokePath,
+									juce::Path &lfoFillPath,
+									juce::Array<float>& waveTable,
+									bool showBand,
+									LFO lfo);
 
-	void drawLFO(	juce::Rectangle<int> bounds,
-					juce::Path &lfoStrokePath,
-					juce::Path &lfoFillPath,
-					juce::Array<float>& waveTable,
-					bool showBand,
-					LFO lfo);
-
+	/* Actions upon resize occur here. Plug-in is fixed-size, so this is called once upon instantiation */
 	void resized() override;
 
+	/* Timer Callback */
 	void timerCallback() override;
 
 	void mouseEnter(const juce::MouseEvent& event) override {};
@@ -242,9 +245,6 @@ struct Oscilloscope :	juce::Component,
 
 	bool updateLfoDisplay{ true };
 
-
-	//juce::AudioParameterFloat* displayPhase{ nullptr };
-
 	float mDisplayPhase = 0.f;
 
 private:
@@ -252,8 +252,6 @@ private:
 	LFO& lowLFO;
 	LFO& midLFO;
 	LFO& highLFO;
-
-
 
 	int timerCounter = 0;
 

@@ -29,16 +29,31 @@ public:
     void resized() override;
 
 private:
+    
+    /* Reference to the Audio Processor & DSP Parameters */
     TertiaryAudioProcessor& audioProcessor;
 
+    /* Contains Lower-Half of Parameters */
 	GlobalControls globalControls{ audioProcessor };
+    
+    /* Time-Domain Display */
 	Oscilloscope oscilloscope{ audioProcessor, globalControls};
+
+    /* Frequency-Domain & Crossover Display */
 	FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
 
+    /* Header displayed in top corner */
 	juce::Label companyTitle;
+
+    /* Graphics Asset, Top-Center Plugin-Name "Tertiary" */
 	juce::Image imageTitleHeader;
 
-	juce::String version = "Beta 0.2";
+    /* Plugin Version Number */
+    juce::String version = "Beta 0.5";
+
+    /* GPU Graphics Accerlation */
+    juce::OpenGLContext openGLContext;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TertiaryAudioProcessorEditor)
 };
+ 

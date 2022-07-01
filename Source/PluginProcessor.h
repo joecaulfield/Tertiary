@@ -9,7 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "DSP\Params.h"
+#include "DSP/Params.h"
 
 struct TremoloBand
 {
@@ -54,7 +54,7 @@ struct LFO
     juce::Array<float> waveTableMapped;                     // Mapped copy of waveTable so that max is always 1.0
 	juce::Array<float> waveTableDisplayScaled;				// For Display: Scale Time by 2, Shift by Quarter-Wave
 	juce::Array<float> waveTableDisplay;					// For Display: Map Amplitudes to -/+ 0.5
-	int wtScalar{ 4 };
+	int wtScalar{ 2 };
 
 
 

@@ -492,7 +492,12 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 	{
 		for (int i = 0; i < buffer.getNumSamples(); i++)
 		{
-			float sample = buffer.getSample(0, i) / 2.f + buffer.getSample(1, i) / 2.f;
+			float sample = 0.f; 
+
+			for (int channel = 0; channel < buffer.getNumChannels(); channel++)
+			{
+				sample += buffer.getSample(channel, i) / 2.f;
+			}
 
 			pushNextSampleIntoFifo(sample);
 		}
@@ -648,9 +653,9 @@ void TertiaryAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce
 		{
 			float sample = 0.f;
 
-			for (int channel = 0; i < buffer.getNumChannels(); i++)
+			for (int channel = 0; channel < buffer.getNumChannels(); channel++)
 			{
-				sample = buffer.getSample(channel, i) / 2.f;
+				sample += buffer.getSample(channel, i) / 2.f;
 			}
 
 			pushNextSampleIntoFifo(sample);
@@ -1071,16 +1076,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
 void TertiaryAudioProcessor::setFftPickoffPoint(int point)
 {
-	//switch (point)
-	//{
-	//case 0: {fftPickoffPointIsInput = true;
-	//	DBG("AP INPUT");
-	//	break; }
+	switch (point)
+	{
+	case 0: {fftPickoffPointIsInput = true;
+		break; }
 
-	//case 1: {fftPickoffPointIsInput = false; 
-	//	DBG("AP OUTPUT"); 
-	//	break; }
-	//}
+	case 1: {fftPickoffPointIsInput = false; 
+		break; }
+	}
 }
 
 void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
