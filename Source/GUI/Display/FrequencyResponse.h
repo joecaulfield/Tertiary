@@ -154,7 +154,7 @@ private:
 	juce::dsp::WindowingFunction<float> window;
 	float fftConstant{ 9.9658f };
 	juce::ToggleButton mButton_FFT;
-	bool mShowFFT{ true };
+
 
 	void drawNextFrameOfSpectrum();
 
@@ -180,5 +180,7 @@ private:
 	juce::AudioParameterChoice* fftPickoffParameter{ nullptr };
 	std::unique_ptr<buttonAttachment>	showFftAttachment;
 
-	int pickOffID{ 0 };
+    // Variables Storing APVTS Parameters
+	int mPickOffID{ 0 };
+    bool mShowFFT{ true };
 };

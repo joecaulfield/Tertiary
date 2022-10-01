@@ -54,7 +54,7 @@ FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p,
 
 	choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
 
-	pickOffID = fftPickoffParameter->getIndex();
+	mPickOffID = fftPickoffParameter->getIndex();
 	updateToggleStates();
 
 	//switch (pickOffID)
@@ -1295,7 +1295,7 @@ void FrequencyResponse::buttonClicked(juce::Button* button)
 		
 	if (button == &togglePickInput || button == &togglePickOutput)
 	{
-		pickOffID = togglePickOutput.getToggleState();
+		mPickOffID = togglePickOutput.getToggleState();
 
 		updateToggleStates();
 	}
@@ -1308,7 +1308,7 @@ void FrequencyResponse::updateToggleStates()
 	// Update Toggle States
 	// Set Parameter
 
-	switch (pickOffID)
+	switch (mPickOffID)
 	{
 		case 0: // Pre
 		{
@@ -1322,7 +1322,7 @@ void FrequencyResponse::updateToggleStates()
 		}
 	}
 
-	fftPickoffParameter->setValueNotifyingHost(pickOffID);
+	fftPickoffParameter->setValueNotifyingHost(mPickOffID);
 
-	audioProcessor.setFftPickoffPoint(pickOffID);
+	audioProcessor.setFftPickoffPoint(mPickOffID);
 }

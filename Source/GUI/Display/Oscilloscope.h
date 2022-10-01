@@ -222,12 +222,13 @@ struct Oscilloscope :	juce::Component,
 						toggleShowCursor,
 						toggleShowPlayhead;
 
-	juce::AudioParameterBool* showLowBand{ nullptr };       // Pointer to the APVTS
-	juce::AudioParameterBool* showMidBand{ nullptr };       // Pointer to the APVTS
-	juce::AudioParameterBool* showHighBand{ nullptr };      // Pointer to the APVTS
-	juce::AudioParameterBool* stackBands{ nullptr };        // Pointer to the APVTS
-	juce::AudioParameterBool* showCursor{ nullptr };        // Pointer to the APVTS
-	juce::AudioParameterBool* showPlayhead{ nullptr };      // Pointer to the APVTS
+    /* Pointers to the APVTS */
+	juce::AudioParameterBool* showLowBandParam{ nullptr };
+	juce::AudioParameterBool* showMidBandParam{ nullptr };
+	juce::AudioParameterBool* showHighBandParam{ nullptr };
+	juce::AudioParameterBool* stackBandsParam{ nullptr };
+	juce::AudioParameterBool* showCursorParam{ nullptr };
+	juce::AudioParameterBool* showPlayheadParam{ nullptr };
 
 	using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
@@ -285,7 +286,7 @@ private:
 
 	juce::Line<float> cursor;
 	bool cursorDrag{ false };
-	float dragX{ 0 };
+	float mCursorPosition{ 0 };
 	float scrollZoom{ 0 };
 	float scrollPan{ 0 };
 

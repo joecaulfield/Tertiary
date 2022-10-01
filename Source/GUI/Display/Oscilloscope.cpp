@@ -301,12 +301,12 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 		jassert(param != nullptr);                                                                      // Error Checking
 	};
 
-	boolHelper(showLowBand, Names::Show_Low_Scope);
-	boolHelper(showMidBand, Names::Show_Mid_Scope);
-	boolHelper(showHighBand, Names::Show_High_Scope);
-	boolHelper(stackBands, Names::Stack_Bands_Scope);
-	boolHelper(showCursor, Names::Show_Cursor_Scope);
-	boolHelper(showPlayhead, Names::Show_Playhead_Scope);
+	boolHelper(showLowBandParam, Names::Show_Low_Scope);
+	boolHelper(showMidBandParam, Names::Show_Mid_Scope);
+	boolHelper(showHighBandParam, Names::Show_High_Scope);
+	boolHelper(stackBandsParam, Names::Stack_Bands_Scope);
+	boolHelper(showCursorParam, Names::Show_Cursor_Scope);
+	boolHelper(showPlayheadParam, Names::Show_Playhead_Scope);
 
 	auto floatHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)              // Float Helper --> Part 8 Param Namespace
 	{
@@ -322,7 +322,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	sliderScroll.initializePoints(scopePoint1Param->get(), scopePoint2Param->get());
 	
 
-	dragX = scopeCursorParam->get();
+	mCursorPosition = scopeCursorParam->get();
 
 	// Update Scroll Points
 	
@@ -677,8 +677,8 @@ void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bou
 		if (fadeAlphaCursor < fadeMinCursor)
 			fadeAlphaCursor = fadeMinCursor;
 
-		cursor.setStart(bounds.getX() + dragX * getWidth(), scopeRegion.getY() + 1);
-		cursor.setEnd(bounds.getX() + dragX * getWidth(), scopeRegion.getBottom() - 1);
+		cursor.setStart(bounds.getX() + mCursorPosition * getWidth(), scopeRegion.getY() + 1);
+		cursor.setEnd(bounds.getX() + mCursorPosition * getWidth(), scopeRegion.getBottom() - 1);
 
 		g.setColour(CURSOR_LINE);
 		g.setOpacity(fadeAlphaCursor);
@@ -700,13 +700,13 @@ void Oscilloscope::timerCallback()
 		updateLfoDisplay)
 	{
 
-		waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
+		waveTableLow = scaleWaveAmplitude(lowLFO.getWaveTable(), lowLFO);
 		generateLFOPathForDrawing(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
 
-		waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
+		waveTableMid = scaleWaveAmplitude(midLFO.getWaveTable(), midLFO);
 		generateLFOPathForDrawing(midRegion, midPath, midPathFill, waveTableMid, mShowMidBand, midLFO);
 
-		waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
+		waveTableHigh = scaleWaveAmplitude(highLFO.getWaveTable(), highLFO);
 		generateLFOPathForDrawing(highRegion, highPath, highPathFill, waveTableHigh, mShowHighBand, highLFO);
 
 		updateLfoDisplay = false;
@@ -1105,12 +1105,12 @@ void Oscilloscope::updatePreferences()
 	using namespace Params;
 	const auto& params = GetParams();
 
-	mShowLowBand = showLowBand->get();
-	mShowMidBand = showMidBand->get();
-	mShowHighBand = showHighBand->get();
-	mStackAllBands = stackBands->get();
-	mShowCursor = showCursor->get();
-	mShowPlayhead = showPlayhead->get();
+	mShowLowBand = showLowBandParam->get();
+	mShowMidBand = showMidBandParam->get();
+	mShowHighBand = showHighBandParam->get();
+	mStackAllBands = stackBandsParam->get();
+	mShowCursor = showCursorParam->get();
+	mShowPlayhead = showPlayheadParam->get();
 
 	mLowBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
 	mMidBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
@@ -1319,14 +1319,14 @@ void Oscilloscope::mouseDown(const juce::MouseEvent& event)
 // A mouse-up gesture indicates the cursor is done being dragged
 void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
-	auto x = event.getPosition().getX();
-	auto y = event.getPosition().getY();
+	//auto x = event.getPosition().getX();
+	//auto y = event.getPosition().getY();
 
-	auto bounds = getLocalBounds();
+	//auto bounds = getLocalBounds();
 
 	cursorDrag = false;
 
-	scopeCursorParam->setValueNotifyingHost(dragX);
+	scopeCursorParam->setValueNotifyingHost(mCursorPosition);
 
 	float maxWidth = (float)sliderScroll.getMaxWidth();
 
@@ -1349,13 +1349,13 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 
 	if (cursorDrag)
 	{
-		dragX = event.getPosition().getX() / (float)getWidth();
+		mCursorPosition = event.getPosition().getX() / (float)getWidth();
 
 		if (event.getPosition().getX() < margin)
-			dragX = margin / (float)getWidth();
+			mCursorPosition = margin / (float)getWidth();
 
 		if (event.getPosition().getX() > (float)getWidth() - margin)
-			dragX = ((float)getWidth() - margin) / getWidth();
+			mCursorPosition = ((float)getWidth() - margin) / getWidth();
 	}
 
 	if (sliderScroll.isMouseOverOrDragging())
@@ -1370,7 +1370,7 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 // Fade-In the cursor when mouse is within 10 pixels of it
 void Oscilloscope::mouseMove(const juce::MouseEvent& event)
 {
-	auto bounds = getLocalBounds();
+	//auto bounds = getLocalBounds();
 
 	auto x = event.getPosition().getX();
 	auto y = event.getPosition().getY();
@@ -1429,9 +1429,9 @@ void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 	{
 		if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
 		{
-			dragX = 0.5f;
+			mCursorPosition = 0.5f;
 			cursorDrag = false;
-			scopeCursorParam->setValueNotifyingHost(dragX);
+			scopeCursorParam->setValueNotifyingHost(mCursorPosition);
 		}
 	}
 

@@ -640,6 +640,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DSP\LFO.cpp">
+      <Filter>Tertiary\DSP</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\DSP\Params.cpp">
       <Filter>Tertiary\DSP</Filter>
     </ClCompile>
@@ -3153,6 +3156,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\DSP\LFO.h">
+      <Filter>Tertiary\DSP</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\DSP\Params.h">
       <Filter>Tertiary\DSP</Filter>
     </ClInclude>

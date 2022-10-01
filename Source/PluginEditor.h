@@ -49,7 +49,7 @@ private:
 	juce::Image imageTitleHeader;
 
     /* Plugin Version Number */
-    juce::String version = "Beta 0.5";
+    juce::String version = "Beta 0.5z";
 
     /* GPU Graphics Accerlation */
     juce::OpenGLContext openGLContext;

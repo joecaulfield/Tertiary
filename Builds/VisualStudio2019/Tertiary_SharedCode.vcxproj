@@ -139,6 +139,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DSP\LFO.cpp"/>
     <ClCompile Include="..\..\Source\DSP\Params.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\Gain\GainBar.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\Gain\GainControls.cpp"/>
@@ -2454,6 +2455,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\DSP\LFO.h"/>
     <ClInclude Include="..\..\Source\DSP\Params.h"/>
     <ClInclude Include="..\..\Source\DSP\LockFreeQueue.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\Gain\GainBar.h"/>
