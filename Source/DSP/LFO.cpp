@@ -10,7 +10,7 @@
 
 #include "LFO.h"
 
-/* Called once upon runtime */
+/* Called once upon construction of AudioProcessor */
 //==============================================================================
 void LFO::initializeLFO(double sampleRate)
 {
@@ -100,12 +100,12 @@ void LFO::setWaveShape(double sampleRate)
         case 2: setWaveShapeSquare      (periodLeft, periodRight, waveTableSize); break;
         case 3: setWaveShapeTriangle    (periodLeft, periodRight, waveTableSize); break;
         case 4: setWaveShapeSine        (periodLeft, periodRight, waveTableSize); break;
-        case 5: setWaveShapeHumpDown    (periodLeft, periodRight, waveTableSize); break;
-        case 6: setWaveShapeHumpUp      (periodLeft, periodRight, waveTableSize); break;
+        case 5: setWaveShapeHumpUp      (periodLeft, periodRight, waveTableSize); break;
+        case 6: setWaveShapeHumpDown    (periodLeft, periodRight, waveTableSize); break;
     }
 
     /* Map waveshape amplitudes from [-0.5 to +0.5] to [0 to +1] */
-    mapWaveShape();
+    scaleWaveShape();
 
 }
 
@@ -220,25 +220,6 @@ void LFO::setWaveShapeSine(int periodLeft, int periodRight, int waveTableSize)
         }
 }
 
-/* Set LFO waveshape to 'Hump Up' ... Upsidedown U-Shape */
-//==============================================================================
-void LFO::setWaveShapeHumpDown(int periodLeft, int periodRight, int waveTableSize)
-{
-    // Populate the Left-Hand Period
-    for (int i = 0; i < periodLeft; i++)
-    {
-        float y = mInvert * ((-sin(0.5f * juce::MathConstants<double>::pi* i / (periodLeft)) + 1));
-        waveTable.set(i, y);
-    }
-
-    // Populate the Right-Hand Period
-    for (int i = periodLeft; i < waveTableSize; i++)
-    {
-        float y = mInvert * ((-cos(0.5f * juce::MathConstants<double>::pi * (i - periodLeft) / (periodRight)) + 1));
-        waveTable.set(i, y);
-    }
-}
-
 /* Set LFO waveshape to 'Hump Down' ... U-Shape */
 //==============================================================================
 void LFO::setWaveShapeHumpUp(int periodLeft, int periodRight, int waveTableSize)
@@ -259,11 +240,32 @@ void LFO::setWaveShapeHumpUp(int periodLeft, int periodRight, int waveTableSize)
     }
 }
 
+/* Set LFO waveshape to 'Hump Up' ... Upsidedown U-Shape */
+//==============================================================================
+void LFO::setWaveShapeHumpDown(int periodLeft, int periodRight, int waveTableSize)
+{
+    // Populate the Left-Hand Period
+    for (int i = 0; i < periodLeft; i++)
+    {
+        float y = mInvert * ((-sin(0.5f * juce::MathConstants<double>::pi* i / (periodLeft)) + 1));
+        waveTable.set(i, y);
+    }
+
+    // Populate the Right-Hand Period
+    for (int i = periodLeft; i < waveTableSize; i++)
+    {
+        float y = mInvert * ((-cos(0.5f * juce::MathConstants<double>::pi * (i - periodLeft) / (periodRight)) + 1));
+        waveTable.set(i, y);
+    }
+}
+
+
+
 /* Maps waveshape amplitudes from [-0.5 to +0.5] to [0 to +1]
  Determines current minimum and maximum amplitude values
  and scales those to fit proportionately within [0, +1] */
 //==============================================================================
-void LFO::mapWaveShape()
+void LFO::scaleWaveShape()
 {
     min = 2.0f;
     max = -1.0f;

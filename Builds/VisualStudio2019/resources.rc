@@ -9,17 +9,17 @@
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION  1,0,0,0
+FILEVERSION  A1,0,0,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "CompanyName",  "Joe Caulfield Engineering\0"
+      VALUE "CompanyName",  "Caulfield Engineering\0"
       VALUE "FileDescription",  "Tertiary\0"
-      VALUE "FileVersion",  "1.0.0\0"
+      VALUE "FileVersion",  "A1\0"
       VALUE "ProductName",  "Tertiary\0"
-      VALUE "ProductVersion",  "1.0.0\0"
+      VALUE "ProductVersion",  "A1\0"
     END
   END
 

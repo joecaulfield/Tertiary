@@ -41,7 +41,7 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 	companyTitle.setFont(juce::Font(17.f, juce::Font::bold));
 	companyTitle.setColour(juce::Label::textColourId, juce::Colours::white);
 	companyTitle.setAlpha(0.5f);
-	companyTitle.setText("Caulfield Engineering \n Version " + version, juce::NotificationType::dontSendNotification);
+	companyTitle.setText("Caulfield Engineering \n Version " + juce::String(ProjectInfo::versionString), juce::NotificationType::dontSendNotification);
 	addAndMakeVisible(companyTitle);
 }
 

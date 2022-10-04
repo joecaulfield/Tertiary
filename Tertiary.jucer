@@ -2,10 +2,11 @@
 
 <JUCERPROJECT id="UXnuug" name="Tertiary" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              cppLanguageStandard="17" companyName="Joe Caulfield Engineering"
-              companyWebsite="JoeCaulfieldEngineering.com" companyEmail="support@t3plugin.com"
-              pluginDesc="Multiband Tremolo" pluginFormats="buildStandalone,buildVST3"
-              pluginManufacturer="Caulfield Engineering">
+              cppLanguageStandard="17" companyName="Caulfield Engineering"
+              companyWebsite="T3plugin.com" companyEmail="support@t3plugin.com"
+              pluginDesc="Multiband Tremolo" pluginFormats="buildAU,buildAUv3,buildVST3"
+              pluginManufacturer="Caulfield Engineering" pluginVST3Category="Dynamics,Modulation"
+              pluginAAXCategory="0,2,32" version="A1">
   <MAINGROUP id="gAXMC9" name="Tertiary">
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="J9Bg6U" name="LFO.cpp" compile="1" resource="0" file="Source/DSP/LFO.cpp"/>

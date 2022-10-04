@@ -28,7 +28,7 @@ struct GainBar : juce::Component, juce::Timer, juce::Button::Listener
 	void mouseEnter(const juce::MouseEvent& event) override;
 	void mouseExit(const juce::MouseEvent& event) override;
 
-	void buttonClicked(juce::Button* button);
+	void buttonClicked(juce::Button* button) override;
 
 	juce::ToggleButton toggleBypass, toggleSolo, toggleMute;
 

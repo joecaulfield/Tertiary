@@ -53,8 +53,6 @@ public:
     float getIncrement() {return mIncrement;}
     float getPosition() {return mPosition; }
     
-    
-    
     /* Returns the waveTable to AudioProcessor as [0, 1] */
     juce::Array<float>& getWaveTableScaled() {return waveTableMapped; }
     
@@ -63,28 +61,28 @@ public:
 
 private:
     
-    juce::Array<float> waveTable;               // Array to store raw LFO waveshape
-    juce::Array<float> waveTableMapped;         // Mapped copy of waveTable so that max is always 1.0
+    juce::Array<float> waveTable;          // Array to store raw LFO waveshape
+    juce::Array<float> waveTableMapped;    // Mapped copy of waveTable so that max is always 1.0
 
     int wtScalar{ 2 };          // Used to set the size of the LFO WaveTable
     int mInvert{ 1 };           // -1 or +1. Multiplied by the WaveTable to invert or not.
     int mWaveshapeID{ 0 };      // Used to select which of 7 waveforms are used
+    
     float mDepth{ 1.0f };       // Stores the current LFO amplitude
     float mSymmetry{ 0.5f };    // Expressed as percentage, used to scale or compress half of the LFO's period
     float mRelativePhase = 0;   // Used to shift phase of LFO relative to others
-    float mIncrement = 1.f;        // Amount By Which To Increment In LFO Cycle
-
-    float mMultiplier = 10.f;    // Rhythm of LFO timing (Rename to Rhythm)
+    float mIncrement = 1.f;     // Amount By Which To Increment In LFO Cycle
+    float mMultiplier = 10.f;   // Rhythm of LFO timing (Rename to Rhythm)
     float mHostBPM{ 1.f };      // Stores the current bpm of the host application, when applicable.
-    float min{ 2.0f };            // Used to Map LFO Amplitudes
-    float max{ -1.0f };            // Used to Map LFO Amplitudes
+    float min{ 2.0f };          // Used to Map LFO Amplitudes
+    float max{ -1.0f };         // Used to Map LFO Amplitudes
     float mRate{ 1.0f };        // Stores the current LFO rate.
     
-    float mPosition = 0.f;            // Used by processBlock to note the current position in reading the LFO cycle.
+    float mPosition = 0.f;      // Used by processBlock to note the current position in reading the LFO cycle.
     
     void setTempo(float hostBPM, double sampleRate);
     void setWaveShape(double sampleRate);
-    void mapWaveShape();
+    void scaleWaveShape();
     void setWaveShapeRampDown(int periodLeft, int periodRight, int waveTableSize);
     void setWaveShapeRampUp(int periodLeft, int periodRight, int waveTableSize);
     void setWaveShapeSquare(int periodLeft, int periodRight, int waveTableSize);
