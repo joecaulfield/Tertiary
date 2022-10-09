@@ -155,7 +155,7 @@
  #define JucePlugin_ARAFactoryID           "com.CaulfieldEngineering.Tertiary.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.CaulfieldEngineering.Tertiary.aradocumentarchive.0.1"
+ #define JucePlugin_ARADocumentArchiveID   "com.CaulfieldEngineering.Tertiary.aradocumentarchive.1"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""

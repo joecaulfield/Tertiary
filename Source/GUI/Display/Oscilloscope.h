@@ -25,14 +25,6 @@ struct Oscilloscope :	juce::Component,
 	Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc);
 	~Oscilloscope() override;
 
-	/* Paint the graphics */
-	void paint(juce::Graphics& g) override;
-
-	/* Paint on top of child components */
-	void paintOverChildren(juce::Graphics& g) override;
-
-	/* Draws the axes and grid-lines for corresponding LFO, based on tempo and zoom/pan scaling */
-	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds);
 
 	/* Generate paths for LFO when new information is available */
 	void generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
@@ -56,43 +48,9 @@ struct Oscilloscope :	juce::Component,
 	void mouseDrag(const juce::MouseEvent& event) override;
 	void mouseDoubleClick(const juce::MouseEvent& event) override;
 
-	void updatePreferences();
-	void checkFocus();
+    //void updatePreferences();
 	void checkMousePosition();
-	void updateRegions();
-
-	//void getPanZoom() {};
-	
 	void getPlayheadPosition();
-
-	bool checkIfLfoHasChanged(LFO &lfo);
-
-	bool lowLfoChanged{ true };
-	bool midLfoChanged{ true };
-	bool highLfoChanged{ true };
-
-	bool panOrZoomChanging{ false };
-
-	int oldInvert[3] = { 0,0,0 };
-	int oldShape[3] = { 0,0,0 };
-	float oldSkew[3] = { 0,0,0 };
-	float oldDepth[3] = { 0,0,0 };
-	int oldSync[3] = { 0,0,0 };
-	float oldRhythm[3] = { 0,0,0 };
-	float oldRate[3] = { 0,0,0 };
-	float oldPhase[3] = { 0,0,0 };
-
-	int oldRegions[4] = { 0,0,0,0 };
-
-
-
-
-	/*	Amount of not-shown pixels in the quarter-note 
-	that overhangs the edge of the screen.
-	Ignores display shift and assumes centered pan.	*/
-	//float playBackOffset{ 0.f };
-	//float playBackOffsetLeft{ 0.f };
-	//float playBackOffsetRight{ 0.f };
 
 	// Pixel-Width of One Complete On-Screen Beat
 	float beatSpacing{ 1.f };
@@ -130,8 +88,88 @@ struct Oscilloscope :	juce::Component,
 
 	void setToggleEnable(bool enabled);
 	void drawSliders() {};
-	void fadeInOutComponents(juce::Graphics& g);
-	void drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bounds);
+    
+    
+    
+    
+    /* Paint Functions */
+    // ================================================================================
+    void paint(juce::Graphics& g) override;
+    void paintOverChildren(juce::Graphics& g) override;
+    void paintRegions(juce::Graphics& g);
+    void paintPlayhead(juce::Graphics& g);
+    void paintCursor(juce::Graphics& g);
+    void paintMenu(juce::Graphics& g);
+    void paintGridLines(juce::Graphics& g, juce::Rectangle<int> bounds);
+    void paintWaveform( juce::Graphics& g,
+                        bool shouldShowBand,
+                        bool isBandBypassed,
+                        juce::Rectangle<int> regionBounds,
+                        bool isBandFocused,
+                        juce::Path pathToDraw,
+                        juce::Path pathToFill ,
+                        juce::ColourGradient fillGradient,
+                        juce::Colour strokeColor);
+
+
+    /* Paint-Flag Functions */
+    // ================================================================================
+    void updateAndCheckForChangesToDisplayPreferences();
+    bool checkForChangesToLfo           (LFO& lfo);
+    bool checkForChangesToLfoInvert     (LFO& lfo, int index);
+    bool checkForChangesToLfoWaveshape  (LFO& lfo, int index);
+    bool checkForChangesToLfoSkew       (LFO& lfo, int index);
+    bool checkForChangesToLfoDepth      (LFO& lfo, int index);
+    bool checkForChangesToLfoSync       (LFO& lfo, int index);
+    bool checkForChangesToLfoRhythm     (LFO& lfo, int index);
+    bool checkForChangesToLfoRate       (LFO& lfo, int index);
+    bool checkForChangesToLfoPhase      (LFO& lfo, int index);
+    bool updateAndCheckForChangesToLfoFocus      (LFO& lfo);
+    bool updateAndCheckForChangesToLfoBypass     (LFO& lfo);
+
+
+    
+    
+    //bool hasBypassChangedLow{false};
+    //bool hasBypassChangedMid{false};
+    //bool hasBypassChangedHigh{false};
+    
+    
+    //bool lowLfoChanged{ true };
+    //bool midLfoChanged{ true };
+    //bool highLfoChanged{ true };
+
+    bool panOrZoomChanging{ false };
+
+    bool mLowBypass{ false }, mMidBypass{ false }, mHighBypass{ false };
+    
+
+    
+    int     oldInvert[3] = { 0,0,0 };
+    int     oldShape[3] = { 0,0,0 };
+    float   oldSkew[3] = { 0,0,0 };
+    float   oldDepth[3] = { 0,0,0 };
+    int     oldSync[3] = { 0,0,0 };
+    float   oldRhythm[3] = { 0,0,0 };
+    float   oldRate[3] = { 0,0,0 };
+    float   oldPhase[3] = { 0,0,0 };
+    int     oldBypass[3] = { 0,0,0 };
+    int     oldFocus[3] = {0,0,0};
+
+
+    int     oldRegions[4] = { 0,0,0,0 };
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 	void makeAttachments();
 
@@ -205,14 +243,18 @@ private:
 
 	bool mShowLowBand, mShowMidBand, mShowHighBand, mStackAllBands, mShowCursor, mShowPlayhead;
 	bool mLowFocus, mMidFocus, mHighFocus;
-	bool mLowBypass{ false }, mMidBypass{ false }, mHighBypass{ false };
 
-	bool fadeIn{ false };			bool fadeInCursor{ false };
-	float fadeAlpha{ 1.f };			float fadeAlphaCursor{ 1.f };
-	float fadeMax = 1.f;			float fadeMaxCursor = 1.f;
-	float fadeMin = 0.0f;			float fadeMinCursor = 0.65;
-	float fadeStepUp = 0.1f;		float fadeStepUpCursor = 0.1f;
-	float fadeStepDown = 0.01f;		float fadeStepDownCursor = 0.05f;
+
+    void fadeInOutMenu();
+    void fadeInOutCursor();
+    
+	bool fadeInMenu{ false };			bool fadeInCursor{ false };
+	float fadeAlphaMenu{ 1.f };			float fadeAlphaCursor{ 1.f };
+	float fadeMaxMenu = 1.f;			float fadeMaxCursor = 1.f;
+	float fadeMinMenu = 0.0f;			float fadeMinCursor = 0.65;
+	float fadeStepUpMenu = 0.1f;		float fadeStepUpCursor = 0.1f;
+	float fadeStepDownMenu = 0.01f;		float fadeStepDownCursor = 0.05f;
+    bool fadeCompleteMenu{false};       bool fadeCompleteCursor{false};
 
 	float sampleRate;
 

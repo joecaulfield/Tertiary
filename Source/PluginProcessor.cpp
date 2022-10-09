@@ -204,7 +204,7 @@ void TertiaryAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 /* Creates the parameter layout */
 //==============================================================================
-juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::createParameterLayout()    //
+juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::createParameterLayout()
 {
     APVTS::ParameterLayout layout;
 
@@ -228,7 +228,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                         params.at(Names::Input_Gain),                   // Parameter Name
                                                         gainRange,                                      // Range
                                                         0));                                            // Default Value
-
+    
     /* Crossover Frequencies */
     // ===================================================================================================================
 
