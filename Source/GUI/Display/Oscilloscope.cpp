@@ -5,292 +5,28 @@
     Created: 30 Dec 2021 11:38:53am
     Author:  Joe Caulfield
 
-	// Class containing the oscilloscope which shows 
-	// the individual LFO waveforms for viewing
+	Class containing the oscilloscope which shows 
+	the individual LFO waveforms for viewing
+
+
+	Tasks:
+	[1] Clean up fade in / fade out approaches
+	[2] This class appears to be hogging graphical resources on some windows machines, especially older ones.  Implementing OpenGL helps on some machines, makes things worse on others!
+	[3] Some code can be cleaned up by creating its own classes: Cursor, Menu Bar
+	[4] A lot of stuff happening on the timer callback... anyway to alleviate this load?
+	[5] Simplify the 'Draw & Fill xxx-Region' sections by creating its own function
   ==============================================================================
 */
 
 #include "Oscilloscope.h"
 
-// Scroll Pad
-ScrollPad::ScrollPad()
-{
-}
-
-ScrollPad::~ScrollPad()
-{
-}
-
-void ScrollPad::resized()
-{
-}
-
-// Takes In Saved Points For Initialization
-void ScrollPad::initializePoints(float newP1, float newP2)
-{
-	// Prevent Crossing Points via Parameters List
-	if (point2 - point1 >= minWidth)
-	{
-		point1 = newP1;
-		point2 = newP2;
-
-		currentCenter = float(point1 + point2) / 2.f;
-		currentWidth = point2 - point1;
-
-		calculateZoomFactor();
-	}
-	else
-		makeDefaultPoints();
-}
-
-// Change Points & Calculate P/Z Upon Movement
-void ScrollPad::updatePoints(int x1, int y1)
-{
-	auto bounds = getLocalBounds();
-
-	int edgeTolerance = bounds.getX() + bounds.getCentreX() - maxWidth / 2.f;
-
-	// Mouse is clicked on or beyond left thumb
-	if (shouldUpdatePoint1)
-	{
-		point1 = x1;
-
-		if (point1 < bounds.getCentreX() - (float)maxWidth / 2.f)
-			point1 = bounds.getCentreX() - (float)maxWidth / 2.f;
-
-		// Halt At Minimum Width
-		if (point2 - point1 < minWidth)
-			point1 = point2 - minWidth;
-
-		currentCenter = (float)(point1 + point2) / 2.f;
-		currentWidth = point2 - point1;
-	}
-
-	// Mouse is clicked on or beyond right thumb
-	if (shouldUpdatePoint2)
-	{
-		point2 = x1;
-
-		if (point2 > bounds.getCentreX() + (float)maxWidth / 2.f)
-			point2 = bounds.getCentreX() + (float)maxWidth / 2.f;
-
-		// Halt At Minimum Width
-		if (point2 - point1 < minWidth)
-			point2 = point1 + minWidth;
-
-		currentCenter = (float)(point1 + point2) / 2.f;
-		currentWidth = point2 - point1;
-	}
-
-	// Mouse is clicked in between thumbs
-	if (shouldCheckPanOrZoom)
-	{
-		// Distance moved since last 'Starting Point'
-		float xAbs = (x1 - x0); // Delta X after breaking distance threshold
-		float yAbs = (y1 - y0);	// Delta Y after breaking distance threshold
-		float hAbs = sqrt(pow(xAbs, 2) + pow(yAbs, 2)); // Absolute Distance
-
-		float ang = 0.f;			// Angle of mouse-move every 3 pixels
-		bool shouldZoom = false;	// Flagged if vertical mouse movement
-		bool shouldPan = false;		// Flagged if horizontal mouse movement
-		float distThreshold = 1;	// Distance before resetting 'Current Position'
-
-		// Once distance-threshold is met, calculate mouse-direction and determine Pan or Zoom
-		if (abs(hAbs) > distThreshold)
-		{
-			ang = abs(juce::radiansToDegrees(asin(yAbs / hAbs)));
-
-			if (ang < 60)
-				shouldPan = true;	// Boundary Checking On Pan Engaged
-			else
-				shouldZoom = true;	// Boundary Checking On Zoom Engaged
-		}
-
-		// Apply Zoom... Larger Upward Motion = Larger Zoom Increment
-
-		if (shouldZoom)
-		{
-			zoomScale = juce::jmap(ang, 0.f, 90.f, 0.f, zoomIncrement);
-
-			// When Zooming In... Shrink 'Width' until Min
-			if (yAbs < 0.f)
-			{
-				currentWidth -= zoomScale;
-
-				if (currentWidth < minWidth)
-					currentWidth = minWidth;
-			}
-
-			// When Zooming Out... Expand 'Width' until Max
-			if (yAbs > 0.f)
-			{
-				currentWidth += zoomScale;
-
-				if (currentWidth > maxWidth)
-					currentWidth = maxWidth;
-			}
-		}
-
-		int c0 = (p01 + p02) / 2.f; // Actual Center of Points at time of Downclick
-		int offset = xDown - c0;	// Distance between Mouse Down and Points-Center
-
-		currentCenter = x1 - offset;		// Center of points as a function of mouse position
-
-		//// Disable Panning Function
-		//currentCenter = bounds.getCentreX();
-
-		// Prevent Panning Beyond Left Edge
-		if (currentCenter < bounds.getX() + edgeTolerance + currentWidth / 2.f)
-			currentCenter = bounds.getX() + edgeTolerance + currentWidth / 2.f;
-
-		// Prevent Panning Beyond Right Edge
-		if (currentCenter > bounds.getRight() - edgeTolerance - currentWidth / 2.f)
-			currentCenter = bounds.getRight() - edgeTolerance - currentWidth / 2.f;
-
-		// Update Points
-		point1 = currentCenter - currentWidth / 2.f;
-		point2 = currentCenter + currentWidth / 2.f;
-
-		// 'Current' Mouse Position become 'Old' position
-		x0 = x1;
-		y0 = y1;
-	}
-
-	// Prevent Point1 from Protruding Left-Side
-	if (point1 < bounds.getX() + edgeTolerance)
-		point1 = bounds.getX() + edgeTolerance;
-
-	// Prevent Point2 from Protruding Right-Side
-	if (point2 > bounds.getRight() - edgeTolerance)
-		point2 = bounds.getRight() - edgeTolerance;
-
-	calculateZoomFactor();
-}
-
-void ScrollPad::paint(juce::Graphics& g)
-{
-	// Establish Bounds
-	auto bounds = getLocalBounds().toFloat();
-
-	// Draw Slider Track
-	juce::Path track;
-	track.startNewSubPath(	bounds.getCentreX() - maxWidth / 2.f,		bounds.getCentreY());
-	track.lineTo(			bounds.getCentreX() + maxWidth / 2.f,		bounds.getCentreY());
-	g.setColour(juce::Colours::darkgrey.withMultipliedBrightness(0.4f));
-	g.strokePath(track, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
-												juce::PathStrokeType::EndCapStyle::rounded));
-
-	// Draw Point-To-Point Range
-	juce::Path range;
-	range.startNewSubPath(point1, bounds.getCentreY());
-	range.lineTo(point2, bounds.getCentreY());
-	g.setColour(juce::Colours::purple);
-	g.strokePath(range, juce::PathStrokeType(	6.f, juce::PathStrokeType::JointStyle::beveled, 
-												juce::PathStrokeType::EndCapStyle::rounded));
-
-	auto size = 10;
-	g.setColour(juce::Colours::lightgrey);
-}
-
-// Reset Pan & Zoom to Default
-void ScrollPad::makeDefaultPoints()
-{
-	auto bounds = getLocalBounds();
-
-	currentCenter = bounds.getCentreX();
-	point1 = currentCenter - defaultWidth / 2;
-	point2 = currentCenter + defaultWidth / 2;
-
-	calculateZoomFactor();
-}
-
-// Record Mouse-Down Positions
-void ScrollPad::mouseDown(const juce::MouseEvent& event)
-{
-	// Initial Mouse Position
-	xDown = event.getMouseDownX();
-	yDown = event.getMouseDownY();
-
-	// Historical Mouse Position
-	x0 = xDown;
-	y0 = yDown;
-
-	// Historical Point1/2 Positions
-	p01 = point1;
-	p02 = point2;
-
-	// Reset Flags
-	shouldUpdatePoint1 = false;
-	shouldUpdatePoint2 = false;
-	shouldCheckPanOrZoom = false;
-
-	int clickTolerance = 5;
-
-	// Mouse is clicked on or beyond Point1
-	if (xDown < point1 + clickTolerance)
-		shouldUpdatePoint1 = true;
-
-	// Mouse is clicked in between points
-	if (xDown >= point1 + clickTolerance && xDown <= point2 - clickTolerance)
-		shouldCheckPanOrZoom = true;
-
-	// Mouse is clicked on or beyond Point2
-	if (xDown > point2 - clickTolerance)
-		shouldUpdatePoint2 = true;
-}
-
-// Mouse Drag Callback
-void ScrollPad::mouseDrag(const juce::MouseEvent& event)
-{
-	auto bounds = getLocalBounds();
-
-	// Immediate Mouse Position
-	x1 = event.getPosition().getX();
-	y1 = event.getPosition().getY();
-
-	updatePoints(x1, y1);
-}
-
-// Mouse Double-Click Callback
-void ScrollPad::mouseDoubleClick(const juce::MouseEvent& event)
-{
-	makeDefaultPoints();
-}
-
-// Take Width and Derive Zoom Factor
-void ScrollPad::calculateZoomFactor()
-{
-	currentWidth = point2 - point1;
-	currentZoomFactor = juce::jmap((float)currentWidth, (float)minWidth, (float)maxWidth, minZoomFactor, maxZoomFactor);
-}
-
-// Returns Current Center Position
-float ScrollPad::getCenter()
-{
-	// Center should represent a percentage of the total waveform.
-	auto bounds = getLocalBounds().toFloat();
-	auto centerScaled = juce::jmap(	(float)currentCenter,
-									bounds.getCentreX() - maxWidth / 2.f, 
-									bounds.getCentreX() + maxWidth / 2.f,
-									+0.5f, -0.5f);
-
-	return centerScaled;
-}
-
-// Returns Current Zoom Value
-float ScrollPad::getZoom()
-{
-	return currentZoomFactor;
-}
-
-// Constructor
+/* Constructor */
+// ========================================================
 Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	: audioProcessor(p), 
 	lowLFO(p.lowLFO), midLFO(p.midLFO), highLFO(p.highLFO),
 	globalControls(gc)
 {
-
-	//openGLContext.attachTo(*this);
 
 	using namespace Params;             // Create a Local Reference to Parameter Mapping
 	const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
@@ -314,7 +50,6 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 		jassert(param != nullptr);                                                                      // Error Checking
 	};
 
-	// Cursor Position.  Rename scopeScrollParam
 	floatHelper(scopeCursorParam, Names::Cursor_Position);
 	floatHelper(scopePoint1Param, Names::Scope_Point1);
 	floatHelper(scopePoint2Param, Names::Scope_Point2);
@@ -361,18 +96,16 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	waveTableHigh.clearQuick();			// Initialize Wavetable
 }
 
-void Oscilloscope::getPanZoom()
-{
-}
-
-// Destructor
+/* Destructor */
+// ========================================================
 Oscilloscope::~Oscilloscope()
 {
 	//sliderScroll.setLookAndFeel(nullptr);
 	buttonOptions.setLookAndFeel(nullptr);
 }
 
-// Called on component resize
+/* Component Resized Callback */
+// ========================================================
 void Oscilloscope::resized()
 {
 	auto bounds = getLocalBounds();
@@ -397,6 +130,8 @@ void Oscilloscope::resized()
 	updateRegions();
 }
 
+/* Opens or closes the options menu */
+// ========================================================
 void Oscilloscope::buttonClicked(juce::Button* button)
 {
 	if (button == &buttonOptions)
@@ -407,7 +142,7 @@ void Oscilloscope::buttonClicked(juce::Button* button)
 	updateLfoDisplay = true;
 }
 
-// Graphics class
+/* Graphics Class */
 void Oscilloscope::paint(juce::Graphics& g)
 {
 	using namespace juce;
@@ -503,12 +238,6 @@ void Oscilloscope::paint(juce::Graphics& g)
 											juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
 	}
 
-
-
-
-
-
-
 	// DRAW THE MOVING PLAYHEAD
 	if (mShowPlayhead && !panOrZoomChanging)
 	{
@@ -525,7 +254,8 @@ void Oscilloscope::paint(juce::Graphics& g)
 	fadeInOutComponents(g);
 }
 
-/* Paint on top of child components */
+/* Graphics Class to Paint over Components */
+// ========================================================
 void Oscilloscope::paintOverChildren(juce::Graphics& g)
 {
 	using namespace juce;
@@ -537,6 +267,7 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 }
 
 /* Draws the axes and grid-lines for corresponding LFO, based on tempo and zoom/pan scaling */
+// ========================================================
 void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
 	using namespace AllColors::OscilloscopeColors;
@@ -652,7 +383,8 @@ void Oscilloscope::drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds)
 	}
 }
 
-// Draw the cursor.  Fade based on mouse-focus.
+/* Draw the cursor.  Fade when mouse moves */
+// ========================================================
 void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
 	if (mShowCursor)
@@ -686,7 +418,8 @@ void Oscilloscope::drawAndFadeCursor(juce::Graphics& g, juce::Rectangle<int> bou
 	}
 }
 
-// Methods to call on a timed-basis
+/* Timer Callback */
+// ========================================================
 void Oscilloscope::timerCallback()
 {
 	updatePreferences();
@@ -694,12 +427,12 @@ void Oscilloscope::timerCallback()
 
 	repaint();
 
+	/* If the parameters of the LFO have changed, regenerate the values and drawing information for the LFO */
 	if (checkIfLfoHasChanged(lowLFO) || 
 		checkIfLfoHasChanged(midLFO) ||
 		checkIfLfoHasChanged(highLFO) ||
 		updateLfoDisplay)
 	{
-
 		waveTableLow = scaleWaveAmplitude(lowLFO.getWaveTable(), lowLFO);
 		generateLFOPathForDrawing(lowRegion, lowPath, lowPathFill, waveTableLow, mShowLowBand, lowLFO);
 
@@ -717,11 +450,10 @@ void Oscilloscope::timerCallback()
 	getPlayheadPosition();
 }
 
+/* Update LFO Drawing on Parameter Change */
+// ========================================================
 bool Oscilloscope::checkIfLfoHasChanged(LFO& lfo)
 {
-	// Update LFO Display On...
-	// Invert, Shape, Skew, Depth, Sync, Rhythm, Rate, Phase
-
 	auto index = 0;
 
 	if (&lfo == &midLFO)
@@ -805,44 +537,8 @@ bool Oscilloscope::checkIfLfoHasChanged(LFO& lfo)
 		
 }
 
-// Grab WaveShapes From Processor For Display
-void Oscilloscope::getWavesForDisplay()
-{
-	//// Pull Waves And Scale Amplitude
-	//waveTableLow = scaleWaveAmplitude(lowLFO.getWaveShapeDisplay(), lowLFO);
-	//waveTableMid = scaleWaveAmplitude(midLFO.getWaveShapeDisplay(), midLFO);
-	//waveTableHigh = scaleWaveAmplitude(highLFO.getWaveShapeDisplay(), highLFO);
-}
-
-// Maps incoming WaveTable amplitude from [0, -1] to [-0.5, +0.5]
-juce::Array<float> Oscilloscope::scaleWaveAmplitude(juce::Array<float> waveTable, LFO lfo)
-{
-	float mDepth = lfo.getWaveDepth();
-
-	float min = 2.0f;		// Used to calculate min value of LFO, for scaling
-	float max = -1.0f;		// Used to calculate max value of LFO, for scaling
-
-	for (int sample = 0; sample < waveTable.size(); sample++)
-	{
-		// Get Min and Max
-		if (waveTable[sample] < min)
-			min = waveTable[sample];
-
-		if (waveTable[sample] > max)
-			max = waveTable[sample];
-	}
-
-	// MAP AMPLITUDE TO CENTER AROUND 0 ===================
-	for (int i = 0; i < waveTable.size(); i++)
-	{
-		float value = juce::jmap<float>(waveTable[i], min, max, 0.5f * mDepth, -0.5f * mDepth);
-		waveTable.set(fmod(i, waveTable.size()), value);
-	}
-
-	return waveTable;
-}
-
-// Checks Host Playhead for Current Position
+/* Checks host for the current playhead position */
+// ========================================================
 void Oscilloscope::getPlayheadPosition()
 {
 	/* Determine current condition of display and onscreen beats and make a decision as to how to loop playhead. 
@@ -904,7 +600,8 @@ void Oscilloscope::getPlayheadPosition()
 	playHeadPositionPixel = bounds.getX() + playHeadStart + position * (playHeadLoopWidth);
 }
 
-// Update the scope-regions based on the configured viewing scheme
+/* Updates the scope region visibility based on current view configuration */
+// ========================================================
 void Oscilloscope::updateRegions()
 {
 	bool update = false;
@@ -957,7 +654,8 @@ void Oscilloscope::updateRegions()
 	}
 }
 
-// Draw the scope boundaries based on the configured viewing scheme
+/* Draws the scope region based on current view configuration */
+// ========================================================
 void Oscilloscope::drawStackedScope()
 {
 	int count = 1;
@@ -994,14 +692,37 @@ void Oscilloscope::drawStackedScope()
 	highRegion.reduce(0, 3);
 }
 
+/* Scales incoming WaveTable by Amplitude Parameter */
+// ========================================================
+juce::Array<float> Oscilloscope::scaleWaveAmplitude(juce::Array<float> waveTable, LFO lfo)
+{
+	float mDepth = lfo.getWaveDepth();
 
+	float min = 2.0f;		// Used to calculate min value of LFO, for scaling
+	float max = -1.0f;		// Used to calculate max value of LFO, for scaling
 
+	for (int sample = 0; sample < waveTable.size(); sample++)
+	{
+		// Get Min and Max
+		if (waveTable[sample] < min)
+			min = waveTable[sample];
 
+		if (waveTable[sample] > max)
+			max = waveTable[sample];
+	}
 
+	// MAP AMPLITUDE TO CENTER AROUND 0 ===================
+	for (int i = 0; i < waveTable.size(); i++)
+	{
+		float value = juce::jmap<float>(waveTable[i], min, max, 0.5f * mDepth, -0.5f * mDepth);
+		waveTable.set(fmod(i, waveTable.size()), value);
+	}
 
-
+	return waveTable;
+}
 
 /* Generate paths for LFO when new information is available */
+// ========================================================
 void Oscilloscope::generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
 												juce::Path &lfoStrokePath, 
 												juce::Path &lfoFillPath,
@@ -1083,7 +804,8 @@ void Oscilloscope::generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
 	}
 }
 
-// Check for external hover focus.  Refactor for encapsulation.
+/* Checks for external hover focus */
+// ========================================================
 void Oscilloscope::checkFocus()
 {
 	mLowFocus = (	globalControls.mTimingControls.timingBarLow.hasFocus || 
@@ -1099,7 +821,8 @@ void Oscilloscope::checkFocus()
 					globalControls.mWaveControls.waveBarHigh.hasFocus );
 }
 
-// Update parameter values
+/* Update parameter values */
+// ========================================================
 void Oscilloscope::updatePreferences()
 {
 	using namespace Params;
@@ -1117,7 +840,8 @@ void Oscilloscope::updatePreferences()
 	mHighBypass = *audioProcessor.apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
 }
 
-// Make component->parameter attachments
+/* Component parameter attachments */
+// ========================================================
 void Oscilloscope::makeAttachments()
 {
 	using namespace Params;
@@ -1154,7 +878,8 @@ void Oscilloscope::makeAttachments()
 							toggleShowPlayhead);
 }
 
-// Initialize and place toggle buttons.  Refactor later.
+/* Initialize and draw toggle buttons */
+// ========================================================
 void Oscilloscope::drawToggles(bool showMenu)
 {
 	using namespace juce;
@@ -1225,7 +950,8 @@ void Oscilloscope::drawToggles(bool showMenu)
 	addAndMakeVisible(toggleShowPlayhead);
 }
 
-// Function to fade in view-menu.  Should optimize view-menu to its own class.
+/* Fade in the view menu */
+// ========================================================
 void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 {
 	using namespace juce;
@@ -1238,11 +964,7 @@ void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 			fadeAlpha += fadeStepUp;
 		
 		if (fadeAlpha > fadeMax)
-		{
-			fadeAlpha = fadeMax;
-			//setToggleEnable(true);
-		}
-			
+			fadeAlpha = fadeMax;	
 	}
 	else // If mouse exit... fade Toggles Alpha down
 	{
@@ -1250,11 +972,7 @@ void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 			fadeAlpha -= fadeStepDown;
 
 		if (fadeAlpha < fadeMin)
-		{
-			fadeAlpha = fadeMin;
-			//setToggleEnable(false);
-		}
-			
+			fadeAlpha = fadeMin;	
 	}
 
 	g.setColour(BUTTON_BACKGROUND_FILL);
@@ -1266,9 +984,10 @@ void Oscilloscope::fadeInOutComponents(juce::Graphics& g)
 							2.f);
 
 	buttonOptions.setAlpha(fadeAlpha);
-
 }
 
+/* Sets toggle menu to be enabled */
+// ========================================================
 void Oscilloscope::setToggleEnable(bool enabled)
 {
 	toggleShowLow.setEnabled(enabled);
@@ -1279,24 +998,19 @@ void Oscilloscope::setToggleEnable(bool enabled)
 	toggleShowPlayhead.setEnabled(enabled);
 }
 
-//// On mouse-enter, fade in view-menu unless dragging cursor
-//void Oscilloscope::mouseEnter(const juce::MouseEvent& event)
-//{
-//}
-
-// On mouse exit, fade out view-menu
+/* On mouse exit, fade out menu */
+// ========================================================
 void Oscilloscope::mouseExit(const juce::MouseEvent& event)
 {
 	auto x = event.getPosition().getX();
 	auto y = event.getPosition().getY();
 
 	if (x < 0 || y < 0)
-	{
 		fadeIn = false;
-	}
 }
 
-// If mouse-down within range of cursor, begin moving cursor
+/* If mouse-down within range of cursor, begin moving cursor but only if the menu is not open */
+// ========================================================
 void Oscilloscope::mouseDown(const juce::MouseEvent& event)
 {
 	auto x = event.getPosition().getX();
@@ -1316,14 +1030,10 @@ void Oscilloscope::mouseDown(const juce::MouseEvent& event)
 		cursorDrag = true;
 }
 
-// A mouse-up gesture indicates the cursor is done being dragged
+/* A mouse-up gesture indicates the cursor is done being dragged */
+// ========================================================
 void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
-	//auto x = event.getPosition().getX();
-	//auto y = event.getPosition().getY();
-
-	//auto bounds = getLocalBounds();
-
 	cursorDrag = false;
 
 	scopeCursorParam->setValueNotifyingHost(mCursorPosition);
@@ -1339,10 +1049,10 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 	scopePoint2Param->setValueNotifyingHost(p2);
 
 	panOrZoomChanging = false;
-
 }
 
-// Move the cursor when it is dragged
+/* Move the cursor while it is being dragged */
+// ========================================================
 void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 {
 	auto margin = 7;
@@ -1358,6 +1068,7 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 			mCursorPosition = ((float)getWidth() - margin) / getWidth();
 	}
 
+	/* Force the display to continually update as the pan and zoom changes */
 	if (sliderScroll.isMouseOverOrDragging())
 	{
 		panOrZoomChanging = true;
@@ -1367,10 +1078,10 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 		panOrZoomChanging = false;
 }
 
-// Fade-In the cursor when mouse is within 10 pixels of it
+/* Fade-in the cursor when the mouse is within 10 pixels of it */
+// ========================================================
 void Oscilloscope::mouseMove(const juce::MouseEvent& event)
 {
-	//auto bounds = getLocalBounds();
 
 	auto x = event.getPosition().getX();
 	auto y = event.getPosition().getY();
@@ -1422,9 +1133,11 @@ void Oscilloscope::mouseMove(const juce::MouseEvent& event)
 		fadeInCursor = false;
 }
 
-// Reset scroll-view position on double-click
+/* A double-click near the cursor or on the ScrollBar resets default values */
+// ========================================================
 void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 {
+	/* If a double-click occurs near the cursor, reset the cursor to center */
 	if (!fadeIn)
 	{
 		if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
@@ -1435,17 +1148,16 @@ void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 		}
 	}
 
+	/* If the scrollbar is double-clicked, pan and zoom have been reset to default,
+	so update the display accordingly. */
 	if (sliderScroll.isMouseOver())
 		updateLfoDisplay = true;
-
 }
 
-// Fade out the view-menu if mouse has left focus
+/* Fade out the cursor if mouse has left focus */
+// ========================================================
 void Oscilloscope::checkMousePosition()
 {
 	if (!isMouseOverOrDragging(true))
-	{
 		fadeInCursor = false;
-		//fadeIn = false;
-	}
 }

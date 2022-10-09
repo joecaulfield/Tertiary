@@ -2,6 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio Version 16
 
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tertiary - Standalone Plugin", "Tertiary_StandalonePlugin.vcxproj", "{650D7C01-454B-B926-D0E3-FD436C7B88BC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1BD03205-7A0A-638C-8634-B0E31FEEA383} = {1BD03205-7A0A-638C-8634-B0E31FEEA383}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tertiary - VST3", "Tertiary_VST3.vcxproj", "{261D5F6F-DD12-9EFC-3429-8B206084B8E3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1BD03205-7A0A-638C-8634-B0E31FEEA383} = {1BD03205-7A0A-638C-8634-B0E31FEEA383}
@@ -19,6 +24,10 @@ Global
 		{261D5F6F-DD12-9EFC-3429-8B206084B8E3}.Debug|x64.Build.0 = Debug|x64
 		{261D5F6F-DD12-9EFC-3429-8B206084B8E3}.Release|x64.ActiveCfg = Release|x64
 		{261D5F6F-DD12-9EFC-3429-8B206084B8E3}.Release|x64.Build.0 = Release|x64
+		{650D7C01-454B-B926-D0E3-FD436C7B88BC}.Debug|x64.ActiveCfg = Debug|x64
+		{650D7C01-454B-B926-D0E3-FD436C7B88BC}.Debug|x64.Build.0 = Debug|x64
+		{650D7C01-454B-B926-D0E3-FD436C7B88BC}.Release|x64.ActiveCfg = Release|x64
+		{650D7C01-454B-B926-D0E3-FD436C7B88BC}.Release|x64.Build.0 = Release|x64
 		{1BD03205-7A0A-638C-8634-B0E31FEEA383}.Debug|x64.ActiveCfg = Debug|x64
 		{1BD03205-7A0A-638C-8634-B0E31FEEA383}.Debug|x64.Build.0 = Debug|x64
 		{1BD03205-7A0A-638C-8634-B0E31FEEA383}.Release|x64.ActiveCfg = Release|x64

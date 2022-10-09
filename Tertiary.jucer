@@ -4,9 +4,9 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               cppLanguageStandard="17" companyName="Caulfield Engineering"
               companyWebsite="T3plugin.com" companyEmail="support@t3plugin.com"
-              pluginDesc="Multiband Tremolo" pluginFormats="buildAU,buildAUv3,buildVST3"
+              pluginDesc="Multiband Tremolo" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3"
               pluginManufacturer="Caulfield Engineering" pluginVST3Category="Dynamics,Modulation"
-              pluginAAXCategory="0,2,32" version="A1">
+              pluginAAXCategory="0,2,32" version="0.1">
   <MAINGROUP id="gAXMC9" name="Tertiary">
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="J9Bg6U" name="LFO.cpp" compile="1" resource="0" file="Source/DSP/LFO.cpp"/>
@@ -60,6 +60,8 @@
         <FILE id="Q6guJE" name="Oscilloscope.cpp" compile="1" resource="0"
               file="Source/GUI/Display/Oscilloscope.cpp"/>
         <FILE id="OyT0HK" name="Oscilloscope.h" compile="0" resource="0" file="Source/GUI/Display/Oscilloscope.h"/>
+        <FILE id="JDGtUj" name="ScrollPad.cpp" compile="1" resource="0" file="Source/GUI/Display/ScrollPad.cpp"/>
+        <FILE id="Z6aSgU" name="ScrollPad.h" compile="0" resource="0" file="Source/GUI/Display/ScrollPad.h"/>
       </GROUP>
       <FILE id="DyfkBW" name="AllColors.cpp" compile="1" resource="0" file="Source/GUI/AllColors.cpp"/>
       <FILE id="pfgg05" name="AllColors.h" compile="0" resource="0" file="Source/GUI/AllColors.h"/>
