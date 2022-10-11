@@ -31,28 +31,34 @@ struct FrequencyResponse :	juce::Component,
 
 	void sliderValueChanged(juce::Slider* slider) override;
 
-	void drawLowRegion(	juce::Graphics& g,
-						juce::Rectangle<float> bounds,
-						float gainPixel,
-						float freq1Pixel,
-						float alpha);
+    void paintResponseRegions(juce::Graphics& g);
+    
+	void paintLowRegion(	juce::Graphics& g,
+                            juce::Rectangle<float> bounds,
+                            float gainPixel,
+                            float freq1Pixel,
+                            float alpha);
 
-	void drawMidRegion(	juce::Graphics& g,
-						juce::Rectangle<float> bounds,
-						float gainPixel,
-						float freq1Pixel,
-						float freq2Pixel,
-						float alpha);
+	void paintMidRegion(	juce::Graphics& g,
+                            juce::Rectangle<float> bounds,
+                            float gainPixel,
+                            float freq1Pixel,
+                            float freq2Pixel,
+                            float alpha);
 
-	void drawHighRegion(	juce::Graphics& g,
+	void paintHighRegion(	juce::Graphics& g,
 							juce::Rectangle<float> bounds,
 							float gainPixel,
 							float freq2Pixel,
 							float alpha);
 
-	void drawGridVertical(juce::Graphics& g);
+	void paintGridGain(juce::Graphics& g);
 
-	void drawGridHorizontal(juce::Graphics& g);
+	void paintGridFrequency(juce::Graphics& g);
+    
+    void paintCursorsFrequency(juce::Graphics& g);
+    
+    void paintCursorsGain(juce::Graphics& g);
 
 	void resized() override;
 
@@ -70,9 +76,17 @@ struct FrequencyResponse :	juce::Component,
 
 	void updateResponse();
 
-	void fadeButtons(juce::Graphics& g);
-	void fadeCursor();
-	void fadeRegions();
+	void paintMenu(juce::Graphics& g);
+	void fadeInOutCursorLM();
+    void fadeInOutCursorMH();
+    void fadeInOutCursorLG();
+    void fadeInOutCursorMG();
+    void fadeInOutCursorHG();
+    void fadeInOutRegionLow();
+    void fadeInOutRegionMid();
+    void fadeInOutRegionHigh();
+    
+    void fadeButton();
 
 	void checkMousePosition();
 
@@ -116,6 +130,16 @@ private:
 	bool fadeRegionLG{ false };		float fadeAlphaRegionLG{ 0.65f };
 	bool fadeRegionHG{ false };		float fadeAlphaRegionHG{ 0.65f };
 	bool fadeRegionMG{ false };		float fadeAlphaRegionMG{ 0.65f };
+    
+    bool fadeCompleteCursorLM{false};
+    bool fadeCompleteCursorMH{false};
+    bool fadeCompleteCursorLG{false};
+    bool fadeCompleteCursorMG{false};
+    bool fadeCompleteCursorHG{false};
+    bool fadeCompleteRegionLow{false};
+    bool fadeCompleteRegionMid{false};
+    bool fadeCompleteRegionHigh{false};
+    bool fadeCompleteButton{false};
 	// COMPONENT FADES ==========================================================================================================================================================================================
 
 

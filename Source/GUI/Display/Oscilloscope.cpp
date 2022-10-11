@@ -1388,7 +1388,6 @@ void Oscilloscope::fadeInOutMenu()
 /* Fade Cursor Function */
 void Oscilloscope::fadeInOutCursor()
 {
-    
     if (fadeInCursor || mShowCursor) // If mouse entered... fade Toggles Alpha up
     {
         /* Fade in until complete */
