@@ -16,16 +16,18 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
 	/* Provides GPU acceleration */
-	openGLContext.attachTo(*getTopLevelComponent());
+	//openGLContext.attachTo(*getTopLevelComponent());
 
 	/* Container class for all parameter controls */
 	addAndMakeVisible(globalControls);
 
 	/* Frequency-Domain & Crossover Display */
-	addAndMakeVisible(frequencyResponse);
+	//addAndMakeVisible(frequencyResponse);
+    addAndMakeVisible(wrapperFrequency);
 
 	/* Time-Domain Display */
-	addAndMakeVisible(oscilloscope);
+	//addAndMakeVisible(oscilloscope);
+    addAndMakeVisible(wrapperOscilloscope);
 
 	/* Registers this class as a listener for mouse-related callbacks */
 	//addMouseListener(this, true); // Do i need this?
@@ -87,9 +89,11 @@ void TertiaryAudioProcessorEditor::resized()
 
 	auto spacer = FlexItem().withWidth(5);	// Gap between O-Scope and Freq Resp
 
-	flexBox.items.add(FlexItem(oscilloscope).withFlex(1.f));		// Insert O-Scope
-	flexBox.items.add(spacer);										// Insert Spacer
-	flexBox.items.add(FlexItem(frequencyResponse).withFlex(1.f));	// Insert Freq Response
+	//flexBox.items.add(FlexItem(oscilloscope).withFlex(1.f));		// Insert O-Scope
+    flexBox.items.add(FlexItem(wrapperOscilloscope).withFlex(1.f));
+    flexBox.items.add(spacer);										// Insert Spacer
+	//flexBox.items.add(FlexItem(frequencyResponse).withFlex(1.f));	// Insert Freq Response
+    flexBox.items.add(FlexItem(wrapperFrequency).withFlex(1.f));    // Insert Freq Wrapper
 	flexBox.performLayout(bounds.removeFromTop(getHeight() * 0.4));	// Do The Layout
 
 	/* Set the boundaries for the remainder of the parameters */

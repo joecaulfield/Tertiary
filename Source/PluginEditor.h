@@ -12,7 +12,9 @@
 #include "PluginProcessor.h"
 #include "GUI/Controls/GlobalControls.h"
 #include "GUI/Display/Oscilloscope.h"
-#include "GUI/Display/FrequencyResponse.h"
+//#include "GUI/Display/FrequencyResponse.h"
+#include "GUI/Display/WindowWrapperFrequency.h"
+#include "GUI/Display/WindowWrapperOscilloscope.h"
 #include "GUI/AllColors.h"
 
 //==============================================================================
@@ -37,11 +39,14 @@ private:
 	GlobalControls globalControls{ audioProcessor };
     
     /* Time-Domain Display */
-	Oscilloscope oscilloscope{ audioProcessor, globalControls};
+	//Oscilloscope oscilloscope{ audioProcessor, globalControls};
+    WindowWrapperOscilloscope wrapperOscilloscope{audioProcessor, globalControls};
 
     /* Frequency-Domain & Crossover Display */
-	FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
-
+	//FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
+    WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
+    
+    
     /* Header displayed in top corner */
 	juce::Label companyTitle;
 

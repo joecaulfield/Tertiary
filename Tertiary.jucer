@@ -62,6 +62,14 @@
         <FILE id="OyT0HK" name="Oscilloscope.h" compile="0" resource="0" file="Source/GUI/Display/Oscilloscope.h"/>
         <FILE id="JDGtUj" name="ScrollPad.cpp" compile="1" resource="0" file="Source/GUI/Display/ScrollPad.cpp"/>
         <FILE id="Z6aSgU" name="ScrollPad.h" compile="0" resource="0" file="Source/GUI/Display/ScrollPad.h"/>
+        <FILE id="Xs3m0j" name="WindowWrapperOscilloscope.cpp" compile="1"
+              resource="0" file="Source/GUI/Display/WindowWrapperOscilloscope.cpp"/>
+        <FILE id="nEpjiX" name="WindowWrapperOscilloscope.h" compile="0" resource="0"
+              file="Source/GUI/Display/WindowWrapperOscilloscope.h"/>
+        <FILE id="Ldzchp" name="WindowWrapperFrequency.cpp" compile="1" resource="0"
+              file="Source/GUI/Display/WindowWrapperFrequency.cpp"/>
+        <FILE id="W8hSh2" name="WindowWrapperFrequency.h" compile="0" resource="0"
+              file="Source/GUI/Display/WindowWrapperFrequency.h"/>
       </GROUP>
       <FILE id="DyfkBW" name="AllColors.cpp" compile="1" resource="0" file="Source/GUI/AllColors.cpp"/>
       <FILE id="pfgg05" name="AllColors.h" compile="0" resource="0" file="Source/GUI/AllColors.h"/>
@@ -102,7 +110,7 @@
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
-               JUCE_ENABLE_REPAINT_DEBUGGING="1"/>
+               JUCE_ENABLE_REPAINT_DEBUGGING="0"/>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>

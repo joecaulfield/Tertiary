@@ -96,6 +96,9 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	waveTableHigh.resize(sampleRate);	// Initialize Wavetable
 	waveTableHigh.clearQuick();			// Initialize Wavetable
+    
+    setBufferedToImage(true);
+    setOpaque(true);
 }
 
 /* Destructor */
@@ -232,6 +235,8 @@ void Oscilloscope::makeAttachments()
 
 void Oscilloscope::paint(juce::Graphics& g)
 {
+    DBG("Scope Background Paint");
+    
 	using namespace juce;
 	using namespace AllColors::OscilloscopeColors;
 
@@ -273,7 +278,7 @@ void Oscilloscope::paint(juce::Graphics& g)
 
     /* Paint Moving Playhead */
     // =========================
-    paintPlayhead(g);
+    //paintPlayhead(g);
     
     /* Paint Cursor */
     // =========================
@@ -471,13 +476,13 @@ void Oscilloscope::paintWaveform(   juce::Graphics& g,
 
 void Oscilloscope::paintPlayhead(juce::Graphics& g)
 {
-    if (mShowPlayhead && !panOrZoomChanging)
-    {
-        g.setColour(juce::Colours::darkgrey);
-        g.drawVerticalLine(playHeadPositionPixel, lowRegion.getY(), lowRegion.getBottom());
-        g.drawVerticalLine(playHeadPositionPixel, midRegion.getY(), midRegion.getBottom());
-        g.drawVerticalLine(playHeadPositionPixel, highRegion.getY(), highRegion.getBottom());
-    }
+//    if (mShowPlayhead && !panOrZoomChanging)
+//    {
+//        g.setColour(juce::Colours::darkgrey);
+//        g.drawVerticalLine(playHeadPositionPixel, lowRegion.getY(), lowRegion.getBottom());
+//        g.drawVerticalLine(playHeadPositionPixel, midRegion.getY(), midRegion.getBottom());
+//        g.drawVerticalLine(playHeadPositionPixel, highRegion.getY(), highRegion.getBottom());
+//    }
 }
 
 void Oscilloscope::paintCursor(juce::Graphics& g)

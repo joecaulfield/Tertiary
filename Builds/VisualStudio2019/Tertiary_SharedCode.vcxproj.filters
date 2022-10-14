@@ -682,6 +682,12 @@
     <ClCompile Include="..\..\Source\GUI\Display\ScrollPad.cpp">
       <Filter>Tertiary\GUI\Display</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\WindowWrapperOscilloscope.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\WindowWrapperFrequency.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\GUI\AllColors.cpp">
       <Filter>Tertiary\GUI</Filter>
     </ClCompile>
@@ -3202,6 +3208,12 @@
       <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Display\ScrollPad.h">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\WindowWrapperOscilloscope.h">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\WindowWrapperFrequency.h">
       <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\AllColors.h">

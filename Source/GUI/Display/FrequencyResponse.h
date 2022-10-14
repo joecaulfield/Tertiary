@@ -15,6 +15,8 @@
 #include "../../PluginProcessor.h"
 #include "../../GUI/Controls/GlobalControls.h"
 
+
+/* ============================================================== */
 struct FrequencyResponse :	juce::Component,
 							juce::Timer,
 							juce::Slider::Listener,
@@ -25,7 +27,7 @@ struct FrequencyResponse :	juce::Component,
 	~FrequencyResponse();
 
 	void paint(juce::Graphics& g) override;
-	void paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds);
+	//void paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds);
 	
 	void drawAxis(juce::Graphics& g, juce::Rectangle<int> bounds, const juce::Colour color) {};
 
@@ -59,7 +61,12 @@ struct FrequencyResponse :	juce::Component,
     void paintCursorsFrequency(juce::Graphics& g);
     
     void paintCursorsGain(juce::Graphics& g);
-
+    
+    //void paintOverChildren(juce::Graphics& g);
+    //float y {0.f};
+    
+    bool getShowFFT(){ return mShowFFT; }
+    
 	void resized() override;
 
 	void makeAttachments();
@@ -68,7 +75,7 @@ struct FrequencyResponse :	juce::Component,
 
 	void mouseEnter(const juce::MouseEvent& event) override;
 	void mouseExit(const juce::MouseEvent& event) override;
-	void mouseDown(const juce::MouseEvent& event) override {};
+    void mouseDown(const juce::MouseEvent& event) override {};
 	void mouseUp(const juce::MouseEvent& event) override {};
 	void mouseMove(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override {};
@@ -113,8 +120,9 @@ struct FrequencyResponse :	juce::Component,
 	bool lowBandBypass{ false },	midBandBypass{ false }, highBandBypass{ false };
 
 private:
+    
 	juce::AudioProcessorValueTreeState& apvts;
-
+    
 	float mLowMidCutoff, mMidHighCutoff, mLowGain, mMidGain, mHighGain;
 	bool mLowFocus{ false }, mMidFocus{ false }, mHighFocus{ false }, mLowMidFocus, mMidHighFocus;
 	bool mLowBypass{ false }, mMidBypass{ false }, mHighBypass{ false };
@@ -140,6 +148,8 @@ private:
     bool fadeCompleteRegionMid{false};
     bool fadeCompleteRegionHigh{false};
     bool fadeCompleteButton{false};
+    
+    bool updateAllPaint{true};
 	// COMPONENT FADES ==========================================================================================================================================================================================
 
 
@@ -152,8 +162,8 @@ private:
 
 	juce::Rectangle<float> responseArea;
 
-	juce::Array<float> freqs { 20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000 };
 
+    juce::Array<float> freqs { 20, 40, 80, 160, 320, 640, 1300, 2500, 5100, 10000, 20000 };
 	juce::Array<float> gain { -30, -24, -18, -12, -6, 0, 6, 12, 18, 24, 30 };
 
 	juce::Slider	sliderLowMidCutoff,
@@ -180,7 +190,7 @@ private:
 	juce::ToggleButton mButton_FFT;
 
 
-	void drawNextFrameOfSpectrum();
+	//void drawNextFrameOfSpectrum();
 
 	/* Options Menu ============= */
 
@@ -190,14 +200,19 @@ private:
 	juce::TextButton buttonOptions;
 	juce::Rectangle<float> buttonBounds;
 	bool showMenu{ false };
-	void drawToggles(bool showMenu);
+
 	void buttonClicked(juce::Button* button) override;
-	void updateToggleStates();
+
 	juce::ToggleButton	toggleShowRTA,
 						togglePickInput,
 						togglePickOutput;
 
 
+    
+    void drawToggles(bool showMenu);
+    void updateToggleStates();
+    
+    
 	using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
 	juce::AudioParameterBool* showFftParameter{ nullptr };

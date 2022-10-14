@@ -1,187 +1,184 @@
 /*
   ==============================================================================
-
-	FrequencyResponse.cpp
-	Created: 30 Dec 2021 11:38:20am
-	Author:  Joe Caulfield
-
-	Class to display and control the frequency response of the crossover
-
+    FrequencyResponse.cpp
+    Created: 30 Dec 2021 11:38:20am
+    Author:  Joe Caulfield
+    Class to display and control the frequency response of the crossover
   ==============================================================================
 */
 
 /*
-
 TO DO ==========
-
 [1] Slow down the FFT. Look into smoothing the values.
 [2] Pop-Up Menu to Disable RTA
-
 */
 
 #include "FrequencyResponse.h"
 
 // Constructor
-FrequencyResponse::FrequencyResponse(	TertiaryAudioProcessor& p, 
-										juce::AudioProcessorValueTreeState& apv, 
-										GlobalControls& gc)
-	: audioProcessor(p),
-	globalControls(gc),
+FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
+                                        juce::AudioProcessorValueTreeState& apv,
+                                        GlobalControls& gc)
+    : audioProcessor(p),
+    globalControls(gc),
     apvts(apv),
-	forwardFFT(audioProcessor.fftOrder),
-	window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
+    forwardFFT(audioProcessor.fftOrder),
+    window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
 
-	using namespace Params;
-	const auto& params = GetParams();
+    using namespace Params;
+    const auto& params = GetParams();
 
-	auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
-	{
-		param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-		jassert(param != nullptr);                                                                      // Error Checking
-	};
+    auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
+    {
+        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
+        jassert(param != nullptr);                                                                      // Error Checking
+    };
 
-	boolHelper(showFftParameter, Names::Show_FFT);
+    boolHelper(showFftParameter, Names::Show_FFT);
 
-	mShowFFT = showFftParameter->get();
+    mShowFFT = showFftParameter->get();
 
-	// Choice Helper To Attach Choice to Parameter ========
-	auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-	{
-		param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-		jassert(param != nullptr);
-	};
+    // Choice Helper To Attach Choice to Parameter ========
+    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+    {
+        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
+    };
 
-	choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
+    choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
 
-	mPickOffID = fftPickoffParameter->getIndex();
-	updateToggleStates();
+    mPickOffID = fftPickoffParameter->getIndex();
+    updateToggleStates();
 
-	//switch (pickOffID)
-	//{
-	//	case 0: togglePickInput.setToggleState(true, false); break;		// Pre
-	//	case 1: togglePickOutput.setToggleState(true, false); break;	// Post
-	//}
+    //switch (pickOffID)
+    //{
+    //    case 0: togglePickInput.setToggleState(true, false); break;        // Pre
+    //    case 1: togglePickOutput.setToggleState(true, false); break;    // Post
+    //}
 
-	// Array Maintenance ==========
-	fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
-	fftDrawingPoints.resize(audioProcessor.scopeSize);
+    // Array Maintenance ==========
+    fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
+    fftDrawingPoints.resize(audioProcessor.scopeSize);
 
-	for (int i = 0; i < audioProcessor.scopeSize; i++)
-		fftDrawingPoints.setUnchecked(i, 0);
+    for (int i = 0; i < audioProcessor.scopeSize; i++)
+        fftDrawingPoints.setUnchecked(i, 0);
 
-	// Button Options
-	buttonOptions.setLookAndFeel(&optionsLookAndFeel);
-	buttonOptions.addListener(this);
-	buttonOptions.addMouseListener(this, true);
-	addAndMakeVisible(buttonOptions);
+    // Button Options
+    buttonOptions.setLookAndFeel(&optionsLookAndFeel);
+    buttonOptions.addListener(this);
+    buttonOptions.addMouseListener(this, true);
+    addAndMakeVisible(buttonOptions);
 
-	toggleShowRTA.addListener(this);
-	togglePickInput.addListener(this);
-	togglePickOutput.addListener(this);
+    toggleShowRTA.addListener(this);
+    togglePickInput.addListener(this);
+    togglePickOutput.addListener(this);
 
-	// Linear Slider from 0 to 1
-	sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-	sliderLowMidInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderLowMidInterface.addListener(this);
-	sliderLowMidInterface.setRange(0, 1.f, 0.001f);
-	sliderLowMidInterface.setAlpha(0.f);
-	addAndMakeVisible(sliderLowMidInterface);
+    // Linear Slider from 0 to 1
+    sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    sliderLowMidInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderLowMidInterface.addListener(this);
+    sliderLowMidInterface.setRange(0, 1.f, 0.001f);
+    sliderLowMidInterface.setAlpha(0.f);
+    addAndMakeVisible(sliderLowMidInterface);
 
-	// Linear Slider from 0 to 1
-	sliderMidHighInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-	sliderMidHighInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderMidHighInterface.addListener(this);
-	sliderMidHighInterface.setRange(0, 1.f, 0.001f);
-	sliderMidHighInterface.setAlpha(0.f);
-	addAndMakeVisible(sliderMidHighInterface);
+    // Linear Slider from 0 to 1
+    sliderMidHighInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    sliderMidHighInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderMidHighInterface.addListener(this);
+    sliderMidHighInterface.setRange(0, 1.f, 0.001f);
+    sliderMidHighInterface.setAlpha(0.f);
+    addAndMakeVisible(sliderMidHighInterface);
 
-	// Linear Slider from 20 to 20k
-	sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-	sliderLowMidCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderLowMidCutoff.addListener(this);
+    // Linear Slider from 20 to 20k
+    sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    sliderLowMidCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderLowMidCutoff.addListener(this);
 
-	// Linear Slider from 20 to 20k
-	sliderMidHighCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-	sliderMidHighCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderMidHighCutoff.addListener(this);
+    // Linear Slider from 20 to 20k
+    sliderMidHighCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    sliderMidHighCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderMidHighCutoff.addListener(this);
 
-	// ==========================
-	sliderLowGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-	sliderLowGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderLowGain.addListener(this);
-	sliderLowGain.setRange(0, 1.f, 0.001f);
-	sliderLowGain.setAlpha(0.f);
-	addAndMakeVisible(sliderLowGain);
+    // ==========================
+    sliderLowGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    sliderLowGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderLowGain.addListener(this);
+    sliderLowGain.setRange(0, 1.f, 0.001f);
+    sliderLowGain.setAlpha(0.f);
+    addAndMakeVisible(sliderLowGain);
 
-	// ==========================
-	sliderMidGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-	sliderMidGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderMidGain.addListener(this);
-	sliderMidGain.setRange(0, 1.f, 0.001f);
-	sliderMidGain.setAlpha(0.f);
-	addAndMakeVisible(sliderMidGain);
+    // ==========================
+    sliderMidGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    sliderMidGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderMidGain.addListener(this);
+    sliderMidGain.setRange(0, 1.f, 0.001f);
+    sliderMidGain.setAlpha(0.f);
+    addAndMakeVisible(sliderMidGain);
 
-	// ==========================
-	sliderHighGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-	sliderHighGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-	sliderHighGain.addListener(this);
-	sliderHighGain.setRange(0, 1.f, 0.001f);
-	sliderHighGain.setAlpha(0.f);
-	addAndMakeVisible(sliderHighGain);
+    // ==========================
+    sliderHighGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    sliderHighGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderHighGain.addListener(this);
+    sliderHighGain.setRange(0, 1.f, 0.001f);
+    sliderHighGain.setAlpha(0.f);
+    addAndMakeVisible(sliderHighGain);
 
-	makeAttachments();
+    makeAttachments();
 
-	updateResponse();
-	startTimerHz(60);
-	//addMouseListener(this, false);
+    setBufferedToImage(true);
+    setOpaque(true);
+    
+    updateResponse();
+    startTimerHz(60);
+    //addMouseListener(this, false);
 }
 
 FrequencyResponse::~FrequencyResponse()
 {
-	buttonOptions.setLookAndFeel(nullptr);
+    buttonOptions.setLookAndFeel(nullptr);
 }
 
 // Make component->parameter attachments
 void FrequencyResponse::makeAttachments()
 {
-	using namespace Params;
-	const auto& params = GetParams();
+    using namespace Params;
+    const auto& params = GetParams();
 
-	lowMidAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Low_Mid_Crossover_Freq),
-						sliderLowMidCutoff);
+    lowMidAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Low_Mid_Crossover_Freq),
+                        sliderLowMidCutoff);
 
-	midHighAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Mid_High_Crossover_Freq),
-						sliderMidHighCutoff);
+    midHighAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Mid_High_Crossover_Freq),
+                        sliderMidHighCutoff);
 
-	lowMidAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Low_Mid_Crossover_Freq),
-						sliderLowMidCutoff);
+    lowMidAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Low_Mid_Crossover_Freq),
+                        sliderLowMidCutoff);
 
-	lowGainAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Gain_Low_Band),
-						sliderLowGain);
+    lowGainAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Gain_Low_Band),
+                        sliderLowGain);
 
-	midGainAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Gain_Mid_Band),
-						sliderMidGain);
+    midGainAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Gain_Mid_Band),
+                        sliderMidGain);
 
-	highGainAttachment =std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-						apvts,
-						params.at(Names::Gain_High_Band),
-						sliderHighGain);
+    highGainAttachment =std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+                        apvts,
+                        params.at(Names::Gain_High_Band),
+                        sliderHighGain);
 
-	showFftAttachment =	std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-						audioProcessor.apvts,
-						params.at(Names::Show_FFT),
-						toggleShowRTA);
+    showFftAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+                        audioProcessor.apvts,
+                        params.at(Names::Show_FFT),
+                        toggleShowRTA);
 }
 
 // Called on Component Resize
@@ -276,15 +273,15 @@ void FrequencyResponse::timerCallback()
     if (!fadeCompleteButton)
         repaint();
     
-    if (mShowFFT)
+    //if (mShowFFT)
         //repaint();
     
-    // Check for new FFT information
-    if (audioProcessor.nextFFTBlockReady)
-    {
-        drawNextFrameOfSpectrum();
-        audioProcessor.nextFFTBlockReady = false;
-    }
+//    // Check for new FFT information
+//    if (audioProcessor.nextFFTBlockReady)
+//    {
+//        drawNextFrameOfSpectrum();
+//        audioProcessor.nextFFTBlockReady = false;
+//    }
 }
 
 
@@ -305,23 +302,23 @@ void FrequencyResponse::timerCallback()
 // Graphics class
 void FrequencyResponse::paint(juce::Graphics& g)
 {
-	using namespace juce;
-	using namespace AllColors::FrequencyResponseColors;
+    using namespace juce;
+    using namespace AllColors::FrequencyResponseColors;
 
-	auto bounds = getLocalBounds().toFloat();
+    auto bounds = getLocalBounds().toFloat();
 
-	g.setGradientFill(BACKGROUND_GRADIENT(bounds));
-	g.fillAll();
+    g.setGradientFill(BACKGROUND_GRADIENT(bounds));
+    g.fillAll();
 
     /* Paint grids */
     // =========================
-	paintGridGain(g);
-	paintGridFrequency(g);
+    paintGridGain(g);
+    paintGridFrequency(g);
 
     /* Paint fft */
     // =========================
-	if (mShowFFT)
-		paintFFT(g, responseArea);
+    //if (mShowFFT)
+        //paintFFT(g, responseArea);
 
     /* Paint Response Regions */
     // =========================
@@ -335,13 +332,15 @@ void FrequencyResponse::paint(juce::Graphics& g)
     // =========================
     paintCursorsGain(g);
 
-	/* Paint Menu */
+    /* Paint Menu */
     // =========================
-	paintMenu(g);
+    paintMenu(g);
 
     /* Paint Border */
     // =========================
-	paintBorder(g, juce::Colours::purple, bounds);
+    paintBorder(g, juce::Colours::purple, bounds);
+    
+    DBG("Background Paint - Frequency");
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -591,107 +590,6 @@ void FrequencyResponse::paintCursorsGain(juce::Graphics& g)
     }
 }
 
-void FrequencyResponse::paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds)
-{
-    // Wrap in Toggle Button
-
-    for (int i = 1; i < audioProcessor.scopeSize; ++i)
-    {
-        float width = bounds.getWidth();
-        float height = bounds.getHeight();
-
-        float startX = bounds.getX() + (float)juce::jmap(    (float)i - 1,
-                                                            0.f,
-                                                            (float)audioProcessor.scopeSize - 1.f,
-                                                            0.f,
-                                                            width);
-
-        float startY = bounds.getY() + juce::jmap(    audioProcessor.scopeData[i - 1],
-                                                    0.0f,
-                                                    1.0f,
-                                                    height,
-                                                    0.0f);
-
-        float endX = bounds.getX() + juce::jmap(    (float)i,
-                                                    0.f,
-                                                    (float)audioProcessor.scopeSize - 1.f,
-                                                    0.f,
-                                                    width);
-        
-        float endY = bounds.getY() + juce::jmap(    audioProcessor.scopeData[i],
-                                                    0.0f,
-                                                    1.0f,
-                                                    height,
-                                                    0.0f);
-
-        fftDrawingPoints.set(i - 1, startY);
-    }
-
-    juce::Path f;
-
-    f.startNewSubPath(bounds.getX() + 2, bounds.getBottom());
-
-    int curve = 3;
-
-    float x0{ 0.f }, x1{ 0.f }, x2{ 0.f };
-
-    for (int i = 0; i < fftDrawingPoints.size()-curve-1; i++)
-    {
-        if (i % curve == 0 && i > 0)
-        {
-            float x0 = juce::jmap(    (float)i-curve,
-                                    0.f,
-                                    (float)(fftDrawingPoints.size()) - 1.f,
-                                    2.f,
-                                    bounds.getWidth()-2 );
-
-            float x1 = juce::jmap(    (float)i,
-                                    0.f,
-                                    (float)(fftDrawingPoints.size()) - 1.f,
-                                    2.f,
-                                    bounds.getWidth()-2 );
-
-            float x2 = juce::jmap(    (float)i+ curve,
-                                    0.f,
-                                    (float)(fftDrawingPoints.size()) - 1.f,
-                                    2.f,
-                                    bounds.getWidth()-2 );
-
-            juce::Point<float> point0 = { bounds.getX() + x0, fftDrawingPoints[i - curve] - 2 };
-            juce::Point<float> point1 = { bounds.getX() + x1, fftDrawingPoints[i] - 2 };
-            juce::Point<float> point2 = { bounds.getX() + x2, fftDrawingPoints[i + curve] - 2 };
-
-            f.cubicTo(point0, point1, point2);
-        }
-
-    }
-
-    f.lineTo(bounds.getRight(), bounds.getBottom());
-    f.closeSubPath();
-
-    // Fill FFT Background
-    float p1 = 0.25f;
-    float p2 = 0.5f;
-
-    auto gradient = juce::ColourGradient(    juce::Colours::grey,
-                                            bounds.getBottomLeft(),
-                                            juce::Colours::lightgrey,
-                                            bounds.getTopRight(), false);
-
-    gradient.addColour(p1, juce::Colours::white.withBrightness(1.25f));
-    gradient.addColour(p2, juce::Colours::whitesmoke.withBrightness(1.25f));
-
-    g.setGradientFill(gradient);
-    g.setOpacity(0.75f);
-    g.fillPath(f);
-
-    // Fill FFT Outline
-    g.setColour(juce::Colours::darkgrey);
-    g.setOpacity(0.75f);
-    g.strokePath(f, juce::PathStrokeType(0.5f));
-
-}
-
 // Fade Components on Mouse Enter
 void FrequencyResponse::paintMenu(juce::Graphics& g)
 {
@@ -722,291 +620,246 @@ void FrequencyResponse::paintMenu(juce::Graphics& g)
 // Update the response prior to painting.
 void FrequencyResponse::updateResponse()
 {
-	using namespace Params;
-	const auto& params = GetParams();
+    using namespace Params;
+    const auto& params = GetParams();
 
-	// Get cutoff frequency parameter values
-	mLowMidCutoff = *apvts.getRawParameterValue(params.at(Names::Low_Mid_Crossover_Freq));
-	mMidHighCutoff = *apvts.getRawParameterValue(params.at(Names::Mid_High_Crossover_Freq));
+    // Get cutoff frequency parameter values
+    mLowMidCutoff = *apvts.getRawParameterValue(params.at(Names::Low_Mid_Crossover_Freq));
+    mMidHighCutoff = *apvts.getRawParameterValue(params.at(Names::Mid_High_Crossover_Freq));
 
-	// Convert cutoff values to relative pixel values
-	freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
-	freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
+    // Convert cutoff values to relative pixel values
+    freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
+    freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
-	// Set Low-Mid Crossover Cursor Bounds
-	cursorLM.setStart(freq1Pixel, responseArea.getY() + 1);
-	cursorLM.setEnd(freq1Pixel, responseArea.getBottom() - 1);
+    // Set Low-Mid Crossover Cursor Bounds
+    cursorLM.setStart(freq1Pixel, responseArea.getY() + 1);
+    cursorLM.setEnd(freq1Pixel, responseArea.getBottom() - 1);
 
-	cursorMH.setStart(freq2Pixel, responseArea.getY() + 1);
-	cursorMH.setEnd(freq2Pixel, responseArea.getBottom() - 1);
+    cursorMH.setStart(freq2Pixel, responseArea.getY() + 1);
+    cursorMH.setEnd(freq2Pixel, responseArea.getBottom() - 1);
 
-	// Set Mid-High Crossover Cursor Bounds
-	mLowGain = *apvts.getRawParameterValue(params.at(Names::Gain_Low_Band));
-	mMidGain = *apvts.getRawParameterValue(params.at(Names::Gain_Mid_Band));
-	mHighGain = *apvts.getRawParameterValue(params.at(Names::Gain_High_Band));
+    // Set Mid-High Crossover Cursor Bounds
+    mLowGain = *apvts.getRawParameterValue(params.at(Names::Gain_Low_Band));
+    mMidGain = *apvts.getRawParameterValue(params.at(Names::Gain_Mid_Band));
+    mHighGain = *apvts.getRawParameterValue(params.at(Names::Gain_High_Band));
 
-	// Convert band gain values to relative pixel values
-	gainLowPixel = responseArea.getY() + juce::jmap(mLowGain,	-30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
-	gainMidPixel = responseArea.getY() + juce::jmap(mMidGain,	-30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
-	gainHighPixel = responseArea.getY() + juce::jmap(mHighGain, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
+    // Convert band gain values to relative pixel values
+    gainLowPixel = responseArea.getY() + juce::jmap(mLowGain,    -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
+    gainMidPixel = responseArea.getY() + juce::jmap(mMidGain,    -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
+    gainHighPixel = responseArea.getY() + juce::jmap(mHighGain, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY());
 
-	// Set Cursor Widths. Cursors A Fraction of Band Width
-	auto lowWidth = (freq1Pixel - responseArea.getX()) * 0.75f;
-	auto midWidth = (freq2Pixel - freq1Pixel) * 0.75f;
-	auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.75f;
+    // Set Cursor Widths. Cursors A Fraction of Band Width
+    auto lowWidth = (freq1Pixel - responseArea.getX()) * 0.75f;
+    auto midWidth = (freq2Pixel - freq1Pixel) * 0.75f;
+    auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.75f;
 
-	// Set Low-Gain Cursor Bounds
-	auto center = (responseArea.getX() + freq1Pixel) / 2.f;
+    // Set Low-Gain Cursor Bounds
+    auto center = (responseArea.getX() + freq1Pixel) / 2.f;
 
-	cursorLG.setStart	(center - lowWidth / 2.f, gainLowPixel);
-	cursorLG.setEnd		(center + lowWidth / 2.f, gainLowPixel);
+    cursorLG.setStart    (center - lowWidth / 2.f, gainLowPixel);
+    cursorLG.setEnd        (center + lowWidth / 2.f, gainLowPixel);
 
-	// Set Mid-Gain Cursor Bounds
-	center = (freq1Pixel + freq2Pixel) / 2.f;
-	
-	cursorMG.setStart	(center - midWidth / 2.f, gainMidPixel);
-	cursorMG.setEnd		(center + midWidth / 2.f, gainMidPixel);
+    // Set Mid-Gain Cursor Bounds
+    center = (freq1Pixel + freq2Pixel) / 2.f;
+    
+    cursorMG.setStart    (center - midWidth / 2.f, gainMidPixel);
+    cursorMG.setEnd        (center + midWidth / 2.f, gainMidPixel);
 
-	// Set High-Gain Cursor Bounds
-	center = (freq2Pixel + responseArea.getRight()) / 2.f;
+    // Set High-Gain Cursor Bounds
+    center = (freq2Pixel + responseArea.getRight()) / 2.f;
 
-	cursorHG.setStart	(center - highWidth / 2.f, gainHighPixel);
-	cursorHG.setEnd		(center + highWidth / 2.f, gainHighPixel);
+    cursorHG.setStart    (center - highWidth / 2.f, gainHighPixel);
+    cursorHG.setEnd        (center + highWidth / 2.f, gainHighPixel);
 
-	// Update Band Bypass States
-	lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
-	midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
-	highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
+    // Update Band Bypass States
+    lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
+    midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
+    highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
 
-	// Update Band Solo States
-	lowBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Low_Band));
-	midBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Mid_Band));
-	highBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_High_Band));
+    // Update Band Solo States
+    lowBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Low_Band));
+    midBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Mid_Band));
+    highBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_High_Band));
 
-	// Update Band Mute States
-	lowBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Low_Band));
-	midBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Mid_Band));
-	highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
+    // Update Band Mute States
+    lowBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Low_Band));
+    midBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Mid_Band));
+    highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
 
-	checkSolos();
+    checkSolos();
 }
 
 // Check if bands are soloed.  Negate mute if so.
 void FrequencyResponse::checkSolos()
 {
-	auto x = lowBandSolo * 100;
-	auto y = midBandSolo * 10;
-	auto z = highBandSolo;
-	auto s = x + y + z;
+    auto x = lowBandSolo * 100;
+    auto y = midBandSolo * 10;
+    auto z = highBandSolo;
+    auto s = x + y + z;
 
-	switch (s)
-	{
-	case 1:   {lowBandMute = true; midBandMute = true;  break; }
-	case 10:  {lowBandMute = true; highBandMute = true; break; }
-	case 11:  {lowBandMute = true;						break; }
-	case 100: {midBandMute = true; highBandMute = true; break; }
-	case 101: {midBandMute = true;						break; }
-	case 110: {highBandMute = true;						break; }
-	}
+    switch (s)
+    {
+    case 1:   {lowBandMute = true; midBandMute = true;  break; }
+    case 10:  {lowBandMute = true; highBandMute = true; break; }
+    case 11:  {lowBandMute = true;                        break; }
+    case 100: {midBandMute = true; highBandMute = true; break; }
+    case 101: {midBandMute = true;                        break; }
+    case 110: {highBandMute = true;                        break; }
+    }
 }
 
 // Map linear slider value to true octave-logarithmic value
 float FrequencyResponse::mapLog2(float freq)
 {
-	auto logMin = std::log2(20.f);
-	auto logMax = std::log2(20000.f);
+    auto logMin = std::log2(20.f);
+    auto logMax = std::log2(20000.f);
 
-	return (std::log2(freq) - logMin) / (logMax - logMin);
+    return (std::log2(freq) - logMin) / (logMax - logMin);
 }
 
 // Called on slider value change
 void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 {
-	// 'Interface' slider is linear from 0 to 1.  
-	// Changed by user by dragging Cutoff Cursors
-	// Slider is converted from [0 to 1] to [20 to 20k] to store frequency
+    // 'Interface' slider is linear from 0 to 1.
+    // Changed by user by dragging Cutoff Cursors
+    // Slider is converted from [0 to 1] to [20 to 20k] to store frequency
 
-	if (slider == &sliderLowMidInterface || slider == &sliderMidHighInterface)
-	{
-		if (slider == &sliderLowMidInterface)
-		{
-			// Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
-			// Send to Cutoff slider to update params.
+    if (slider == &sliderLowMidInterface || slider == &sliderMidHighInterface)
+    {
+        if (slider == &sliderLowMidInterface)
+        {
+            // Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
+            // Send to Cutoff slider to update params.
 
-			auto y = slider->getValue();
-			auto f = 20 * pow(2, std::log2(1000.f) * y);
-			sliderLowMidCutoff.setValue(f);
-		}
+            auto y = slider->getValue();
+            auto f = 20 * pow(2, std::log2(1000.f) * y);
+            sliderLowMidCutoff.setValue(f);
+        }
 
-		if (slider == &sliderMidHighInterface)
-		{
-			// Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
-			// Send to Cutoff slider to update params.
+        if (slider == &sliderMidHighInterface)
+        {
+            // Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
+            // Send to Cutoff slider to update params.
 
-			auto y = slider->getValue();
-			auto f = 20 * pow(2, std::log2(1000.f) * y);
-			sliderMidHighCutoff.setValue(f);
-		}
+            auto y = slider->getValue();
+            auto f = 20 * pow(2, std::log2(1000.f) * y);
+            sliderMidHighCutoff.setValue(f);
+        }
 
-	}
+    }
 
-	// 'Cutoff' slider is linear from 20 to 20k.
-	// Changed by user via attachment to external sliders.
-	// Slider is converted from [20 to 20k] to [0 to 1] for pixel representation
+    // 'Cutoff' slider is linear from 20 to 20k.
+    // Changed by user via attachment to external sliders.
+    // Slider is converted from [20 to 20k] to [0 to 1] for pixel representation
 
-	if (slider == &sliderLowMidCutoff || slider == &sliderMidHighCutoff)
-	{
-		sliderMidHighInterface.setValue(mapLog2(sliderMidHighCutoff.getValue()));
-		sliderLowMidInterface.setValue(mapLog2(sliderLowMidCutoff.getValue()));
-	}
+    if (slider == &sliderLowMidCutoff || slider == &sliderMidHighCutoff)
+    {
+        sliderMidHighInterface.setValue(mapLog2(sliderMidHighCutoff.getValue()));
+        sliderLowMidInterface.setValue(mapLog2(sliderLowMidCutoff.getValue()));
+    }
     
     repaint();
 }
 
-void FrequencyResponse::drawNextFrameOfSpectrum()
-{
-	// Apply Window Function to Data
-	window.multiplyWithWindowingTable(audioProcessor.fftData, audioProcessor.fftSize);
-
-	// Render FFT Data
-	forwardFFT.performFrequencyOnlyForwardTransform(audioProcessor.fftData);
-
-	auto mindB = -60.f;
-	auto maxdB = 0.0f;
-
-	for (int i = 0; i < audioProcessor.scopeSize; ++i)
-	{
-		//auto skewedProportionX = 1.0f - pow(2, std::log2(1.0f - (float)i / (float)processor.scopeSize * 0.2f));
-		//auto skewedProportionX = 1.0f - std::exp(std::log(1.0f - (float)i / (float)processor.scopeSize) * 0.2f);
-		//auto linearScale = i / float(processor.scopeSize) * 0.835f;
-
-		auto linearScale = i / float(audioProcessor.scopeSize) * 9.699f;
-		auto skewedProportionX = (20 * pow(2, linearScale)) / 20000;
-
-        // 
-        auto fftDataIndex = juce::jlimit	(   0,                                                          // Lower
-												audioProcessor.fftSize / 2,                                      // Upper Limit
-												(int)(skewedProportionX * (float)audioProcessor.fftSize * 0.5f)  // Value to Constrain
-											);
-
-        // Clamps the value to within specified dB range
-        auto limit = juce::jlimit	(	mindB,      // Lower Limit
-										maxdB,      // Upper Limit
-										juce::Decibels::gainToDecibels(audioProcessor.fftData[fftDataIndex]) - juce::Decibels::gainToDecibels((float)audioProcessor.fftSize)  // Value to Constrain
-									);
-
-
-        auto level = juce::jmap (	limit,  // Source Value
-									mindB,  // Source Range Min
-									maxdB,  // Source Range Max
-									0.0f,   // Target Range Min
-									1.0f    // Target Range Max
-								);
-
-        audioProcessor.scopeData[i] = level;                                   // [4]
-	}
-
-
-}
-
 void FrequencyResponse::drawToggles(bool showMenu)
 {
-	using namespace juce;
+    using namespace juce;
 
-	/* Toggle Menu Visibility Based On Display Params */
-	if (showMenu)
-		buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
-	else
-		buttonBounds.setBounds(0, 0, 0, 0);
+    /* Toggle Menu Visibility Based On Display Params */
+    if (showMenu)
+        buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
+    else
+        buttonBounds.setBounds(0, 0, 0, 0);
 
-	FlexBox flexBox;
-	flexBox.flexDirection = FlexBox::Direction::column;
-	flexBox.flexWrap = FlexBox::Wrap::noWrap;
+    FlexBox flexBox;
+    flexBox.flexDirection = FlexBox::Direction::column;
+    flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-	auto margin = FlexItem().withHeight(5);
-	auto spacer = FlexItem().withHeight(2.5);
-	auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
+    auto margin = FlexItem().withHeight(5);
+    auto spacer = FlexItem().withHeight(2.5);
+    auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
 
-	flexBox.items.add(margin);
-	flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
-	flexBox.items.add(spacer);
-	flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
-	flexBox.items.add(spacer);
-	flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
-	flexBox.items.add(margin);
+    flexBox.items.add(margin);
+    flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
+    flexBox.items.add(spacer);
+    flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
+    flexBox.items.add(spacer);
+    flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
+    flexBox.items.add(margin);
 
-	flexBox.performLayout(buttonBounds);
+    flexBox.performLayout(buttonBounds);
 
-	toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-	togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
 
-	toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-	togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-	togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-	
-	toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-	togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-	togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    
+    toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
 
-	toggleShowRTA.setButtonText("Show FFT");
-	togglePickInput.setButtonText("FFT In");
-	togglePickOutput.setButtonText("FFT Out");
+    toggleShowRTA.setButtonText("Show FFT");
+    togglePickInput.setButtonText("FFT In");
+    togglePickOutput.setButtonText("FFT Out");
 
-	togglePickInput.setRadioGroupId(1);
-	togglePickOutput.setRadioGroupId(1);
+    togglePickInput.setRadioGroupId(1);
+    togglePickOutput.setRadioGroupId(1);
 
-	addAndMakeVisible(toggleShowRTA);
-	addAndMakeVisible(togglePickInput);
-	addAndMakeVisible(togglePickOutput);
+    addAndMakeVisible(toggleShowRTA);
+    addAndMakeVisible(togglePickInput);
+    addAndMakeVisible(togglePickOutput);
 }
 
 void FrequencyResponse::buttonClicked(juce::Button* button)
 {
-	if (button == &buttonOptions)
-	{
-		showMenu = !showMenu;
-		drawToggles(showMenu);
-	}
-		
+    if (button == &buttonOptions)
+    {
+        showMenu = !showMenu;
+        drawToggles(showMenu);
+    }
+        
 
-	if (button == &toggleShowRTA)
-	{
-		mShowFFT = toggleShowRTA.getToggleState();
-	}
-		
-	if (button == &togglePickInput || button == &togglePickOutput)
-	{
-		mPickOffID = togglePickOutput.getToggleState();
+    if (button == &toggleShowRTA)
+    {
+        mShowFFT = toggleShowRTA.getToggleState();
+    }
+        
+    if (button == &togglePickInput || button == &togglePickOutput)
+    {
+        mPickOffID = togglePickOutput.getToggleState();
 
-		updateToggleStates();
-	}
-	
+        updateToggleStates();
+    }
+    
+    repaint();
 }
 
 void FrequencyResponse::updateToggleStates()
 {
-	// When Pickoff ID Changes,
-	// Update Toggle States
-	// Set Parameter
+    // When Pickoff ID Changes,
+    // Update Toggle States
+    // Set Parameter
 
-	switch (mPickOffID)
-	{
-		case 0: // Pre
-		{
-			togglePickInput.setToggleState(true, false);
-			togglePickOutput.setToggleState(false, false); break;
-		}
-		case 1: // Post
-		{
-			togglePickOutput.setToggleState(true, false);
-			togglePickInput.setToggleState(false, false); break;
-		}
-	}
+    switch (mPickOffID)
+    {
+        case 0: // Pre
+        {
+            togglePickInput.setToggleState(true, false);
+            togglePickOutput.setToggleState(false, false); break;
+        }
+        case 1: // Post
+        {
+            togglePickOutput.setToggleState(true, false);
+            togglePickInput.setToggleState(false, false); break;
+        }
+    }
 
-	fftPickoffParameter->setValueNotifyingHost(mPickOffID);
+    fftPickoffParameter->setValueNotifyingHost(mPickOffID);
 
-	audioProcessor.setFftPickoffPoint(mPickOffID);
+    audioProcessor.setFftPickoffPoint(mPickOffID);
 }
 
 

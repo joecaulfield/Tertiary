@@ -89,8 +89,13 @@ struct Oscilloscope :	juce::Component,
 	void setToggleEnable(bool enabled);
 	void drawSliders() {};
     
+    bool getShowPlayhead() {return mShowPlayhead; }
+    bool getPanOrZoomChanging() {return panOrZoomChanging; }
+    float getPlayheadPositionPixel() {return playHeadPositionPixel; }
     
-    
+    juce::Rectangle<int> getLowRegion() {return lowRegion; }
+    juce::Rectangle<int> getMidRegion() {return midRegion; }
+    juce::Rectangle<int> getHighRegion() {return highRegion; }
     
     /* Paint Functions */
     // ================================================================================
