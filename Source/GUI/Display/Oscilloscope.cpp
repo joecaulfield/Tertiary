@@ -98,7 +98,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 	waveTableHigh.clearQuick();			// Initialize Wavetable
     
     setBufferedToImage(true);
-    setOpaque(true);
+    //setOpaque(true);
 }
 
 /* Destructor */
@@ -181,7 +181,7 @@ void Oscilloscope::timerCallback()
         repaint(cursor.getStartX()-5, cursor.getStartY(), 10, cursor.getLength() );
     
     getPlayheadPosition();
-
+    
 }
 
 /* Component parameter attachments */
@@ -235,8 +235,6 @@ void Oscilloscope::makeAttachments()
 
 void Oscilloscope::paint(juce::Graphics& g)
 {
-    DBG("Scope Background Paint");
-    
 	using namespace juce;
 	using namespace AllColors::OscilloscopeColors;
 
@@ -507,7 +505,7 @@ void Oscilloscope::paintMenu(juce::Graphics& g)
     using namespace juce;
     using namespace AllColors::OscilloscopeColors;
     
-    g.setColour(BUTTON_BACKGROUND_FILL);
+    g.setColour(juce::Colours::white);
     g.setOpacity(0.9f);
     g.fillRoundedRectangle( buttonBounds.getX(),
                             buttonBounds.getY(),
@@ -515,7 +513,7 @@ void Oscilloscope::paintMenu(juce::Graphics& g)
                             buttonBounds.getHeight(),
                             2.f);
     
-    buttonOptions.setAlpha(fadeAlphaMenu);
+    //buttonOptions.setAlpha(fadeAlphaMenu);
 }
 
 /* |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
@@ -1066,15 +1064,16 @@ void Oscilloscope::generateLFOPathForDrawing(	juce::Rectangle<int> bounds,
 void Oscilloscope::buttonClicked(juce::Button* button)
 {
     if (button == &buttonOptions)
+    {
         showMenu = !showMenu;
+        drawToggles(showMenu);
+    }
 
     if (button == &toggleShowCursor)
     {
         if (!mShowCursor)
             fadeAlphaCursor = 0.f;
     }
-    
-    drawToggles(showMenu);
 
     updateLfoDisplay = true;
 }
@@ -1152,17 +1151,6 @@ void Oscilloscope::drawToggles(bool showMenu)
 }
 
 
-/* Sets toggle menu to be enabled */
-// ========================================================
-void Oscilloscope::setToggleEnable(bool enabled)
-{
-	toggleShowLow.setEnabled(enabled);
-	toggleShowMid.setEnabled(enabled);
-	toggleShowHigh.setEnabled(enabled);
-	toggleStackBands.setEnabled(enabled);
-	toggleShowCursor.setEnabled(enabled);
-	toggleShowPlayhead.setEnabled(enabled);
-}
 
 /* |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
 /* ================================================================================================================ */
@@ -1388,6 +1376,8 @@ void Oscilloscope::fadeInOutMenu()
             fadeCompleteMenu = true;
         }
     }
+    
+    buttonOptions.setAlpha(fadeAlphaMenu);
 }
 
 /* Fade Cursor Function */

@@ -85,13 +85,14 @@ struct Oscilloscope :	juce::Component,
 
 	void drawStackedScope();
 
-
-	void setToggleEnable(bool enabled);
+    void setToggleEnable(bool enabled) {};
 	void drawSliders() {};
     
     bool getShowPlayhead() {return mShowPlayhead; }
     bool getPanOrZoomChanging() {return panOrZoomChanging; }
     float getPlayheadPositionPixel() {return playHeadPositionPixel; }
+    bool isMenuOpen() {return showMenu; }
+    juce::Rectangle<int> getMenuButtonBounds() {return buttonBounds.toNearestInt();}
     
     juce::Rectangle<int> getLowRegion() {return lowRegion; }
     juce::Rectangle<int> getMidRegion() {return midRegion; }
@@ -262,8 +263,6 @@ private:
     bool fadeCompleteMenu{false};       bool fadeCompleteCursor{false};
 
 	float sampleRate;
-
-	
 
 	juce::Line<float> cursor;
 	bool cursorDrag{ false };

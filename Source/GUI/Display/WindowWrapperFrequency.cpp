@@ -68,7 +68,6 @@ void WindowWrapperFrequency::timerCallback()
 void WindowWrapperFrequency::paintOverChildren(juce::Graphics& g)
 {
     /* FFT Animation goes here */
-    DBG("Freq Overlay Paint");
     
     /* Paint fft */
     // =========================
@@ -78,7 +77,6 @@ void WindowWrapperFrequency::paintOverChildren(juce::Graphics& g)
  
 void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds)
 {
-
     
     for (int i = 1; i < audioProcessor.scopeSize; ++i)
     {
@@ -121,7 +119,18 @@ void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> 
             juce::Point<float> point0 = { bounds.getX() + x0, fftDrawingPoints[i - curve] - 2 };
             juce::Point<float> point1 = { bounds.getX() + x1, fftDrawingPoints[i] - 2 };
             juce::Point<float> point2 = { bounds.getX() + x2, fftDrawingPoints[i + curve] - 2 };
-
+            
+            float tempMax = juce::jmin(point0.getY(), point1.getY(), point2.getY());
+            
+            if (    frequencyResponse.isMenuOpen() &&
+                    point2.getX() < frequencyResponse.getMenuButtonBounds().getRight() + 20 &&
+                    tempMax < frequencyResponse.getMenuButtonBounds().getBottom() )
+            {
+                point0 = { bounds.getX() + x0, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
+                point1 = { bounds.getX() + x1, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
+                point2 = { bounds.getX() + x2, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
+            }
+            
             f.cubicTo(point0, point1, point2);
         }
 

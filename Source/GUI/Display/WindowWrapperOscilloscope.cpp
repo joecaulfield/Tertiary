@@ -49,7 +49,6 @@ void WindowWrapperOscilloscope::paint(juce::Graphics& g) {}
 
 void WindowWrapperOscilloscope::paintOverChildren(juce::Graphics& g)
 {
-    DBG("Scope Foreground Paint");
     paintPlayhead(g);
 }
 
@@ -59,8 +58,25 @@ void WindowWrapperOscilloscope::paintPlayhead(juce::Graphics& g)
     {
         g.setColour(juce::Colours::darkgrey);
         
-        g.drawVerticalLine(mPlayheadPositionPixel, mLowRegion.getY(), mLowRegion.getBottom());
-        g.drawVerticalLine(mPlayheadPositionPixel, mMidRegion.getY(), mMidRegion.getBottom());
-        g.drawVerticalLine(mPlayheadPositionPixel, mHighRegion.getY(), mHighRegion.getBottom());
+        float buttonBoundsRight = oscilloscope.getMenuButtonBounds().getRight();
+        float buttonBoundsBottom = oscilloscope.getMenuButtonBounds().getBottom();
+        
+        if (oscilloscope.isMenuOpen())
+        {
+            if (mPlayheadPositionPixel > buttonBoundsRight)
+            {
+                g.drawVerticalLine(mPlayheadPositionPixel, mLowRegion.getY(), mLowRegion.getBottom());
+                g.drawVerticalLine(mPlayheadPositionPixel, mMidRegion.getY(), mMidRegion.getBottom());
+                g.drawVerticalLine(mPlayheadPositionPixel, mHighRegion.getY(), mHighRegion.getBottom());
+            }
+            else
+                g.drawVerticalLine(mPlayheadPositionPixel, buttonBoundsBottom, mHighRegion.getBottom());
+        }
+        else
+        {
+            g.drawVerticalLine(mPlayheadPositionPixel, mLowRegion.getY(), mLowRegion.getBottom());
+            g.drawVerticalLine(mPlayheadPositionPixel, mMidRegion.getY(), mMidRegion.getBottom());
+            g.drawVerticalLine(mPlayheadPositionPixel, mHighRegion.getY(), mHighRegion.getBottom());
+        }
     }
 }

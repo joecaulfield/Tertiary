@@ -126,12 +126,13 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
 
     makeAttachments();
 
-    setBufferedToImage(true);
-    setOpaque(true);
+
     
     updateResponse();
     startTimerHz(60);
-    //addMouseListener(this, false);
+    
+    setBufferedToImage(true);
+    //setOpaque(true);
 }
 
 FrequencyResponse::~FrequencyResponse()
@@ -215,17 +216,8 @@ void FrequencyResponse::resized()
 void FrequencyResponse::timerCallback()
 {
     
-    /* [1] Update display preferences */
-    /* [2] Check Mouse Position */
+
     checkMousePosition();
-    /* [3] Any fade in/out's*/
-
-    /* [4] Check for changes to Low, if so update */
-    /* [5] Check for changes to Mid, if so update */
-    /* [6] Check for changes to High, if so update */
-    
-
-
 
     updateResponse();
     
@@ -261,27 +253,26 @@ void FrequencyResponse::timerCallback()
     if (!fadeCompleteCursorHG)
         repaint(cursorHG.getStartX(), cursorHG.getStartY()-5, cursorHG.getLength(), 10 );
     
-    if (!fadeCompleteRegionLow)
+    if (!fadeCompleteRegionLow || updateDisplay)
         repaint();
     
-    if (!fadeCompleteRegionMid)
+    if (!fadeCompleteRegionMid|| updateDisplay)
         repaint();
     
-    if (!fadeCompleteRegionHigh)
+    if (!fadeCompleteRegionHigh || updateDisplay)
         repaint();
     
-    if (!fadeCompleteButton)
+    if (!fadeCompleteButton || updateDisplay)
+        repaint(buttonOptions.getBounds());
+    
+    if (updateDisplay)
+    {
         repaint();
-    
-    //if (mShowFFT)
-        //repaint();
-    
-//    // Check for new FFT information
-//    if (audioProcessor.nextFFTBlockReady)
-//    {
-//        drawNextFrameOfSpectrum();
-//        audioProcessor.nextFFTBlockReady = false;
-//    }
+        updateDisplay = false;
+    }
+
+
+
 }
 
 
@@ -339,8 +330,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
     /* Paint Border */
     // =========================
     paintBorder(g, juce::Colours::purple, bounds);
-    
-    DBG("Background Paint - Frequency");
+
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -595,13 +585,13 @@ void FrequencyResponse::paintMenu(juce::Graphics& g)
 {
     g.setColour(juce::Colours::white);
     g.setOpacity(0.9f);
-    g.fillRoundedRectangle(    buttonBounds.getX(),
+    g.fillRoundedRectangle( buttonBounds.getX(),
                             buttonBounds.getY(),
                             buttonBounds.getWidth(),
                             buttonBounds.getHeight(),
                             2.f);
 
-    buttonOptions.setAlpha(fadeAlphaButton);
+    //buttonOptions.setAlpha(fadeAlphaButton);
 }
 
 
@@ -769,7 +759,11 @@ void FrequencyResponse::drawToggles(bool showMenu)
     if (showMenu)
         buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
     else
+    {
         buttonBounds.setBounds(0, 0, 0, 0);
+        updateDisplay = true;
+    }
+
 
     FlexBox flexBox;
     flexBox.flexDirection = FlexBox::Direction::column;
@@ -820,7 +814,6 @@ void FrequencyResponse::buttonClicked(juce::Button* button)
         showMenu = !showMenu;
         drawToggles(showMenu);
     }
-        
 
     if (button == &toggleShowRTA)
     {
@@ -834,7 +827,8 @@ void FrequencyResponse::buttonClicked(juce::Button* button)
         updateToggleStates();
     }
     
-    repaint();
+    updateDisplay = true;
+
 }
 
 void FrequencyResponse::updateToggleStates()
@@ -1220,7 +1214,7 @@ void FrequencyResponse::fadeButton()
     if (fadeInButton || showMenu) // If mouse entered... fade Toggles Alpha up
     {
         /* Fade in until complete */
-        if (fadeAlphaButton <= fadeMaxButton)
+        if (fadeAlphaButton < fadeMaxButton)
         {
             fadeCompleteButton = false;
             fadeAlphaButton += fadeStepUpButton;
@@ -1236,19 +1230,21 @@ void FrequencyResponse::fadeButton()
     else // If mouse exit... fade Toggles Alpha down
     {
         /* Fade out until complete */
-        if (fadeAlphaButton >= fadeMinButton)
+        if (fadeAlphaButton > fadeMinButton)
         {
             fadeCompleteButton = false;
             fadeAlphaButton -= fadeStepDownButton;
         }
 
         /* Fade out complete */
-        if (fadeAlphaButton <= fadeMinButton)
+        if (fadeAlphaButton < fadeMinButton)
         {
             fadeAlphaButton = fadeMinButton;
             fadeCompleteButton = true;
         }
     }
+    
+    buttonOptions.setAlpha(fadeAlphaButton);
 }
 
 

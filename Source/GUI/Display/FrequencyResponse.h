@@ -66,6 +66,8 @@ struct FrequencyResponse :	juce::Component,
     //float y {0.f};
     
     bool getShowFFT(){ return mShowFFT; }
+    bool isMenuOpen() {return showMenu; }
+    juce::Rectangle<int> getMenuButtonBounds() {return buttonBounds.toNearestInt();}
     
 	void resized() override;
 
@@ -80,7 +82,7 @@ struct FrequencyResponse :	juce::Component,
 	void mouseMove(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override {};
 	void mouseDoubleClick(const juce::MouseEvent& event) override {};
-
+    
 	void updateResponse();
 
 	void paintMenu(juce::Graphics& g);
@@ -189,7 +191,10 @@ private:
 	float fftConstant{ 9.9658f };
 	juce::ToggleButton mButton_FFT;
 
-
+    bool updateDisplay{true};
+    int menuPaintCounter{0};
+    
+    
 	//void drawNextFrameOfSpectrum();
 
 	/* Options Menu ============= */
@@ -200,6 +205,7 @@ private:
 	juce::TextButton buttonOptions;
 	juce::Rectangle<float> buttonBounds;
 	bool showMenu{ false };
+
 
 	void buttonClicked(juce::Button* button) override;
 
