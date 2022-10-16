@@ -110,7 +110,7 @@ void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> 
                                     2.f,
                                     bounds.getWidth()-2 );
 
-            float x2 = juce::jmap(    (float)i+ curve,
+        float x2 = juce::jmap(      (float)i+ curve,
                                     0.f,
                                     (float)(fftDrawingPoints.size()) - 1.f,
                                     2.f,
@@ -123,12 +123,12 @@ void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> 
             float tempMax = juce::jmin(point0.getY(), point1.getY(), point2.getY());
             
             if (    frequencyResponse.isMenuOpen() &&
-                    point2.getX() < frequencyResponse.getMenuButtonBounds().getRight() + 20 &&
+                    point2.getX() < frequencyResponse.getMenuButtonBounds().getRight() + 5 &&
                     tempMax < frequencyResponse.getMenuButtonBounds().getBottom() )
             {
-                point0 = { bounds.getX() + x0, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
-                point1 = { bounds.getX() + x1, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
-                point2 = { bounds.getX() + x2, float(frequencyResponse.getMenuButtonBounds().getBottom()+20)};
+                point0 = { bounds.getX() + x0, float(frequencyResponse.getMenuButtonBounds().getBottom()+5)};
+                point1 = { bounds.getX() + x1, float(frequencyResponse.getMenuButtonBounds().getBottom()+5)};
+                point2 = { bounds.getX() + x2, float(frequencyResponse.getMenuButtonBounds().getBottom()+5)};
             }
             
             f.cubicTo(point0, point1, point2);
