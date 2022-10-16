@@ -38,9 +38,12 @@ struct GainBar : juce::Component, juce::Timer, juce::Button::Listener
 
 	StandardSliderLookAndFeel gainSliderLookAndFeel;
 
+    bool hasBSMchanged() {return mBsmChanged; }
+    void setBsmRead() {mBsmChanged = false;}
+    
 	void setMode(juce::String bandMode); // "low", "mid", "high"
 	int mode{ 0 };
 
 private:
-
+    bool mBsmChanged{true};
 };

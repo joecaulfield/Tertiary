@@ -28,6 +28,8 @@ struct GainControls : juce::Component
 
 	void makeAttachments();
 
+
+
 	GainBar gainBarLow,
 			gainBarMid,
 			gainBarHigh;
@@ -58,4 +60,6 @@ private:
 
 	juce::Image background;
 	juce::Image imageGainControls;
+    
+
 };

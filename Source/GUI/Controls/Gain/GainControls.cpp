@@ -20,7 +20,7 @@ GainControls::GainControls(juce::AudioProcessorValueTreeState& apv)
 	gainBarLow.setMode("low");	
 	gainBarMid.setMode("mid");
 	gainBarHigh.setMode("high");
-
+    
 	addAndMakeVisible(gainBarLow);
 	addAndMakeVisible(gainBarMid);
 	addAndMakeVisible(gainBarHigh);
@@ -243,3 +243,4 @@ void GainControls::makeAttachments()
 							params.at(Names::Mute_High_Band),
 							gainBarHigh.toggleMute);
 }
+

@@ -17,6 +17,7 @@ GainBar::GainBar()
 	// BYPASS TOGGLE ===================================================================================
 	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::white);
 	toggleBypass.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::white);
+    toggleBypass.addListener(this);
 	addAndMakeVisible(toggleBypass);
 
 	// SOLO TOGGLE ===================================================================================
@@ -94,6 +95,8 @@ void GainBar::buttonClicked(juce::Button* button)
 		if (button->getToggleState())
 			toggleSolo.setToggleState(false, true);
 	}
+    
+    mBsmChanged = true;
 }
 
 void GainBar::setMode(juce::String bandMode)

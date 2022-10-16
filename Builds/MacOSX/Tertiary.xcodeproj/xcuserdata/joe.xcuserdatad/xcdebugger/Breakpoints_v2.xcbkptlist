@@ -30,8 +30,8 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "806"
-            endingLineNumber = "806"
+            startingLineNumber = "815"
+            endingLineNumber = "815"
             landmarkName = "FrequencyResponse::drawToggles(showMenu)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "266"
-            endingLineNumber = "266"
+            startingLineNumber = "275"
+            endingLineNumber = "275"
             landmarkName = "FrequencyResponse::timerCallback()"
             landmarkType = "7">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "814"
-            endingLineNumber = "814"
+            startingLineNumber = "823"
+            endingLineNumber = "823"
             landmarkName = "FrequencyResponse::buttonClicked(button)"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "820"
-            endingLineNumber = "820"
+            startingLineNumber = "829"
+            endingLineNumber = "829"
             landmarkName = "FrequencyResponse::buttonClicked(button)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "815"
-            endingLineNumber = "815"
+            startingLineNumber = "824"
+            endingLineNumber = "824"
             landmarkName = "FrequencyResponse::buttonClicked(button)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,8 +206,24 @@
             filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "270"
-            endingLineNumber = "270"
+            startingLineNumber = "279"
+            endingLineNumber = "279"
+            landmarkName = "FrequencyResponse::timerCallback()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "054DF38F-5214-4C31-873B-AF1039A34D6F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/GUI/Display/FrequencyResponse.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
             landmarkName = "FrequencyResponse::timerCallback()"
             landmarkType = "7">
          </BreakpointContent>

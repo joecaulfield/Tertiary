@@ -216,6 +216,15 @@ void FrequencyResponse::resized()
 void FrequencyResponse::timerCallback()
 {
     
+    if (globalControls.mGainControls.gainBarLow.hasBSMchanged() ||
+        globalControls.mGainControls.gainBarMid.hasBSMchanged() ||
+        globalControls.mGainControls.gainBarHigh.hasBSMchanged() )
+    {
+        repaint();
+        globalControls.mGainControls.gainBarLow.setBsmRead();
+        globalControls.mGainControls.gainBarMid.setBsmRead();
+        globalControls.mGainControls.gainBarHigh.setBsmRead();
+    }
 
     checkMousePosition();
 
