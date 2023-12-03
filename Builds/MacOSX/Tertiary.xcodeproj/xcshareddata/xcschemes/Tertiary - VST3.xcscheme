@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1340"
+   LastUpgradeVersion = "1420"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -42,8 +42,7 @@
       allowLocationSimulation = "YES">
       <PathRunnable
          runnableDebuggingMode = "0"
-         BundleIdentifier = "com.steinberg.cubase12"
-         FilePath = "/Applications/Cubase 12.app">
+         FilePath = "/Applications/REAPER.app">
       </PathRunnable>
    </LaunchAction>
    <ProfileAction

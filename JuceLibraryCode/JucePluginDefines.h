@@ -20,7 +20,7 @@
  #define JucePlugin_Build_AU               1
 #endif
 #ifndef  JucePlugin_Build_AUv3
- #define JucePlugin_Build_AUv3             1
+ #define JucePlugin_Build_AUv3             0
 #endif
 #ifndef  JucePlugin_Build_AAX
  #define JucePlugin_Build_AAX              0
@@ -47,10 +47,10 @@
  #define JucePlugin_Desc                   "Multiband Tremolo"
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "Caulfield Engineering"
+ #define JucePlugin_Manufacturer           "Wonderland Audio"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
- #define JucePlugin_ManufacturerWebsite    "T3plugin.com"
+ #define JucePlugin_ManufacturerWebsite    "WonderlandAudio.com"
 #endif
 #ifndef  JucePlugin_ManufacturerEmail
  #define JucePlugin_ManufacturerEmail      "support@t3plugin.com"
@@ -77,13 +77,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  0
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                0.1
+ #define JucePlugin_Version                0.3
 #endif
 #ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x100
+ #define JucePlugin_VersionCode            0x300
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "0.1"
+ #define JucePlugin_VersionString          "0.3"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
@@ -110,10 +110,10 @@
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.CaulfieldEngineering.Tertiary
+ #define JucePlugin_CFBundleIdentifier     com.WonderlandAudio.Tertiary
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.CaulfieldEngineering.Tertiary
+ #define JucePlugin_AAXIdentifier          com.WonderlandAudio.Tertiary
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -137,7 +137,7 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "Caulfield Engineering: Tertiary"
+ #define JucePlugin_IAAName                "Wonderland Audio: Tertiary"
 #endif
 #ifndef  JucePlugin_VSTNumMidiInputs
  #define JucePlugin_VSTNumMidiInputs       16
@@ -152,10 +152,10 @@
  #define JucePlugin_ARATransformationFlags  0
 #endif
 #ifndef  JucePlugin_ARAFactoryID
- #define JucePlugin_ARAFactoryID           "com.CaulfieldEngineering.Tertiary.factory"
+ #define JucePlugin_ARAFactoryID           "com.WonderlandAudio.Tertiary.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.CaulfieldEngineering.Tertiary.aradocumentarchive.0.1"
+ #define JucePlugin_ARADocumentArchiveID   "com.WonderlandAudio.Tertiary.aradocumentarchive.0.3"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""

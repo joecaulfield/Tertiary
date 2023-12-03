@@ -5,20 +5,14 @@
     <Filter Include="Tertiary\DSP">
       <UniqueIdentifier>{A9D67538-214B-8022-4987-1F40E17BE63A}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tertiary\GUI\Controls\Gain">
-      <UniqueIdentifier>{F582201E-D1FA-BB92-C12B-9C8D590458E6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tertiary\GUI\Controls\Timing">
-      <UniqueIdentifier>{55F46BA4-604A-2BBD-820F-A8C7F4389318}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tertiary\GUI\Controls\Wave">
-      <UniqueIdentifier>{F9D30877-E99E-12D1-D47C-9A7006F487EB}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tertiary\GUI\Controls">
       <UniqueIdentifier>{C88380B8-2621-AC9F-A8B3-885DC55A61B7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tertiary\GUI\Display">
       <UniqueIdentifier>{F434FDE7-0693-A167-A1FC-1516EDDC2E1D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tertiary\GUI\Utility">
+      <UniqueIdentifier>{C2EC2752-BD03-49AF-D65D-80FB258D810D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tertiary\GUI">
       <UniqueIdentifier>{8BF2AED9-8F15-53EE-B0E9-F76DBF7E9D4D}</UniqueIdentifier>
@@ -646,32 +640,23 @@
     <ClCompile Include="..\..\Source\DSP\Params.cpp">
       <Filter>Tertiary\DSP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Gain\GainBar.cpp">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
+    <ClCompile Include="..\..\Source\GUI\Controls\InputOutputGain.cpp">
+      <Filter>Tertiary\GUI\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Gain\GainControls.cpp">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Gain\InputOutputGain.cpp">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Timing\TimingBar.cpp">
-      <Filter>Tertiary\GUI\Controls\Timing</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Timing\TimingControls.cpp">
-      <Filter>Tertiary\GUI\Controls\Timing</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Wave\WaveBar.cpp">
-      <Filter>Tertiary\GUI\Controls\Wave</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\Wave\WaveControls.cpp">
-      <Filter>Tertiary\GUI\Controls\Wave</Filter>
+    <ClCompile Include="..\..\Source\GUI\Controls\BandControls.cpp">
+      <Filter>Tertiary\GUI\Controls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GUI\Controls\GlobalControls.cpp">
       <Filter>Tertiary\GUI\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\Controls\CrossoverControls.cpp">
-      <Filter>Tertiary\GUI\Controls</Filter>
+    <ClCompile Include="..\..\Source\GUI\Display\OptionsMenu.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\ScopeChannel.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\TopBanner.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GUI\Display\FrequencyResponse.cpp">
       <Filter>Tertiary\GUI\Display</Filter>
@@ -688,14 +673,17 @@
     <ClCompile Include="..\..\Source\GUI\Display\WindowWrapperFrequency.cpp">
       <Filter>Tertiary\GUI\Display</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\AllColors.cpp">
-      <Filter>Tertiary\GUI</Filter>
+    <ClCompile Include="..\..\Source\Utility\AllColors.cpp">
+      <Filter>Tertiary\GUI\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\MyLookAndFeel.cpp">
-      <Filter>Tertiary\GUI</Filter>
+    <ClCompile Include="..\..\Source\Utility\MyLookAndFeel.cpp">
+      <Filter>Tertiary\GUI\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\GUI\UtilityFunctions.cpp">
-      <Filter>Tertiary\GUI</Filter>
+    <ClCompile Include="..\..\Source\Utility\UtilityFunctions.cpp">
+      <Filter>Tertiary\GUI\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ActivatorWindow.cpp">
+      <Filter>Tertiary\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PluginEditor.cpp">
       <Filter>Tertiary\Source</Filter>
@@ -3174,32 +3162,23 @@
     <ClInclude Include="..\..\Source\DSP\LockFreeQueue.h">
       <Filter>Tertiary\DSP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Gain\GainBar.h">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
+    <ClInclude Include="..\..\Source\GUI\Controls\InputOutputGain.h">
+      <Filter>Tertiary\GUI\Controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Gain\GainControls.h">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Gain\InputOutputGain.h">
-      <Filter>Tertiary\GUI\Controls\Gain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Timing\TimingBar.h">
-      <Filter>Tertiary\GUI\Controls\Timing</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Timing\TimingControls.h">
-      <Filter>Tertiary\GUI\Controls\Timing</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Wave\WaveBar.h">
-      <Filter>Tertiary\GUI\Controls\Wave</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\Wave\WaveControls.h">
-      <Filter>Tertiary\GUI\Controls\Wave</Filter>
+    <ClInclude Include="..\..\Source\GUI\Controls\BandControls.h">
+      <Filter>Tertiary\GUI\Controls</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Controls\GlobalControls.h">
       <Filter>Tertiary\GUI\Controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\Controls\CrossoverControls.h">
-      <Filter>Tertiary\GUI\Controls</Filter>
+    <ClInclude Include="..\..\Source\GUI\Display\OptionsMenu.h">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\ScopeChannel.h">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\TopBanner.h">
+      <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Display\FrequencyResponse.h">
       <Filter>Tertiary\GUI\Display</Filter>
@@ -3216,14 +3195,17 @@
     <ClInclude Include="..\..\Source\GUI\Display\WindowWrapperFrequency.h">
       <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\AllColors.h">
-      <Filter>Tertiary\GUI</Filter>
+    <ClInclude Include="..\..\Source\Utility\AllColors.h">
+      <Filter>Tertiary\GUI\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\MyLookAndFeel.h">
-      <Filter>Tertiary\GUI</Filter>
+    <ClInclude Include="..\..\Source\Utility\MyLookAndFeel.h">
+      <Filter>Tertiary\GUI\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\GUI\UtilityFunctions.h">
-      <Filter>Tertiary\GUI</Filter>
+    <ClInclude Include="..\..\Source\Utility\UtilityFunctions.h">
+      <Filter>Tertiary\GUI\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ActivatorWindow.h">
+      <Filter>Tertiary\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginEditor.h">
       <Filter>Tertiary\Source</Filter>
@@ -6137,6 +6119,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Assets\CompanyLogo.png">
+      <Filter>Tertiary\Assets</Filter>
+    </None>
     <None Include="..\..\Assets\Mult0.png">
       <Filter>Tertiary\Assets</Filter>
     </None>

@@ -8,7 +8,7 @@
     <key>CFBundleIconFile</key>
     <string></string>
     <key>CFBundleIdentifier</key>
-    <string>com.CaulfieldEngineering.Tertiary</string>
+    <string>com.WonderlandAudio.Tertiary</string>
     <key>CFBundleName</key>
     <string>Tertiary</string>
     <key>CFBundleDisplayName</key>
@@ -18,9 +18,9 @@
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1</string>
+    <string>0.3</string>
     <key>CFBundleVersion</key>
-    <string>0.1</string>
+    <string>0.3</string>
     <key>NSHumanReadableCopyright</key>
     <string></string>
     <key>NSHighResolutionCapable</key>
