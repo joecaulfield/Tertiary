@@ -18,6 +18,8 @@ WindowWrapperFrequency::WindowWrapperFrequency( TertiaryAudioProcessor& p,
 : audioProcessor(p),
 globalControls(gc),
 apvts(apv),
+lowFrequencyLabelRef(frequencyResponse.freqLabelLow),
+highFrequencyLabelRef(frequencyResponse.freqLabelHigh),
 forwardFFT(audioProcessor.fftOrder),
 window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
@@ -30,7 +32,8 @@ window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarr
     for (int i = 0; i < audioProcessor.scopeSize; i++)
         fftDrawingPoints.setUnchecked(i, 0);
     
-    
+    //addAndMakeVisible(lowFrequencyLabelRef);
+    //addAndMakeVisible(highFrequencyLabelRef);
     
     startTimerHz(30);
 }

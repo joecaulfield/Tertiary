@@ -19,6 +19,8 @@ void LFO::initializeLFO(double sampleRate)
 
     waveTableMapped.resize(sampleRate / wtScalar);
     waveTableMapped.clearQuick();
+    
+    waveTableForDisplay.clearQuick();
 }
 
 /* Called when LFO parameters are changed or updated */
@@ -167,18 +169,15 @@ void LFO::setWaveShapeSquare(int periodLeft, int periodRight, int waveTableSize)
 {
     float deltaPulse = 0.01f;    // Rounding Function
 
-    if (mWaveshapeID == 2)
+    for (float i = 0; i < periodLeft; i++)
     {
-        for (float i = 0; i < periodLeft; i++)
-        {
-            float y = mInvert * (0.5 + ((0.5 / atan(1 / deltaPulse)) * atan(sin(juce::MathConstants<double>::pi* i / periodLeft) / deltaPulse)));
-            waveTable.set(i, y);
-        }
-        for (float i = periodLeft; i < waveTableSize; i++)
-        {
-            float y = mInvert * (0.5 - ((0.5 / atan(1 / deltaPulse)) * atan(sin(juce::MathConstants<double>::pi * (i - periodLeft) / periodRight) / deltaPulse)));
-            waveTable.set(i, y);
-        }
+        float y = mInvert * (0.5 + ((0.5 / atan(1 / deltaPulse)) * atan(sin(juce::MathConstants<double>::pi* i / periodLeft) / deltaPulse)));
+        waveTable.set(i, y);
+    }
+    for (float i = periodLeft; i < waveTableSize; i++)
+    {
+        float y = mInvert * (0.5 - ((0.5 / atan(1 / deltaPulse)) * atan(sin(juce::MathConstants<double>::pi * (i - periodLeft) / periodRight) / deltaPulse)));
+        waveTable.set(i, y);
     }
 }
 
@@ -189,14 +188,14 @@ void LFO::setWaveShapeTriangle(int periodLeft, int periodRight, int waveTableSiz
     // Populate the Left-Hand Period
     for (int i = 0; i < periodLeft; i++)
     {
-        float y = mInvert * ((i / periodLeft));
+        float y = mInvert * ((i / (float)periodLeft));
         waveTable.set(i, y);
     }
 
     // Populate the Right-Hand Period
     for (int i = periodLeft; i < waveTableSize; i++)
     {
-        float y = mInvert * ((1 - ((i - periodLeft) / periodRight)));
+        float y = mInvert * ((1.f - ((i - (float)periodLeft) / (float)periodRight)));
         waveTable.set(i, y);
     }
 }
@@ -205,19 +204,19 @@ void LFO::setWaveShapeTriangle(int periodLeft, int periodRight, int waveTableSiz
 //==============================================================================
 void LFO::setWaveShapeSine(int periodLeft, int periodRight, int waveTableSize)
 {
-        // Populate the Left-Hand Period
-        for (int i = 0; i < periodLeft; i++)
-        {
-            float y = mInvert * ((0.5f) + (0.5f) * sin(juce::MathConstants<double>::pi * i / (periodLeft)));
-            waveTable.set(i, y);
-        }
+    // Populate the Left-Hand Period
+    for (int i = 0; i < periodLeft; i++)
+    {
+        float y = mInvert * ((0.5f) + (0.5f) * sin(juce::MathConstants<double>::pi * i / (periodLeft)));
+        waveTable.set(i, y);
+    }
 
-        // Populate the Right-Hand Period
-        for (int i = periodLeft; i < waveTableSize; i++)
-        {
-            float y = mInvert * ((0.5f) + (0.5f) * -sin(juce::MathConstants<double>::pi * (i - periodLeft) / (periodRight)));
-            waveTable.set(i, y);
-        }
+    // Populate the Right-Hand Period
+    for (int i = periodLeft; i < waveTableSize; i++)
+    {
+        float y = mInvert * ((0.5f) + (0.5f) * -sin(juce::MathConstants<double>::pi * (i - periodLeft) / (periodRight)));
+        waveTable.set(i, y);
+    }
 }
 
 /* Set LFO waveshape to 'Hump Down' ... U-Shape */
@@ -259,8 +258,6 @@ void LFO::setWaveShapeHumpDown(int periodLeft, int periodRight, int waveTableSiz
     }
 }
 
-
-
 /* Maps waveshape amplitudes from [-0.5 to +0.5] to [0 to +1]
  Determines current minimum and maximum amplitude values
  and scales those to fit proportionately within [0, +1] */
@@ -285,6 +282,30 @@ void LFO::scaleWaveShape()
         float value = juce::jmap<float>(waveTable[i], min, max, 1.0f - mDepth, 1.0f);
         waveTableMapped.set(i, value);
     }
+}
+
+/* Downsamples the WaveTable and returns to Oscilloscope */
+//==============================================================================
+juce::Array<float>& LFO::getWaveTableForDisplay(int amountToDownSample)
+{
+    
+    auto waveTableSize = waveTable.size() / amountToDownSample;
+    
+    for (int i = 0; i < waveTableSize; i++)
+    {
+        auto value = waveTable[i*amountToDownSample];
+        waveTableForDisplay.set(i, value);
+    }
+    
+    // Hard print the first value
+    auto firstValue = waveTable[0];
+    waveTableForDisplay.set(0, firstValue);
+    
+    // Hard print the last value
+    auto lastValue = waveTable[waveTable.size()-1];
+    waveTableForDisplay.set(waveTableForDisplay.size()-1, lastValue);
+    
+    return waveTableForDisplay;
 }
 
 

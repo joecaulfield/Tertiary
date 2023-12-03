@@ -32,7 +32,8 @@ public:
     
 
     
-
+    void setLfoID (int id) {lfoID = id;}
+    int getLfoID() {return lfoID; }
 
     void initializeLFO(double sampleRate);
     void updateLFO(double sampleRate, double hostBPM);
@@ -58,12 +59,18 @@ public:
     
     /* Returns the waveTable to Display as [-0.5 to +0.5] */
     juce::Array<float>& getWaveTable() {return waveTable; }
+    
+    /* Downsamples the WaveTable and returns to Oscilloscope */
+    juce::Array<float>& getWaveTableForDisplay(int amountToDownSample);
 
 private:
     
-    juce::Array<float> waveTable;          // Array to store raw LFO waveshape
-    juce::Array<float> waveTableMapped;    // Mapped copy of waveTable so that max is always 1.0
-
+    int lfoID = 0;
+    
+    juce::Array<float> waveTable;           // Array to store raw LFO waveshape
+    juce::Array<float> waveTableMapped;     // Mapped copy of waveTable so that max is always 1.0
+    juce::Array<float> waveTableForDisplay; // Downsampled copy of waveTable
+    
     int wtScalar{ 2 };          // Used to set the size of the LFO WaveTable
     int mInvert{ 1 };           // -1 or +1. Multiplied by the WaveTable to invert or not.
     int mWaveshapeID{ 0 };      // Used to select which of 7 waveforms are used

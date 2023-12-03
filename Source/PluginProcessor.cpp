@@ -23,6 +23,10 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
 	midLFO.initializeLFO(getSampleRate());
 	highLFO.initializeLFO(getSampleRate());
 
+    lowLFO.setLfoID(0);
+    midLFO.setLfoID(1);
+    highLFO.setLfoID(2);
+    
     // Set Crossover Types
     LP1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
     HP1.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
@@ -244,13 +248,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
 
     /* LFO Waveshape */
     // ===================================================================================================================
-    sa = {  "Ramp Up",
-            "Ramp Down",
+    sa = {  "Ramp Down",
+            "Ramp Up",
             "Square",
             "Triangle",
             "Sine",
-            "Lumps",
-            "Humps" };
+            "Hills",
+            "Valleys" };
 
     
     layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::Wave_Low_LFO),1},  // Parameter ID
@@ -344,7 +348,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
     // ===================================================================================================================
     auto rateRange = NormalisableRange<float> ( 0.5f,   // Start
                                                 12.5f,  // Stop
-                                                0.25f,  // Step Size
+                                                0.1f,  // Step Size
                                                 1.f);   // Skew
 
     layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Rate_Low_LFO),1},  // Parameter ID & Hint
@@ -748,10 +752,27 @@ void TertiaryAudioProcessor::updateState()
     for (auto& trem : tremolos)
         trem.updateTremoloSettings();
 
-    /* Update LFO waveshape and timing params */
-    lowLFO.updateLFO(sampleRate, hostInfo.bpm);
-    midLFO.updateLFO(sampleRate, hostInfo.bpm);
-    highLFO.updateLFO(sampleRate, hostInfo.bpm);
+    // Flag to update Low LFO parameters
+    if (parameterChangedLfoLow)
+    {
+        lowLFO.updateLFO(sampleRate, hostInfo.bpm);
+        parameterChangedLfoLow = false;
+    }
+
+    // Flag to update Mid LFO parameters
+    if (parameterChangedLfoMid)
+    {
+        midLFO.updateLFO(sampleRate, hostInfo.bpm);
+        parameterChangedLfoMid = false;
+    }
+
+    // Flag to update High LFO parameters
+    if (parameterChangedLfoHigh)
+    {
+        highLFO.updateLFO(sampleRate, hostInfo.bpm);
+        parameterChangedLfoHigh = false;
+    }
+
 
     // Update Crossover Params
     LP1.setCutoffFrequency(lowMidCrossover->get());
@@ -1114,39 +1135,48 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 
-
-
-
-
-
-
-
-
-
-
+/* Parameter Changed Callback */
 //==============================================================================
-//void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
-//{
-//    using namespace juce;
-//    using namespace Params;
-//    const auto& params = GetParams();
-//
-//    // If we update 'Sync To Host', reset the phase of all
-//    // LFOs so they remain in phase with each other.
-//    if (parameterID == params.at(Names::Sync_Low_LFO) ||
-//        parameterID == params.at(Names::Sync_Mid_LFO) ||
-//        parameterID == params.at(Names::Sync_High_LFO) ||
-//        parameterID == params.at(Names::Multiplier_Low_LFO) ||
-//        parameterID == params.at(Names::Multiplier_Mid_LFO) ||
-//        parameterID == params.at(Names::Multiplier_High_LFO))
-//    {
-//        //multChanged = true;
-//    }
-//
-//    if (parameterID == params.at(Names::Rate_Low_LFO) ||
-//        parameterID == params.at(Names::Rate_Mid_LFO) ||
-//        parameterID == params.at(Names::Rate_High_LFO) )
-//    {
-//        //rateChanged = true;
-//    }
-//}
+void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+    using namespace juce;
+    using namespace Params;
+    const auto& params = GetParams();
+
+    // Flag for updates to Low LFO
+    if (parameterID == params.at(Wave_Low_LFO) ||
+        parameterID == params.at(Symmetry_Low_LFO) ||
+        parameterID == params.at(Depth_Low_LFO) ||
+        parameterID == params.at(Rate_Low_LFO) ||
+        parameterID == params.at(Multiplier_Low_LFO) ||
+        parameterID == params.at(Relative_Phase_Low_LFO) ||
+        parameterID == params.at(Invert_Low_LFO))
+    {
+        parameterChangedLfoLow = true;
+    }
+      
+    // Flag for updates to Mid LFO
+    if (parameterID == params.at(Wave_Mid_LFO) ||
+        parameterID == params.at(Symmetry_Mid_LFO) ||
+        parameterID == params.at(Depth_Mid_LFO) ||
+        parameterID == params.at(Rate_Mid_LFO) ||
+        parameterID == params.at(Multiplier_Mid_LFO) ||
+        parameterID == params.at(Relative_Phase_Mid_LFO) ||
+        parameterID == params.at(Invert_Mid_LFO))
+    {
+        parameterChangedLfoMid = true;
+    }
+
+    // Flag for updates to High LFO
+    if (parameterID == params.at(Wave_High_LFO) ||
+        parameterID == params.at(Symmetry_High_LFO) ||
+        parameterID == params.at(Depth_High_LFO) ||
+        parameterID == params.at(Rate_High_LFO) ||
+        parameterID == params.at(Multiplier_High_LFO) ||
+        parameterID == params.at(Relative_Phase_High_LFO) ||
+        parameterID == params.at(Invert_High_LFO))
+    {
+        parameterChangedLfoHigh = true;
+    }
+
+}

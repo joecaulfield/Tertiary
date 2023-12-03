@@ -16,7 +16,7 @@ struct TremoloBand
     juce::AudioParameterBool* soloParam{ nullptr };
     juce::AudioParameterFloat* bandGainParam{ nullptr };
 
-    juce::dsp::Gain<float> bandGain;                        
+    juce::dsp::Gain<float> bandGain;
 
     void updateTremoloSettings()
     {
@@ -70,11 +70,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 
-
     using APVTS = juce::AudioProcessorValueTreeState;       // Alias
     static APVTS::ParameterLayout createParameterLayout();  // Parameter Layout Function
 
-    void parameterChanged(const juce::String& parameterID, float newValue) override {};
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
 
 	void setFftPickoffPoint(int point);
 
@@ -116,9 +115,14 @@ public:
     int fifoIndex = 0;
     
 
-
 private:
 
+    
+    bool parameterChangedLfoLow{true};
+    bool parameterChangedLfoMid{true};
+    bool parameterChangedLfoHigh{true};
+    
+    
     /* Main DSP */
     void applyAmplitudeModulation();
     void sumAudioBands(juce::AudioBuffer<float>& buffer);

@@ -48,5 +48,7 @@ private:
 
     juce::Rectangle<float> spectrumArea;
     
+    juce::Label& lowFrequencyLabelRef;
+    juce::Label& highFrequencyLabelRef;
 
 };

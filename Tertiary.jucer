@@ -2,11 +2,11 @@
 
 <JUCERPROJECT id="UXnuug" name="Tertiary" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              cppLanguageStandard="17" companyName="Caulfield Engineering"
-              companyWebsite="T3plugin.com" companyEmail="support@t3plugin.com"
-              pluginDesc="Multiband Tremolo" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3"
-              pluginManufacturer="Caulfield Engineering" pluginVST3Category="Dynamics,Modulation"
-              pluginAAXCategory="0,2,32" version="0.1">
+              cppLanguageStandard="17" companyName="Wonderland Audio" companyWebsite="WonderlandAudio.com"
+              companyEmail="support@t3plugin.com" pluginDesc="Multiband Tremolo"
+              pluginFormats="buildAU,buildStandalone,buildVST3" pluginManufacturer="Wonderland Audio"
+              pluginVST3Category="Dynamics,Modulation" pluginAAXCategory="0,2,32"
+              version="0.3">
   <MAINGROUP id="gAXMC9" name="Tertiary">
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="J9Bg6U" name="LFO.cpp" compile="1" resource="0" file="Source/DSP/LFO.cpp"/>
@@ -17,42 +17,26 @@
     </GROUP>
     <GROUP id="{015ED6FA-482B-8BDD-1A0A-39876D18454B}" name="GUI">
       <GROUP id="{B219FD33-719E-79FC-6A47-8ADA4F45032C}" name="Controls">
-        <GROUP id="{04B858A4-6D43-C310-4E55-D2B8E30299DB}" name="Gain">
-          <FILE id="axsBZ5" name="GainBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Gain/GainBar.cpp"/>
-          <FILE id="pcFFJ9" name="GainBar.h" compile="0" resource="0" file="Source/GUI/Controls/Gain/GainBar.h"/>
-          <FILE id="l9nl9Y" name="GainControls.cpp" compile="1" resource="0"
-                file="Source/GUI/Controls/Gain/GainControls.cpp"/>
-          <FILE id="QgDPxC" name="GainControls.h" compile="0" resource="0" file="Source/GUI/Controls/Gain/GainControls.h"/>
-          <FILE id="ckfEIc" name="InputOutputGain.cpp" compile="1" resource="0"
-                file="Source/GUI/Controls/Gain/InputOutputGain.cpp"/>
-          <FILE id="CaOiTL" name="InputOutputGain.h" compile="0" resource="0"
-                file="Source/GUI/Controls/Gain/InputOutputGain.h"/>
-        </GROUP>
-        <GROUP id="{E301EA59-8A89-645A-D42B-F3255C5110C9}" name="Timing">
-          <FILE id="Qw6gCc" name="TimingBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Timing/TimingBar.cpp"/>
-          <FILE id="X5tyLb" name="TimingBar.h" compile="0" resource="0" file="Source/GUI/Controls/Timing/TimingBar.h"/>
-          <FILE id="QxEjOI" name="TimingControls.cpp" compile="1" resource="0"
-                file="Source/GUI/Controls/Timing/TimingControls.cpp"/>
-          <FILE id="sBMcpA" name="TimingControls.h" compile="0" resource="0"
-                file="Source/GUI/Controls/Timing/TimingControls.h"/>
-        </GROUP>
-        <GROUP id="{137AD4B3-BF8C-7B00-ACF2-8F787E81543A}" name="Wave">
-          <FILE id="Z1cFMQ" name="WaveBar.cpp" compile="1" resource="0" file="Source/GUI/Controls/Wave/WaveBar.cpp"/>
-          <FILE id="AvOeH7" name="WaveBar.h" compile="0" resource="0" file="Source/GUI/Controls/Wave/WaveBar.h"/>
-          <FILE id="d1SRy4" name="WaveControls.cpp" compile="1" resource="0"
-                file="Source/GUI/Controls/Wave/WaveControls.cpp"/>
-          <FILE id="cynWn5" name="WaveControls.h" compile="0" resource="0" file="Source/GUI/Controls/Wave/WaveControls.h"/>
-        </GROUP>
+        <FILE id="o7rBjc" name="InputOutputGain.cpp" compile="1" resource="0"
+              file="Source/GUI/Controls/InputOutputGain.cpp"/>
+        <FILE id="HTsNbO" name="InputOutputGain.h" compile="0" resource="0"
+              file="Source/GUI/Controls/InputOutputGain.h"/>
+        <FILE id="LFbBgB" name="BandControls.cpp" compile="1" resource="0"
+              file="Source/GUI/Controls/BandControls.cpp"/>
+        <FILE id="n2b5Wk" name="BandControls.h" compile="0" resource="0" file="Source/GUI/Controls/BandControls.h"/>
         <FILE id="rryP2o" name="GlobalControls.cpp" compile="1" resource="0"
               file="Source/GUI/Controls/GlobalControls.cpp"/>
         <FILE id="NtKC37" name="GlobalControls.h" compile="0" resource="0"
               file="Source/GUI/Controls/GlobalControls.h"/>
-        <FILE id="HiGJ5W" name="CrossoverControls.cpp" compile="1" resource="0"
-              file="Source/GUI/Controls/CrossoverControls.cpp"/>
-        <FILE id="BGZ14E" name="CrossoverControls.h" compile="0" resource="0"
-              file="Source/GUI/Controls/CrossoverControls.h"/>
       </GROUP>
       <GROUP id="{76A8763A-6712-BF7B-D604-A362203AC5EF}" name="Display">
+        <FILE id="TwWvE0" name="OptionsMenu.cpp" compile="1" resource="0" file="Source/GUI/Display/OptionsMenu.cpp"/>
+        <FILE id="UsWfav" name="OptionsMenu.h" compile="0" resource="0" file="Source/GUI/Display/OptionsMenu.h"/>
+        <FILE id="yVq3XW" name="ScopeChannel.cpp" compile="1" resource="0"
+              file="Source/GUI/Display/ScopeChannel.cpp"/>
+        <FILE id="AQZLv8" name="ScopeChannel.h" compile="0" resource="0" file="Source/GUI/Display/ScopeChannel.h"/>
+        <FILE id="ySZ6RN" name="TopBanner.cpp" compile="1" resource="0" file="Source/GUI/Display/TopBanner.cpp"/>
+        <FILE id="VgyjsF" name="TopBanner.h" compile="0" resource="0" file="Source/GUI/Display/TopBanner.h"/>
         <FILE id="XLCa2P" name="FrequencyResponse.cpp" compile="1" resource="0"
               file="Source/GUI/Display/FrequencyResponse.cpp"/>
         <FILE id="f7Lt67" name="FrequencyResponse.h" compile="0" resource="0"
@@ -71,17 +55,23 @@
         <FILE id="W8hSh2" name="WindowWrapperFrequency.h" compile="0" resource="0"
               file="Source/GUI/Display/WindowWrapperFrequency.h"/>
       </GROUP>
-      <FILE id="DyfkBW" name="AllColors.cpp" compile="1" resource="0" file="Source/GUI/AllColors.cpp"/>
-      <FILE id="pfgg05" name="AllColors.h" compile="0" resource="0" file="Source/GUI/AllColors.h"/>
-      <FILE id="QoJAzC" name="MyLookAndFeel.cpp" compile="1" resource="0"
-            file="Source/GUI/MyLookAndFeel.cpp"/>
-      <FILE id="lIWSL6" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/GUI/MyLookAndFeel.h"/>
-      <FILE id="Vd4hvz" name="UtilityFunctions.cpp" compile="1" resource="0"
-            file="Source/GUI/UtilityFunctions.cpp"/>
-      <FILE id="O7hnQT" name="UtilityFunctions.h" compile="0" resource="0"
-            file="Source/GUI/UtilityFunctions.h"/>
+      <GROUP id="{A041E5CD-3039-F2E4-06E0-5B9DEBC7EEB5}" name="Utility">
+        <FILE id="zoI40r" name="AllColors.h" compile="0" resource="0" file="Source/Utility/AllColors.h"/>
+        <FILE id="E4ncKg" name="AllColors.cpp" compile="1" resource="0" file="Source/Utility/AllColors.cpp"/>
+        <FILE id="FK199a" name="MyLookAndFeel.cpp" compile="1" resource="0"
+              file="Source/Utility/MyLookAndFeel.cpp"/>
+        <FILE id="tJbaSe" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/Utility/MyLookAndFeel.h"/>
+        <FILE id="oyeFEJ" name="UtilityFunctions.cpp" compile="1" resource="0"
+              file="Source/Utility/UtilityFunctions.cpp"/>
+        <FILE id="Q8xOJQ" name="UtilityFunctions.h" compile="0" resource="0"
+              file="Source/Utility/UtilityFunctions.h"/>
+      </GROUP>
     </GROUP>
     <GROUP id="{2998FF50-7A04-CF09-34EE-98E94AB511BB}" name="Source">
+      <FILE id="nDUGY3" name="ActivatorWindow.cpp" compile="1" resource="0"
+            file="Source/ActivatorWindow.cpp"/>
+      <FILE id="GvnwsO" name="ActivatorWindow.h" compile="0" resource="0"
+            file="Source/ActivatorWindow.h"/>
       <FILE id="cRi3XZ" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="Ta0Y4C" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
@@ -91,6 +81,7 @@
             file="Source/PluginProcessor.h"/>
     </GROUP>
     <GROUP id="{6A9E6FF9-C77A-EE0E-09B4-9203C36E7583}" name="Assets">
+      <FILE id="UMAQMe" name="CompanyLogo.png" compile="0" resource="1" file="Assets/CompanyLogo.png"/>
       <FILE id="IXfQ10" name="Mult0.png" compile="0" resource="1" file="Assets/Mult0.png"/>
       <FILE id="To1spF" name="Mult1.png" compile="0" resource="1" file="Assets/Mult1.png"/>
       <FILE id="IvraBg" name="Mult2.png" compile="0" resource="1" file="Assets/Mult2.png"/>
@@ -110,13 +101,13 @@
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
-               JUCE_ENABLE_REPAINT_DEBUGGING="0"/>
+               JUCE_ENABLE_REPAINT_DEBUGGING="0" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="1"/>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="TertiaryDBG" enablePluginBinaryCopyStep="1"
                        vst3BinaryLocation="C:\Program Files\Common Files\VST3"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="TertiaryRLS" enablePluginBinaryCopyStep="1"
+        <CONFIGURATION isDebug="0" name="Release" targetName="Tertiary" enablePluginBinaryCopyStep="1"
                        vst3BinaryLocation="C:\Program Files\Common Files\VST3\"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -136,10 +127,12 @@
         <MODULEPATH id="juce_opengl" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" externalLibraries="LexActivator"
+               extraLinkerFlags="-L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal"
+               extraFrameworks="CoreFoundation, Security, SystemConfiguration">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="TertiaryDBG"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="TertiaryRLS"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Tertiary"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../juce"/>

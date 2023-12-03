@@ -169,6 +169,9 @@ void ScrollPad::updatePoints(int x1, int y1)
 
 void ScrollPad::paint(juce::Graphics& g)
 {
+    using namespace ColorScheme::ScrollPadColors;
+    using namespace Gradients::ScrollPad;
+    
 	// Establish Bounds
 	auto bounds = getLocalBounds().toFloat();
 
@@ -184,12 +187,34 @@ void ScrollPad::paint(juce::Graphics& g)
 	juce::Path range;
 	range.startNewSubPath(point1, bounds.getCentreY());
 	range.lineTo(point2, bounds.getCentreY());
-	g.setColour(juce::Colours::purple);
-	g.strokePath(range, juce::PathStrokeType(6.f, juce::PathStrokeType::JointStyle::beveled,
-		juce::PathStrokeType::EndCapStyle::rounded));
+    
+    float totalNumBorders = 6;
+    
+    for (int i = 0; i < (int)totalNumBorders; i++)
+    {
+        //g.setColour(getScrollPadBaseColor().withMultipliedAlpha(1.f/((i*i)+0.75f)));
+        
 
-	auto size = 10;
-	g.setColour(juce::Colours::lightgrey);
+        float multAlpha = juce::jmap((float)i*i, 0.f, (totalNumBorders*totalNumBorders), 0.1f, 0.95f);
+
+        g.setColour(getScrollPadBaseColor().withMultipliedAlpha(multAlpha));
+        g.strokePath(range, juce::PathStrokeType(6.f - i, juce::PathStrokeType::JointStyle::beveled,
+            juce::PathStrokeType::EndCapStyle::rounded));
+    }
+
+    g.setGradientFill(setScrollBarGradient(range.getBounds().toFloat()));
+
+    g.strokePath(range, juce::PathStrokeType(2.f, juce::PathStrokeType::JointStyle::beveled, juce::PathStrokeType::EndCapStyle::rounded));
+    
+    
+    
+    
+    
+    
+    //g.setColour(getScrollPadBaseColor().withMultipliedBrightness(0.1f));
+    //g.drawRoundedRectangle(range.getBounds(), 4.f, 1.f);
+
+	//g.setColour(juce::Colours::lightgrey);
 }
 
 // Reset Pan & Zoom to Default
@@ -242,7 +267,7 @@ void ScrollPad::mouseDown(const juce::MouseEvent& event)
 // Mouse Drag Callback
 void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 {
-	auto bounds = getLocalBounds();
+	//auto bounds = getLocalBounds();
 
 	// Immediate Mouse Position
 	x1 = event.getPosition().getX();

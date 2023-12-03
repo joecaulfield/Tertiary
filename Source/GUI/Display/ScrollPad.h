@@ -11,6 +11,7 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "../../Utility/AllColors.h"
 
 struct ScrollPad : juce::Component,
 	juce::Slider::Listener
