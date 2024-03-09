@@ -57,6 +57,11 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     topBanner.setDaysLeft(activatorWindow.getTrialDaysLeft());
     topBanner.addMouseListener(this, true);
     
+    // Add Action Listener
+    globalControls.getLowControl().addActionListener( &wrapperOscilloscope.getOscilloscopeLow() );
+    globalControls.getMidControl().addActionListener( &wrapperOscilloscope.getOscilloscopeMid() );
+    globalControls.getHighControl().addActionListener( &wrapperOscilloscope.getOscilloscopeHigh() );
+    
     setBufferedToImage(true);
     setOpaque(true);
 }

@@ -126,7 +126,7 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
 
     
     updateResponse();
-    startTimerHz(60);
+    ////startTimerHz(60);
     
     setBufferedToImage(true);
     //setOpaque(true);

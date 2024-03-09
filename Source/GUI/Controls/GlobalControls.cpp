@@ -21,7 +21,9 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
     addAndMakeVisible(lowBandControls);
     addAndMakeVisible(midBandControls);
     addAndMakeVisible(highBandControls);
+    
 
+    
     lowBandControls.setMode("LOW");
     midBandControls.setMode("MID");
     highBandControls.setMode("HIGH");
@@ -43,6 +45,8 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
     makeLabel(mLabelBandGain, "Gain");
     
 	setSize(250, 140);
+    
+    ////    addMouseListener(this, true);
     
     //setBufferedToImage(true);
     //setOpaque(true);

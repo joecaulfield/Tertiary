@@ -60,6 +60,10 @@ struct Oscilloscope :	juce::Component,
 
 	bool updateLfoDisplay{ true };
 
+    ScopeChannel& getLowScope(){return lowScope;};
+    ScopeChannel& getMidScope(){return midScope;};
+    ScopeChannel& getHighScope(){return highScope;};
+    
 private:
 
     LFO& lowLFO;

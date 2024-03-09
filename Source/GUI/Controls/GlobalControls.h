@@ -37,6 +37,11 @@ struct GlobalControls : juce::Component
     BandControl midBandControls{apvts};
     BandControl highBandControls{apvts};
     
+    // Pass Children up to PluginEditor
+    BandControl& getLowControl() {return lowBandControls; };
+    BandControl& getMidControl() {return midBandControls; };
+    BandControl& getHighControl() {return highBandControls; };
+    
 private:
 
     bool shouldPaintOnceOnInit{true};

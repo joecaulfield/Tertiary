@@ -16,7 +16,10 @@
 #include "../../DSP/Params.h"
 
 
-struct BandControl : juce::Component, juce::Button::Listener
+struct BandControl :    juce::Component,
+                        juce::Button::Listener,
+                        juce::MouseListener,
+                        juce::ActionBroadcaster
 {
     BandControl(juce::AudioProcessorValueTreeState& apv);
     ~BandControl();
@@ -25,6 +28,10 @@ struct BandControl : juce::Component, juce::Button::Listener
     
     void resized() override;
     void buttonClicked(juce::Button* button) override;
+
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
     
     void setMode(juce::String bandMode);
 
@@ -57,11 +64,14 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
     
     int mode{0};
+    juce::String bandModeName;
     
     bool isSyncedToHost {false};
     
     bool runOnceOnConstructor{true};
 
+    bool focusToggleFlag{false};
+    
     void buildToggleSync();
     void buildToggleInvert();
     void buildRateOrRhythm();

@@ -107,7 +107,7 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     // Initially check whether any bands are bypassed
     updateBandBypass();
     
-    startTimerHz(30);
+    ////startTimerHz(30);
 }
 
 // ========================================================
@@ -207,6 +207,15 @@ void ScopeChannel::parameterChanged(const juce::String& parameterID, float newVa
     parameterChangedNewValue = newValue;
     
     timerCounterParam = 0;
+}
+
+// ========================================================
+void ScopeChannel::actionListenerCallback(const juce::String& message)
+{
+    
+    redrawScope();
+    repaint();
+    
 }
 
 // ========================================================

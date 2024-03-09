@@ -29,8 +29,7 @@ BandControl::BandControl(juce::AudioProcessorValueTreeState& apv)
     buildToggleMute();
     
     runOnceOnConstructor = false;
-    
-    
+
     setBufferedToImage(true);
 }
 
@@ -117,12 +116,28 @@ void BandControl::buildToggleSync()
 {
     mToggleSync.mToggleButton.addListener(this);
     addAndMakeVisible(mToggleSync);
+    
+    // Broadcast Sync Changes to Oscilloscope
+    mToggleSync.mToggleButton.onClick = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_SYNC";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
 }
 
 void BandControl::buildToggleInvert()
 {
     mToggleInvert.mToggleButton.addListener(this);
     addAndMakeVisible(mToggleInvert);
+    
+    // Broadcast Invert Changes to Oscilloscope
+    mToggleInvert.mToggleButton.onClick = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_INVERT";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
 }
 
 void BandControl::buildRateOrRhythm()
@@ -149,12 +164,29 @@ void BandControl::buildRateOrRhythm()
         placeholder = &mDropRhythm;
         mDropRhythm.setVisible(true);
         mSliderRate.setVisible(false);
+        
+        // Broadcast Rate Changes to Oscilloscope
+        mSliderRate.slider.onValueChange = [this]()
+        {
+            auto message = bandModeName + "_UPDATE_RATE";
+            sendActionMessage(message);
+            DBG("BROADCAST - " + message);
+        };
+        
     }
     else
     {
         placeholder = &mSliderRate;
         mDropRhythm.setVisible(false);
         mSliderRate.setVisible(true);
+        
+        // Broadcast Rhythm Changes to Oscilloscope
+        mDropRhythm.onChange = [this]()
+        {
+            auto message = bandModeName + "_UPDATE_RHYTHM";
+            sendActionMessage(message);
+            DBG("BROADCAST - " + message);
+        };
     }
 
 
@@ -172,48 +204,117 @@ void BandControl::buildMenuWaveshape()
     mDropWaveshape.setTextWhenNothingSelected("Waveshape");
     mDropWaveshape.setAlpha(0.85f);
     addAndMakeVisible(mDropWaveshape);
+    
+    // Broadcast LFO Changes to Oscilloscope
+    mDropWaveshape.onChange = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_LFO";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
+    
 }
 
 void BandControl::buildSliderPhase()
 {
     mSliderPhase.setStyleCenter(juce::CharPointer_UTF8("\xc2\xb0"));
     addAndMakeVisible(mSliderPhase);
+    
+    // Broadcast LFO Changes to Oscilloscope
+    mSliderPhase.slider.onValueChange = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_PHASE";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
+    
 }
 
 void BandControl::buildSliderSkew()
 {
     mSliderSkew.setStyleCenter("%");
     addAndMakeVisible(mSliderSkew);
+    
+    // Broadcast Skew Changes to Oscilloscope
+    mSliderSkew.slider.onValueChange = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_SKEW";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
 }
 
 void BandControl::buildSliderDepth()
 {
     mSliderDepth.setStyleStandard("%");
     addAndMakeVisible(mSliderDepth);
+    
+    // Broadcast Skew Changes to Oscilloscope
+    mSliderDepth.slider.onValueChange = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_DEPTH";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
+    
 }
 
 void BandControl::buildSliderBandGain()
 {
     mSliderBandGain.setStyleStandard(" dB");
     addAndMakeVisible(mSliderBandGain);
+    
+    // Broadcast Skew Changes to Oscilloscope
+    mSliderBandGain.slider.onValueChange = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_GAIN";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
 }
 
 void BandControl::buildToggleBypass()
 {
     mToggleBypass.mToggleButton.addListener(this);
     addAndMakeVisible(mToggleBypass);
+    
+    // Broadcast Bypass Changes to Oscilloscope
+    mToggleBypass.mToggleButton.onClick = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_BYPASS";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
+    
 }
 
 void BandControl::buildToggleSolo()
 {
     mToggleSolo.mToggleButton.addListener(this);
     addAndMakeVisible(mToggleSolo);
+    
+    // Broadcast Solo Changes to Oscilloscope
+    mToggleSolo.mToggleButton.onClick = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_SOLO";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
+    
 }
 
 void BandControl::buildToggleMute()
 {
     mToggleMute.mToggleButton.addListener(this);
     addAndMakeVisible(mToggleMute);
+    
+    // Broadcast Mute Changes to Oscilloscope
+    mToggleMute.mToggleButton.onClick = [this]()
+    {
+        auto message = bandModeName + "_UPDATE_MUTE";
+        sendActionMessage(message);
+        DBG("BROADCAST - " + message);
+    };
 }
 
 void BandControl::setMode(juce::String bandMode)
@@ -224,6 +325,8 @@ void BandControl::setMode(juce::String bandMode)
 
     if (bandMode == "HIGH") mode = 2;
 
+    bandModeName = bandMode;
+    
     mSliderPhase.setBandMode(mode);
     mSliderRate.setBandMode(mode);
     mSliderSkew.setBandMode(mode);
@@ -274,3 +377,20 @@ void BandControl::buttonClicked(juce::Button* button)
     }
     
 }
+
+void BandControl::mouseEnter(const juce::MouseEvent& event)
+{
+
+}
+
+void BandControl::mouseMove(const juce::MouseEvent& event)
+{
+
+}
+
+void BandControl::mouseExit(const juce::MouseEvent& event)
+{
+
+    
+}
+

@@ -31,6 +31,11 @@ struct WindowWrapperOscilloscope :  juce::Component,
     void paint(juce::Graphics& g) override;
     void paintOverChildren(juce::Graphics& g) override;
 
+    // Pass Scope Channels up to Plugin Editor
+    ScopeChannel& getOscilloscopeLow() {return oscilloscope.getLowScope(); };
+    ScopeChannel& getOscilloscopeMid() {return oscilloscope.getMidScope(); };
+    ScopeChannel& getOscilloscopeHigh() {return oscilloscope.getHighScope(); };
+    
 private:
     /* Reference to the Audio Processor & DSP Parameters */
 

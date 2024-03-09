@@ -50,7 +50,7 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	sliderScroll.addMouseListener(this, true);
 
-	startTimerHz(30);
+	////startTimerHz(30);
 
     //setBufferedToImage(true);
     //setOpaque(true);

@@ -16,7 +16,8 @@
 
 struct ScopeChannel :   juce::Component,
                         juce::Timer,
-                        juce::AudioProcessorValueTreeState::Listener
+                        juce::AudioProcessorValueTreeState::Listener,
+                        juce::ActionListener
 {
     ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, ScrollPad& sliderScroll);
     ~ScopeChannel();
@@ -29,6 +30,8 @@ struct ScopeChannel :   juce::Component,
     
     void parameterChanged(const juce::String& parameterID, float newValue) override;
         
+    void actionListenerCallback(const juce::String& message) override;
+    
     void timerCallback() override;
     
     void updateBandBypass();
