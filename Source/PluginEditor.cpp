@@ -42,19 +42,19 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     /* Check for license */
     
     /* If trial is not yet activated, or is expired, open the activator dialog */
-    if (activatorWindow.getLicenseState() == 0 || activatorWindow.getLicenseState() == 2)
-    {
+    ////if (activatorWindow.getLicenseState() == 0 || activatorWindow.getLicenseState() == 2)
+    ////{
         // LICENSING WINDOW TEMPORARILY DISABLED...........
         //openLicenseWindow();
-    }
+    ////}
 
 
     /* Add mouse listeners */
-    activatorWindow.mButtonActivateFull.addListener(this);
-    activatorWindow.mButtonActivateTrial.addListener(this);
-    activatorWindow.mButtonClose.addListener(this);
+    ////activatorWindow.mButtonActivateFull.addListener(this);
+    ////activatorWindow.mButtonActivateTrial.addListener(this);
+    ////activatorWindow.mButtonClose.addListener(this);
     
-    topBanner.setDaysLeft(activatorWindow.getTrialDaysLeft());
+    ////topBanner.setDaysLeft(activatorWindow.getTrialDaysLeft());
     topBanner.addMouseListener(this, true);
     
     // Add Action Listener
@@ -124,97 +124,97 @@ void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 //==============================================================================
 void TertiaryAudioProcessorEditor::timerCallback()
 {
-    // Checks if user has clicked the 'Close' or 'Activate' buttons on the ActivatorWindow
-    if (buttonAction == true && activatorWindow.isOkToClose())
-        closeLicenseWindow();
-
+////    // Checks if user has clicked the 'Close' or 'Activate' buttons on the ActivatorWindow
+////    if (buttonAction == true && activatorWindow.isOkToClose())
+////        closeLicenseWindow();
+////
 }
 
 /* Opens the license window */
 //==============================================================================
-void TertiaryAudioProcessorEditor::openLicenseWindow()
-{
-    addAndMakeVisible(activatorWindow);
-    
-    //if (activatorWindow.getLicenseState() == 1)
-    //    checkIfShouldShowTrialTitle();
-
-    activatorWindow.setSize(getWidth()*0.6f, getHeight()*0.5f);
-    activatorWindow.setCentreRelative(0.5f, 0.5f);
-
-    activatorWindow.setAlpha(0.95f);
-}
-
-/* Closes the license window - fades out if an Activation was performed, immediate if 'X' button */
-//==============================================================================
-void TertiaryAudioProcessorEditor::closeLicenseWindow()
-{
-    counterWait++;
-    
-    // If user has hit the 'Close' button, close does not wait
-    if (doNotWait)
-    {
-        counterWait = 45;
-        doNotWait = false;
-    }
-
-    // Wait A Moment
-    if (counterWait > 45)
-    {
-        // Fade Out Window
-        activatorWindow.setAlpha((float)counterFade / 30.f);
-        
-        if (counterFade > 0)
-            counterFade--;
-        else
-        {
-            activatorWindow.setVisible(false);
-            counterFade = 30;
-            counterWait = 0;
-            buttonAction = false;
-            checkIfShouldShowTrialTitle();
-        }
-
-    }
-}
-
-/* Updates whether or not the trial title should be shown in top banner, based on updates with Activator Window */
-//==============================================================================
-void TertiaryAudioProcessorEditor::checkIfShouldShowTrialTitle()
-{
-    if (activatorWindow.getLicenseState() == 1)
-        topBanner.setShowTrialTitle(true);
-    else
-        topBanner.setShowTrialTitle(false);
-    
-    repaint();
-}
-
-/* Closes License Window on Trial Activate, License Activate, or Close (When Valid) */
-//==============================================================================
-void TertiaryAudioProcessorEditor::buttonClicked(juce::Button *button)
-{
-    if (button == &activatorWindow.mButtonClose)
-        doNotWait = true;
-    else
-        doNotWait = false;
-    
-    buttonAction = true;
-}
-
-
-/* Opens License Window on Top Banner Double Click */
-//==============================================================================
-void TertiaryAudioProcessorEditor::mouseDoubleClick (const juce::MouseEvent &event)
-{
-    if (event.getPosition().getY() < 50)
-    {
-        addAndMakeVisible(activatorWindow);
-        activatorWindow.resetOkToClose();
-        openLicenseWindow();
-    }
-
-}
+//void TertiaryAudioProcessorEditor::openLicenseWindow()
+//{
+//    addAndMakeVisible(activatorWindow);
+//    
+//    //if (activatorWindow.getLicenseState() == 1)
+//    //    checkIfShouldShowTrialTitle();
+//
+//    activatorWindow.setSize(getWidth()*0.6f, getHeight()*0.5f);
+//    activatorWindow.setCentreRelative(0.5f, 0.5f);
+//
+//    activatorWindow.setAlpha(0.95f);
+//}
+//
+///* Closes the license window - fades out if an Activation was performed, immediate if 'X' button */
+////==============================================================================
+//void TertiaryAudioProcessorEditor::closeLicenseWindow()
+//{
+//    counterWait++;
+//    
+//    // If user has hit the 'Close' button, close does not wait
+//    if (doNotWait)
+//    {
+//        counterWait = 45;
+//        doNotWait = false;
+//    }
+//
+//    // Wait A Moment
+//    if (counterWait > 45)
+//    {
+//        // Fade Out Window
+//        activatorWindow.setAlpha((float)counterFade / 30.f);
+//        
+//        if (counterFade > 0)
+//            counterFade--;
+//        else
+//        {
+//            activatorWindow.setVisible(false);
+//            counterFade = 30;
+//            counterWait = 0;
+//            buttonAction = false;
+//            checkIfShouldShowTrialTitle();
+//        }
+//
+//    }
+//}
+//
+///* Updates whether or not the trial title should be shown in top banner, based on updates with Activator Window */
+////==============================================================================
+//void TertiaryAudioProcessorEditor::checkIfShouldShowTrialTitle()
+//{
+//    if (activatorWindow.getLicenseState() == 1)
+//        topBanner.setShowTrialTitle(true);
+//    else
+//        topBanner.setShowTrialTitle(false);
+//    
+//    repaint();
+//}
+//
+///* Closes License Window on Trial Activate, License Activate, or Close (When Valid) */
+////==============================================================================
+//void TertiaryAudioProcessorEditor::buttonClicked(juce::Button *button)
+//{
+//    if (button == &activatorWindow.mButtonClose)
+//        doNotWait = true;
+//    else
+//        doNotWait = false;
+//    
+//    buttonAction = true;
+//}
+//
+//
+///* Opens License Window on Top Banner Double Click */
+////==============================================================================
+//void TertiaryAudioProcessorEditor::mouseDoubleClick (const juce::MouseEvent &event)
+//{
+//    if (event.getPosition().getY() < 50)
+//    {
+//        addAndMakeVisible(activatorWindow);
+//        activatorWindow.resetOkToClose();
+//        openLicenseWindow();
+//    }
+//
+//}
 
 
 

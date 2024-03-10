@@ -26,6 +26,10 @@ TertiaryAudioProcessor::TertiaryAudioProcessor()
     lowLFO.setLfoID(0);
     midLFO.setLfoID(1);
     highLFO.setLfoID(2);
+
+    lowLFO.setDsp(true);
+    midLFO.setDsp(true);
+    highLFO.setDsp(true);
     
     // Set Crossover Types
     LP1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
@@ -924,9 +928,9 @@ void TertiaryAudioProcessor::applyAmplitudeModulation()
         
         /* Index = Current Position in the Given WaveTable.
         Apply a single offset based on the Relative Phase Shift.*/
-        int lowIndex = fmod((lowLFO.getPosition() + lowLFO.getRelativePhase()), (float)waveTableSize);
-        int midIndex = fmod((midLFO.getPosition() + midLFO.getRelativePhase()), (float)waveTableSize);
-        int highIndex = fmod((highLFO.getPosition() + highLFO.getRelativePhase()), (float)waveTableSize);
+        int lowIndex = fmod((lowLFO.getPosition() + lowLFO.getRelativePhaseInSamples()), (float)waveTableSize);
+        int midIndex = fmod((midLFO.getPosition() + midLFO.getRelativePhaseInSamples()), (float)waveTableSize);
+        int highIndex = fmod((highLFO.getPosition() + highLFO.getRelativePhaseInSamples()), (float)waveTableSize);
 
         /* LFO Instantaneous Amplitude, usd to Modulate Input Signal */
         float mGainLowLFO = lowLFO.getWaveTableScaled()[lowIndex];

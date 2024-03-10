@@ -26,6 +26,11 @@
  
         4. Grid lines and waveform scale and move per scrollpad's pan & zoom
  
+
+ // Repair the slider scroll bar
+ // Update band focus
+ // Bypass color-coding
+
   ==============================================================================
 */
 
@@ -39,9 +44,9 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
 {
     
     // Initialize WaveTable Arrays
-    auto wtSize = lfo.getWaveTableSize();
-    waveTable.resize(wtSize);       // Initialize Wavetable
-    waveTable.clearQuick();         // Initialize Wavetable
+    //auto wtSize = lfo.getWaveTableSize();
+    //waveTable.resize(wtSize);       // Initialize Wavetable
+    //waveTable.clearQuick();         // Initialize Wavetable
     
     // Initializes the display's color-scheme based on band type
     setBandColors();
@@ -49,6 +54,28 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
     
+    mSampleRate = lfo.getSampleRate();
+    mHostBpm = lfo.getHostBPM();
+
+    localLFO.initializeLFO(mSampleRate);
+
+    if (mSampleRate == 0)
+        mSampleRate = 48000;
+
+    if (mHostBpm == 0)
+        mHostBpm = 120;
+
+    localLFO.setDsp(false);
+    
+    localLFO.setWaveRate            (lfo.getWaveRate());
+    localLFO.setRelativePhase       (lfo.getRelativePhase());
+    localLFO.setWaveMultiplier      (lfo.getWaveMultiplier());
+    localLFO.setSyncedToHost        (lfo.isSyncedToHost());
+    localLFO.setWaveSkew            (lfo.getWaveSkew());
+    localLFO.setWaveDepth           (lfo.getWaveDepth());
+    localLFO.setWaveInvert          (lfo.getWaveInvert());
+    localLFO.setWaveform            (lfo.getWaveform());
+
     // Listen for changes to scrollbar
     apvts.addParameterListener(params.at(Names::Scope_Point1), this);
     apvts.addParameterListener(params.at(Names::Scope_Point2), this);
@@ -58,56 +85,14 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     apvts.addParameterListener(params.at(Names::Show_Mid_Scope), this);
     apvts.addParameterListener(params.at(Names::Show_High_Scope), this);
     apvts.addParameterListener(params.at(Names::Stack_Bands_Scope), this);
-    
-    // Listen for change to Low Waveform
-    if (lfo.getLfoID() == 0)
-    {
-        apvts.addParameterListener(params.at(Names::Wave_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Invert_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Symmetry_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Depth_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Multiplier_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Rate_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Relative_Phase_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Gain_Low_Band), this);
-        apvts.addParameterListener(params.at(Names::Sync_Low_LFO), this);
-        apvts.addParameterListener(params.at(Names::Bypass_Low_Band), this);
-    }
-    
-    // Listen for change to Mid Waveform
-    if (lfo.getLfoID() == 1)
-    {
-        apvts.addParameterListener(params.at(Names::Wave_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Invert_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Symmetry_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Depth_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Multiplier_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Rate_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Relative_Phase_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Gain_Mid_Band), this);
-        apvts.addParameterListener(params.at(Names::Sync_Mid_LFO), this);
-        apvts.addParameterListener(params.at(Names::Bypass_Mid_Band), this);
-    }
-
-    // Listen for change to High Waveform
-    if (lfo.getLfoID() == 2)
-    {
-        apvts.addParameterListener(params.at(Names::Wave_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Invert_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Symmetry_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Depth_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Multiplier_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Rate_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Relative_Phase_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Gain_High_Band), this);
-        apvts.addParameterListener(params.at(Names::Sync_High_LFO), this);
-        apvts.addParameterListener(params.at(Names::Bypass_High_Band), this);
-    }
 
     // Initially check whether any bands are bypassed
     updateBandBypass();
-    
-    ////startTimerHz(30);
+
+    localLFO.updateLFO(mSampleRate, mHostBpm);
+
+    repaint();
+
 }
 
 // ========================================================
@@ -115,40 +100,6 @@ ScopeChannel::~ScopeChannel()
 {
     
 }
-
-// ========================================================
-void ScopeChannel::timerCallback()
-{
-    
-    // One shot latch to update focus.
-    if (focusHasChanged)
-    {
-        repaint();
-        focusHasChanged = false;
-    }
-    
-    // Force recalc and repaint based on any changes
-    if (parameterHasChanged || timerCounterParam < 5 ||
-        sliderScroll.isMouseButtonDown() ||
-        timerCounterInit < 10)
-    {
-        redrawScope();
-        repaint();
-    }
-    
-    // Add extra time for initialization of waveform
-    if (timerCounterInit < 10)
-        timerCounterInit++;
-    
-    // Add extra time after parameter changed
-    if (timerCounterParam < 5)
-        timerCounterParam++;
-
-    // Flag for repaint
-    parameterHasChanged = false;
-}
-
-
 
 // ========================================================
 void ScopeChannel::setBandColors()
@@ -197,22 +148,80 @@ void ScopeChannel::paint(juce::Graphics& g)
 }
 
 // ========================================================
-void ScopeChannel::parameterChanged(const juce::String& parameterID, float newValue)
-{
-    updateBandBypass();
-    parameterHasChanged = true;
-    
-    // Store the changed parameter, will use to check if everything is up to date.
-    parameterChangedID = parameterID;
-    parameterChangedNewValue = newValue;
-    
-    timerCounterParam = 0;
-}
-
-// ========================================================
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
     
+    DBG("RX " + message);
+
+    auto paramName = message.replaceSection(0, 10, "");
+    paramName = paramName.replaceSection(10, 25, "");
+    paramName = paramName.removeCharacters("x");
+
+    juce::String paramValue = message.replaceSection(0, 25, "");
+    paramValue = paramValue.removeCharacters("x");
+
+
+    if (paramName == "WAVESHAPE")
+    {
+        int waveform = 0;
+        waveform = paramValue.getIntValue();
+        localLFO.setWaveform(waveform);
+    }
+
+    if (paramName == "DEPTH")
+    {
+        float depth = 0.0f;
+        depth = paramValue.getFloatValue();
+        localLFO.setWaveDepth(depth);
+    }
+
+    if (paramName == "SKEW")
+    {
+        float skew = 50.0f;
+        skew = paramValue.getFloatValue();
+        localLFO.setWaveSkew(skew);
+    }
+
+    if (paramName == "PHASE")
+    {
+        float phase = 0.0f;
+        phase = paramValue.getFloatValue();
+        localLFO.setRelativePhase(phase);
+    }
+
+    if (paramName == "RHYTHM")
+    {
+        int rhythm = 0;
+        rhythm = paramValue.getIntValue();
+        localLFO.setWaveMultiplier(rhythm);
+    }
+
+    if (paramName == "RATE")
+    {
+        float rate = 0.0f;
+        rate = paramValue.getFloatValue();
+        localLFO.setWaveRate(rate);
+    }
+
+    if (paramName == "INVERT")
+    {
+        bool invert = false;
+        invert = paramValue.getIntValue();
+        localLFO.setWaveInvert(invert);
+    }
+
+    if (paramName == "SYNC")
+    {
+        bool sync = false;
+        sync = paramValue.getIntValue();
+        localLFO.setSyncedToHost(sync);
+    }
+
+
+    localLFO.updateLFO(mSampleRate, mHostBpm);
+
+    DBG("PHASE " << localLFO.getRelativePhase());
+
     redrawScope();
     repaint();
     
@@ -221,6 +230,9 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 // ========================================================
 void ScopeChannel::paintGridLines(juce::Graphics& g)
 {
+
+    DBG("PAINT GRID LINES----------------");
+
     using namespace AllColors::OscilloscopeColors;
 
     auto bounds = getLocalBounds();
@@ -318,6 +330,8 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
         auto y = bounds.getY() + i * (bounds.getHeight() / numDepthLines);
         g.drawHorizontalLine(y, bounds.getX(), bounds.getRight());
     }
+
+    redrawScope();
 }
 
 // ========================================================
@@ -345,23 +359,28 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::redrawScope()
 {
-  
+    DBG("REDRAW SCOPE ----------------");
+
+    DBG(    "RATE\t" << localLFO.getWaveRate()          );
+    DBG(    "PHASE " << localLFO.getRelativePhase()     );
+    DBG(    "MULT\t" << localLFO.getWaveMultiplier()    );
+    DBG(    "SKEW\t" << localLFO.getWaveSkew()          );
+    DBG(    "DEPTH\t" << localLFO.getWaveDepth()        );
+    DBG(    "INV\t" << localLFO.getWaveInvert()         );
+    DBG(    "WAVE\t" << localLFO.getWaveform()          );
+
     waveTable = scaleWaveAmplitude();
-    generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, lfo);
-    repaint();
+    generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
 }
 
 /* Scales incoming WaveTable by Amplitude Parameter */
 // ========================================================
 juce::Array<float> ScopeChannel::scaleWaveAmplitude()
 {
+    auto waveTable = localLFO.getWaveTableForDisplay(waveTableDownSampleSize);
 
-    auto waveTable = lfo.getWaveTableForDisplay(waveTableDownSampleSize);
-    
-    //DBG(waveTable.size());
-    
-    float mDepth = lfo.getWaveDepth();
-    
+    float mDepth = localLFO.getWaveDepth() / 100.f;
+
     float min = 2.0f;        // Used to calculate min value of LFO, for scaling
     float max = -1.0f;        // Used to calculate max value of LFO, for scaling
     
@@ -381,7 +400,7 @@ juce::Array<float> ScopeChannel::scaleWaveAmplitude()
         float value = juce::jmap<float>(waveTable[i], min, max, 0.5f * mDepth, -0.5f * mDepth);
         waveTable.set(fmod(i, waveTable.size()), value);
     }
-    
+
     return waveTable;
 }
 
@@ -396,11 +415,11 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
 
     auto bounds = getLocalBounds();
     
-    auto lfoWaveMultiplier = lfo.getWaveMultiplier();
-    auto lfoWaveRate = lfo.getWaveRate();
-    auto lfoHostBPM = lfo.getHostBPM();
-    auto lfoRelativePhase = lfo.getRelativePhase();
-    auto lfoSync = lfo.isSyncedToHost();
+    auto lfoWaveMultiplier = localLFO.getWaveMultiplier();
+    auto lfoWaveRate = localLFO.getWaveRate();
+    auto lfoHostBPM = localLFO.getHostBPM();
+    auto lfoRelativePhase = localLFO.getRelativePhaseInSamples();
+    auto lfoSync = localLFO.isSyncedToHost();
     
     /* Vertical Midpoint of Drawing Region */
     float midY = ((float)bounds.getY() + bounds.getHeight() / 2.f);

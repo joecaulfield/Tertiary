@@ -15,7 +15,7 @@
 #include "GUI/Display/WindowWrapperOscilloscope.h"
 #include "GUI/Display/TopBanner.h"
 #include "Utility/UtilityFunctions.h"
-#include "ActivatorWindow.h"
+//#include "ActivatorWindow.h"
 
 //==============================================================================
 /**
@@ -31,24 +31,24 @@ public:
     void resized() override;
     
     void timerCallback() override;
-    void buttonClicked(juce::Button* button) override;
-    void mouseDoubleClick (const juce::MouseEvent &event) override;
+    void buttonClicked(juce::Button* button) override {};
+    void mouseDoubleClick (const juce::MouseEvent &event) override {};
     
 private:
     
     /* Handles opening & closing of the license activator window */
-    void checkIfShouldShowTrialTitle();
-    void openLicenseWindow();
-    void closeLicenseWindow();
+    ////void checkIfShouldShowTrialTitle();
+    ////void openLicenseWindow();
+    ////void closeLicenseWindow();
     
-    ActivatorWindow activatorWindow;
-    bool showTrialTitle{false};
-    int counterFade = 30;
-    int counterWait = 0;
+    ////ActivatorWindow activatorWindow;
+    ////bool showTrialTitle{false};
+    ////int counterFade = 30;
+    ////int counterWait = 0;
     
     /* Actions used to close the Activator pop-up window */
-    bool buttonAction{false};
-    bool doNotWait{false};
+    ////bool buttonAction{false};
+    ////bool doNotWait{false};
     
     /* Reference to the Audio Processor & DSP Parameters */
     TertiaryAudioProcessor& audioProcessor;
@@ -63,7 +63,7 @@ private:
     WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
     
     /* Company & Plugin Title Banner */
-    void buildTopBanner(juce::Graphics& g);
+    //void buildTopBanner(juce::Graphics& g);
     TopBanner topBanner;
     
     /* Header displayed in top corner */

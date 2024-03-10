@@ -120,9 +120,10 @@ void BandControl::buildToggleSync()
     // Broadcast Sync Changes to Oscilloscope
     mToggleSync.mToggleButton.onClick = [this]()
     {
-        auto message = bandModeName + "_UPDATE_SYNC";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+        auto paramName = "SYNC";
+        auto paramValue = mToggleSync.mToggleButton.getToggleStateValue().toString();
+
+        sendBroadcast(paramName, paramValue);
     };
 }
 
@@ -134,9 +135,10 @@ void BandControl::buildToggleInvert()
     // Broadcast Invert Changes to Oscilloscope
     mToggleInvert.mToggleButton.onClick = [this]()
     {
-        auto message = bandModeName + "_UPDATE_INVERT";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+        auto paramName = "INVERT";
+        auto paramValue = mToggleInvert.mToggleButton.getToggleStateValue().toString();
+
+        sendBroadcast(paramName, paramValue);
     };
 }
 
@@ -168,9 +170,10 @@ void BandControl::buildRateOrRhythm()
         // Broadcast Rate Changes to Oscilloscope
         mSliderRate.slider.onValueChange = [this]()
         {
-            auto message = bandModeName + "_UPDATE_RATE";
-            sendActionMessage(message);
-            DBG("BROADCAST - " + message);
+            auto paramName = "RATE";
+            auto paramValue = (juce::String)mSliderRate.slider.getValue();
+
+            sendBroadcast(paramName, paramValue);
         };
         
     }
@@ -183,9 +186,11 @@ void BandControl::buildRateOrRhythm()
         // Broadcast Rhythm Changes to Oscilloscope
         mDropRhythm.onChange = [this]()
         {
-            auto message = bandModeName + "_UPDATE_RHYTHM";
-            sendActionMessage(message);
-            DBG("BROADCAST - " + message);
+            auto paramName = "RHYTHM";
+
+            auto paramValue = (juce::String)mDropRhythm.getSelectedItemIndex();
+
+            sendBroadcast(paramName, paramValue);
         };
     }
 
@@ -208,9 +213,11 @@ void BandControl::buildMenuWaveshape()
     // Broadcast LFO Changes to Oscilloscope
     mDropWaveshape.onChange = [this]()
     {
-        auto message = bandModeName + "_UPDATE_LFO";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+        auto paramName = "WAVESHAPE";
+
+        auto paramValue = (juce::String)mDropWaveshape.getSelectedItemIndex();
+
+        sendBroadcast(paramName, paramValue);
     };
     
 }
@@ -223,9 +230,10 @@ void BandControl::buildSliderPhase()
     // Broadcast LFO Changes to Oscilloscope
     mSliderPhase.slider.onValueChange = [this]()
     {
-        auto message = bandModeName + "_UPDATE_PHASE";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+        auto paramName = "PHASE";
+        auto paramValue = (juce::String)mSliderPhase.slider.getValue();
+
+        sendBroadcast(paramName, paramValue);
     };
     
 }
@@ -238,9 +246,10 @@ void BandControl::buildSliderSkew()
     // Broadcast Skew Changes to Oscilloscope
     mSliderSkew.slider.onValueChange = [this]()
     {
-        auto message = bandModeName + "_UPDATE_SKEW";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "SKEW";
+            auto paramValue = (juce::String)mSliderSkew.slider.getValue();
+
+            sendBroadcast(paramName, paramValue);
     };
 }
 
@@ -252,9 +261,10 @@ void BandControl::buildSliderDepth()
     // Broadcast Skew Changes to Oscilloscope
     mSliderDepth.slider.onValueChange = [this]()
     {
-        auto message = bandModeName + "_UPDATE_DEPTH";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "DEPTH";
+            auto paramValue = (juce::String)mSliderDepth.slider.getValue();
+
+            sendBroadcast(paramName, paramValue);
     };
     
 }
@@ -267,9 +277,10 @@ void BandControl::buildSliderBandGain()
     // Broadcast Skew Changes to Oscilloscope
     mSliderBandGain.slider.onValueChange = [this]()
     {
-        auto message = bandModeName + "_UPDATE_GAIN";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "GAIN";
+            auto paramValue = (juce::String)mSliderBandGain.slider.getValue();
+
+            sendBroadcast(paramName, paramValue);
     };
 }
 
@@ -281,9 +292,10 @@ void BandControl::buildToggleBypass()
     // Broadcast Bypass Changes to Oscilloscope
     mToggleBypass.mToggleButton.onClick = [this]()
     {
-        auto message = bandModeName + "_UPDATE_BYPASS";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "BYPASS";
+            auto paramValue = mToggleBypass.mToggleButton.getToggleStateValue().toString();
+
+            sendBroadcast(paramName, paramValue);
     };
     
 }
@@ -296,9 +308,10 @@ void BandControl::buildToggleSolo()
     // Broadcast Solo Changes to Oscilloscope
     mToggleSolo.mToggleButton.onClick = [this]()
     {
-        auto message = bandModeName + "_UPDATE_SOLO";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "SOLO";
+            auto paramValue = mToggleSolo.mToggleButton.getToggleStateValue().toString();
+
+            sendBroadcast(paramName, paramValue);
     };
     
 }
@@ -311,9 +324,10 @@ void BandControl::buildToggleMute()
     // Broadcast Mute Changes to Oscilloscope
     mToggleMute.mToggleButton.onClick = [this]()
     {
-        auto message = bandModeName + "_UPDATE_MUTE";
-        sendActionMessage(message);
-        DBG("BROADCAST - " + message);
+            auto paramName = "MUTE";
+            auto paramValue = mToggleMute.mToggleButton.getToggleStateValue().toString();
+
+            sendBroadcast(paramName, paramValue);
     };
 }
 
@@ -394,3 +408,12 @@ void BandControl::mouseExit(const juce::MouseEvent& event)
     
 }
 
+void BandControl::sendBroadcast(juce::String parameterName, juce::String parameterValue)
+{
+    auto delimiter = ":::::";
+
+    auto message = bandModeName.paddedLeft('x', 5) + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
+    
+    sendActionMessage(message);
+    //DBG("BROADCAST - " + message);
+}

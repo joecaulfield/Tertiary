@@ -28,11 +28,11 @@ struct ScopeChannel :   juce::Component,
     
     void resized() override;
     
-    void parameterChanged(const juce::String& parameterID, float newValue) override;
+    void parameterChanged(const juce::String& parameterID, float newValue) override {};
         
     void actionListenerCallback(const juce::String& message) override;
     
-    void timerCallback() override;
+    void timerCallback() override {};
     
     void updateBandBypass();
     
@@ -45,7 +45,15 @@ struct ScopeChannel :   juce::Component,
 private:
     
     juce::AudioProcessorValueTreeState& apvts;
-    LFO& lfo;
+
+
+    LFO& lfo;   // Chopping Block
+    LFO localLFO;
+
+
+    double mSampleRate;
+    double mHostBpm;
+
     ScrollPad& sliderScroll;
     
     bool isBandFocused{false};

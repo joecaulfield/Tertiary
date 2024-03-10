@@ -38,6 +38,8 @@ struct BandControl :    juce::Component,
     bool hasBSMchanged() {return mBsmChanged; }
     void setBsmRead() {mBsmChanged = false;}
     
+    void sendBroadcast(juce::String parameterName, juce::String parameterValue);
+
     juce::Rectangle<int> getWaveBounds() {return mDropWaveshape.getBoundsInParent(); }
     juce::Rectangle<int> getSkewBounds() {return mSliderSkew.getBoundsInParent(); }
     juce::Rectangle<int> getDepthBounds() {return mSliderDepth.getBoundsInParent(); }
