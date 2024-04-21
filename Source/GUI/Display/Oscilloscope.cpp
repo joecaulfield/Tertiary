@@ -50,7 +50,12 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	sliderScroll.addMouseListener(this, true);
 
-	////startTimerHz(30);
+	startTimerHz(30);
+
+    // Set Scope Channels as Listeners to the Scroll Slider
+    sliderScroll.addActionListener(&lowScope);
+    sliderScroll.addActionListener(&midScope);
+    sliderScroll.addActionListener(&highScope);
 
     //setBufferedToImage(true);
     //setOpaque(true);
@@ -73,6 +78,9 @@ void Oscilloscope::resized()
     sliderScroll.setSize(getWidth(), 25);
     sliderScroll.setTopLeftPosition(getWidth()/2-sliderScroll.getWidth()/2, getBottom()-25);
     
+
+
+
     /* Initialize the pan/zoom points for the scroll bar... a little rusty on this! */
 	int x = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
 	float p1 = scopePoint1Param->get() / 100.f * (float)sliderScroll.getMaxWidth();
@@ -293,16 +301,16 @@ void Oscilloscope::timerCallback()
     
     /* Not sure */
     // ========================================================
-    if (updateLfoDisplay || cursorDrag)
-    {
-        repaint();
-        updateLfoDisplay = false;
-    }
+    //if (updateLfoDisplay || cursorDrag)
+    //{
+        //repaint();
+        //updateLfoDisplay = false;
+    //}
     
     /* Not sure */
     // ========================================================
-    if (!fadeCompleteCursor && mShowCursor)
-        repaint(cursor.getStartX()-5, cursor.getStartY(), 10, cursor.getLength() );
+    //if (!fadeCompleteCursor && mShowCursor)
+    //    repaint(cursor.getStartX()-5, cursor.getStartY(), 10, cursor.getLength() );
     
     /* Not currently in use. Move to wrapper */
     // ========================================================
@@ -434,18 +442,22 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
 	cursorDrag = false;
 
-	scopeCursorParam->setValueNotifyingHost(mCursorPosition);
+	scopeCursorParam->setValueNotifyingHost(mCursorPosition);   // Get Rid?
 
 	float maxWidth = (float)sliderScroll.getMaxWidth();
 
+    // Get rid?  Cursor is 86'ed
 	int cursorX = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
 
+    // Store the current pan & zoom settings in memory
 	float p1 = (float)(sliderScroll.getPoint1() - cursorX) / (float)maxWidth;
 	float p2 = (float)(sliderScroll.getPoint2() - cursorX) / (float)maxWidth;
 
+    // Store the current pan & zoom settings in memory
 	scopePoint1Param->setValueNotifyingHost(p1);
 	scopePoint2Param->setValueNotifyingHost(p2);
 
+    // Was used when playhead was active... still need since playhead is 86'ed?
 	panOrZoomChanging = false;
 }
 
@@ -480,56 +492,6 @@ void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 // ========================================================
 void Oscilloscope::mouseMove(const juce::MouseEvent& event)
 {
-
-	//auto x = event.getPosition().getX();
-	//auto y = event.getPosition().getY();
-
-	// Check Mouse Proximity to Cursor ===================
-	//bool mouseIsNearCursor{ false };
-
-	//if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
-	//	mouseIsNearCursor = true;
-
-	// Check if Cursor is Within Menu Region ==============
-	//bool cursorIsWithinMenu{ true };
-
-	//if (cursor.getStartX() < buttonOptions.getRight())
-	//	cursorIsWithinMenu = true;
-	//else
-	//	cursorIsWithinMenu = false;
-		
-	// Check If Mouse Enters Menu Region ==========
-	//bool mouseIsWithinMenu;
-
-	//if (x < buttonOptions.getRight() && y < buttonOptions.getBottom())
-	//	mouseIsWithinMenu = true;
-	//else
-	//	mouseIsWithinMenu = false;
-
-
-	// If Mouse is Within Menu, Fade in Menu
-	//if (mouseIsWithinMenu)
-	//{
-	//	fadeInMenu = true;
-	//	fadeInCursor = false;
-	//}
-	//else
-	//{
-	//	if (!showMenu)
-	//		fadeInMenu = false;
-	//}
-
-	// If Mouse is Within Cursor, Fade In Cursor
-	//if (mouseIsNearCursor)
-	//{
-	//	if (mouseIsWithinMenu)
-	//		fadeInMenu = true;
-	//	else
-    //        fadeInCursor = true;
-	//}
-	//else
-    //    fadeInCursor = false;
-
 }
 
 /* A double-click near the cursor or on the ScrollBar resets default values */
@@ -539,20 +501,20 @@ void Oscilloscope::mouseDoubleClick(const juce::MouseEvent& event)
 	/* If a double-click occurs near the cursor, reset the cursor to center */
     if (abs(event.getMouseDownPosition().getX() - cursor.getStartX()) < 10)
     {
-        mCursorPosition = 0.5f;
-        cursorDrag = false;
-        scopeCursorParam->setValueNotifyingHost(mCursorPosition);
-        updateLfoDisplay = true;
+        //mCursorPosition = 0.5f;
+        //cursorDrag = false;
+        //scopeCursorParam->setValueNotifyingHost(mCursorPosition);
+        //updateLfoDisplay = true;
     }
 
 	/* If the scrollbar is double-clicked, pan and zoom have been reset to default,
 	so update the display accordingly. */
 	if (sliderScroll.isMouseOver())
     {
-        updateLfoDisplay = true;
-        lowScope.redrawScope();
-        midScope.redrawScope();
-        highScope.redrawScope();
+        //updateLfoDisplay = true;
+        //lowScope.redrawScope();
+        //midScope.redrawScope();
+        //highScope.redrawScope();
     }
     
 

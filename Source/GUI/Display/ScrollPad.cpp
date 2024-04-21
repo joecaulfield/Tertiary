@@ -41,6 +41,8 @@ void ScrollPad::initializePoints(float newP1, float newP2)
 	}
 	else
 		makeDefaultPoints();
+
+	sendBroadcast("SCROLLBAR", "");
 }
 
 // Change Points & Calculate P/Z Upon Movement
@@ -274,12 +276,20 @@ void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 	y1 = event.getPosition().getY();
 
 	updatePoints(x1, y1);
+
+	repaint();
+
+	sendBroadcast("SCROLLBAR", "");
 }
 
 // Mouse Double-Click Callback
 void ScrollPad::mouseDoubleClick(const juce::MouseEvent& event)
 {
 	makeDefaultPoints();
+
+	repaint();
+
+	sendBroadcast("SCROLLBAR","");
 }
 
 // Take Width and Derive Zoom Factor
@@ -290,7 +300,7 @@ void ScrollPad::calculateZoomFactor()
 }
 
 // Returns Current Center Position
-float ScrollPad::getCenter()
+float ScrollPad::getScrollCenter()
 {
 	// Center should represent a percentage of the total waveform.
 	auto bounds = getLocalBounds().toFloat();
@@ -303,7 +313,20 @@ float ScrollPad::getCenter()
 }
 
 // Returns Current Zoom Value
-float ScrollPad::getZoom()
+float ScrollPad::getScrollZoom()
 {
 	return currentZoomFactor;
+}
+
+void ScrollPad::sendBroadcast(juce::String parameterName, juce::String parameterValue)
+{
+	juce::String delimiter = ":::::";
+
+	juce::String bandName = "xxxxx";
+
+	auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
+
+	sendActionMessage(message);
+
+	//DBG("BROADCAST - " + message);
 }

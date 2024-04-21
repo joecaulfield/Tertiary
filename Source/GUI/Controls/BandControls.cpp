@@ -408,12 +408,16 @@ void BandControl::mouseExit(const juce::MouseEvent& event)
     
 }
 
+// Guarantees a 30-Character long message
 void BandControl::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
-    auto delimiter = ":::::";
+    juce::String delimiter = ":::::";
 
-    auto message = bandModeName.paddedLeft('x', 5) + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
-    
+    juce::String bandName = bandModeName.paddedLeft('x', 5);
+
+    auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
+
     sendActionMessage(message);
+
     //DBG("BROADCAST - " + message);
 }

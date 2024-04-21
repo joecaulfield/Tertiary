@@ -13,8 +13,9 @@
 #include "JuceHeader.h"
 #include "../../Utility/AllColors.h"
 
-struct ScrollPad : juce::Component,
-	juce::Slider::Listener
+struct ScrollPad :	juce::Component,
+					juce::Slider::Listener,
+					juce::ActionBroadcaster
 {
 public:
 
@@ -39,7 +40,8 @@ public:
 	void makeDefaultPoints();
 
 	//void setCenter(float panPercentage);
-	float getCenter();
+	float getScrollCenter();
+	float getScrollZoom();
 
 	int getMaxWidth() { return maxWidth; }
 	int getMinWidth() { return minWidth; }
@@ -49,7 +51,9 @@ public:
 	float getPoint2() { return point2; }
 
 	//void setZoom(float zoom);
-	float getZoom();
+
+
+	void sendBroadcast(juce::String parameterName, juce::String parameterValue);
 
 private:
 	float point1;	// Value & Position of Left Thumb

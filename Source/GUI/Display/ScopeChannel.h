@@ -55,7 +55,9 @@ private:
     double mHostBpm;
 
     ScrollPad& sliderScroll;
-    
+    float scrollZoom = 1.f;
+    float scrollCenter = 1.f;
+
     bool isBandFocused{false};
     bool focusHasChanged {false};
     

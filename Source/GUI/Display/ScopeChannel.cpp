@@ -91,7 +91,7 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
 
     localLFO.updateLFO(mSampleRate, mHostBpm);
 
-    repaint();
+    //repaint();
 
 }
 
@@ -150,8 +150,6 @@ void ScopeChannel::paint(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
-    
-    DBG("RX " + message);
 
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
@@ -217,10 +215,16 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         localLFO.setSyncedToHost(sync);
     }
 
+    if (paramName == "SCROLLBAR")
+    {
+        scrollZoom = sliderScroll.getScrollZoom();
+        scrollCenter = sliderScroll.getScrollCenter();
+    }
+
 
     localLFO.updateLFO(mSampleRate, mHostBpm);
 
-    DBG("PHASE " << localLFO.getRelativePhase());
+    //DBG("PHASE " << localLFO.getRelativePhase());
 
     redrawScope();
     repaint();
@@ -231,7 +235,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 void ScopeChannel::paintGridLines(juce::Graphics& g)
 {
 
-    DBG("PAINT GRID LINES----------------");
+    //DBG("PAINT GRID LINES----------------");
 
     using namespace AllColors::OscilloscopeColors;
 
@@ -245,19 +249,20 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
 
     // Convert Zoom Factor to Int
     // Represents Number of Full Quarter-Notes to be Shown
-    float zoomFactor = sliderScroll.getZoom();
+    //float zoomFactor = sliderScroll.getZoom();
 
     g.setColour(juce::Colours::lightgrey);
 
     g.setOpacity(0.35f);
     
     if (bounds.getWidth() > 0)
-        beatSpacing = bounds.getWidth() / (zoomFactor);
+        beatSpacing = bounds.getWidth() / (scrollZoom);
     else
         beatSpacing = 1.f;
 
     // Allows Grid to Split Center
-    float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
+    float mDisplayPhase = scrollCenter * bounds.getWidth();
+    //float mDisplayPhase = sliderScroll.getScrollCenter() * bounds.getWidth();
 
     auto c = bounds.getCentreX() + mDisplayPhase;
     int num = 0;
@@ -359,15 +364,15 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::redrawScope()
 {
-    DBG("REDRAW SCOPE ----------------");
+    //DBG("REDRAW SCOPE ----------------");
 
-    DBG(    "RATE\t" << localLFO.getWaveRate()          );
-    DBG(    "PHASE " << localLFO.getRelativePhase()     );
-    DBG(    "MULT\t" << localLFO.getWaveMultiplier()    );
-    DBG(    "SKEW\t" << localLFO.getWaveSkew()          );
-    DBG(    "DEPTH\t" << localLFO.getWaveDepth()        );
-    DBG(    "INV\t" << localLFO.getWaveInvert()         );
-    DBG(    "WAVE\t" << localLFO.getWaveform()          );
+    //DBG(    "RATE\t" << localLFO.getWaveRate()          );
+    //DBG(    "PHASE " << localLFO.getRelativePhase()     );
+    //DBG(    "MULT\t" << localLFO.getWaveMultiplier()    );
+    //DBG(    "SKEW\t" << localLFO.getWaveSkew()          );
+    //DBG(    "DEPTH\t" << localLFO.getWaveDepth()        );
+    //DBG(    "INV\t" << localLFO.getWaveInvert()         );
+    //DBG(    "WAVE\t" << localLFO.getWaveform()          );
 
     waveTable = scaleWaveAmplitude();
     generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
@@ -450,7 +455,8 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
         auto mRelativePhase = lfoRelativePhase / waveTableDownSampleSize / 2;
 
         // Get Display Phase Shift
-        float mDisplayPhase = sliderScroll.getCenter() * bounds.getWidth();
+        float mDisplayPhase = scrollCenter * bounds.getWidth();
+        //float mDisplayPhase = sliderScroll.getScrollCenter() * bounds.getWidth();
 
         // Match Width of 1x Multiplier to Width of One Quarter-Note
         auto increment = scalar * waveTable.size() / (beatSpacing);
@@ -518,6 +524,7 @@ void ScopeChannel::updateBandBypass()
 // ========================================================
 void ScopeChannel::resized()
 {
+    repaint();
 }
 
 
