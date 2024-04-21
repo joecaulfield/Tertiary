@@ -58,9 +58,13 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     topBanner.addMouseListener(this, true);
     
     // Add Action Listener
-    globalControls.getLowControl().addActionListener( &wrapperOscilloscope.getOscilloscopeLow() );
-    globalControls.getMidControl().addActionListener( &wrapperOscilloscope.getOscilloscopeMid() );
-    globalControls.getHighControl().addActionListener( &wrapperOscilloscope.getOscilloscopeHigh() );
+    globalControls.getLowControl().addActionListener    ( &wrapperOscilloscope.getOscilloscopeLow() );
+    globalControls.getMidControl().addActionListener    ( &wrapperOscilloscope.getOscilloscopeMid() );
+    globalControls.getHighControl().addActionListener   ( &wrapperOscilloscope.getOscilloscopeHigh() );
+
+    globalControls.getLowControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
+    globalControls.getMidControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
+    globalControls.getHighControl().addActionListener   ( &wrapperFrequency.getFrequencyResponse() );
     
     setBufferedToImage(true);
     setOpaque(true);

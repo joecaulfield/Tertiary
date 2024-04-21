@@ -12,8 +12,11 @@
 
 #include <JuceHeader.h>
 #include "FrequencyResponse.h"
+#include "OptionsMenu.h"
 
-struct WindowWrapperFrequency : juce::Component, juce::Timer
+struct WindowWrapperFrequency : juce::Component, 
+                                juce::Timer,
+                                juce::AudioProcessorValueTreeState::Listener
 {
     WindowWrapperFrequency(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
     ~WindowWrapperFrequency();
@@ -22,11 +25,12 @@ struct WindowWrapperFrequency : juce::Component, juce::Timer
     
     void timerCallback();
     
-    void paint(juce::Graphics& g) {};
+    void paint(juce::Graphics& g);
     void paintOverChildren(juce::Graphics& g);
     void paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds);
 
-        
+    FrequencyResponse& getFrequencyResponse() { return frequencyResponse; };
+
 private:
     /* Reference to the Audio Processor & DSP Parameters */
 
@@ -36,7 +40,21 @@ private:
     
     FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
 
-    void makeAttachments();
+    void buildOptionsMenuParameters();
+    void updateOptionsParameters();
+
+    OptionsMenu optionsMenu;
+    juce::AudioParameterBool* showFftParam{ nullptr };
+    juce::AudioParameterChoice* fftPickoffParam{ nullptr };
+
+    using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    std::unique_ptr<buttonAttachment>	showFftAttachment;
+
+    bool mShouldShowFFT{ false };
+
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
+
+    //void makeAttachments();
     
     // FFT Components =========
     void drawNextFrameOfSpectrum();

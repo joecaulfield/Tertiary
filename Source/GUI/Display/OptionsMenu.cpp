@@ -20,8 +20,9 @@ OptionsMenu::OptionsMenu()
     
     mButtonOptions.setLookAndFeel(&optionsLookAndFeel);
     mButtonOptions.addListener(this);
+
     addAndMakeVisible(mButtonOptions);
-    
+
     shouldShowDropdown = false;
     
     startTimerHz(30);
@@ -64,7 +65,7 @@ void OptionsMenu::paint(juce::Graphics& g)
         g.setColour(juce::Colours::darkgrey.withMultipliedAlpha(1.f/((i*i)+0.75f)));
         g.drawRect(buttonBounds.toFloat().reduced(i,i), 1.f);
     }
-    
+  
 }
 
 // ========================================================
@@ -74,6 +75,8 @@ void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
         But refrain from doing so if the mouse button is already down, as this
         may indicate that the user is the middle of dragging a cursor */
     
+    /* Implement Fade-In Later */
+
     if (!isMouseButtonDown())
     {
         if (shouldShowDropdown == false)
@@ -90,10 +93,11 @@ void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
 void OptionsMenu::mouseExit(const juce::MouseEvent& event)
 {
 
-    // If menu is not open, fade out when mouse exits
-    if (shouldShowDropdown == false)
-    {
-        mouseIsWithinBounds = false;    // Trigger for beginning timer (future implementation)
+    /* Implement Fade-Out Later */
+
+    if (!isMouseOver(true)) {
+        closeDropdown();
+        mouseIsWithinBounds = false;
         setAlpha(0.0f);
     }
 
@@ -125,10 +129,14 @@ void OptionsMenu::buttonClicked(juce::Button* button)
 // ========================================================
 void OptionsMenu::openDropdown()
 {
+
+    // Allocate 25 Pixels per populated option
+    auto dropSize = optionsArray.size() * 25;
+
     setSize (   mButtonOptions.getWidth(),
-                mButtonOptions.getHeight() + 100
+                mButtonOptions.getHeight() + dropSize
             );
-    
+
     buildDropdown();
     
 }
@@ -139,6 +147,8 @@ void OptionsMenu::closeDropdown()
     setSize (   mButtonOptions.getWidth(),
                 mButtonOptions.getHeight()
             );
+
+    shouldShowDropdown = false;
 }
 
 // ========================================================

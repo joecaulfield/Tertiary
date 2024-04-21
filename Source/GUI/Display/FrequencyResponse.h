@@ -21,7 +21,8 @@ struct FrequencyResponse :	juce::Component,
 							juce::Timer,
 							juce::Slider::Listener,
 							juce::Button::Listener,
-                            juce::Label::Listener
+                            juce::Label::Listener,
+							juce::ActionListener
 {
 
 	FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
@@ -35,7 +36,7 @@ struct FrequencyResponse :	juce::Component,
 	void sliderValueChanged(juce::Slider* slider) override;
 
     void paintResponseRegions(juce::Graphics& g);
-    
+
 	void paintLowRegion(	juce::Graphics& g,
                             juce::Rectangle<float> bounds,
                             float gainPixel,
@@ -66,9 +67,9 @@ struct FrequencyResponse :	juce::Component,
     //void paintOverChildren(juce::Graphics& g);
     //float y {0.f};
     
-    bool getShowFFT(){ return mShowFFT; }
-    bool isMenuOpen() {return showMenu; }
-    juce::Rectangle<int> getMenuButtonBounds() {return buttonBounds.toNearestInt();}
+    //bool getShowFFT(){ return mShowFFT; }
+    //bool isMenuOpen() {return false; }
+    //juce::Rectangle<int> getMenuButtonBounds() {return Null;}
     
 	void resized() override;
 
@@ -86,7 +87,7 @@ struct FrequencyResponse :	juce::Component,
     
 	void updateResponse();
 
-	void paintMenu(juce::Graphics& g);
+	//void paintMenu(juce::Graphics& g);
     void paintLabels(juce::Graphics& g);
 	void fadeInOutCursorLM();
     void fadeInOutCursorMH();
@@ -125,6 +126,9 @@ struct FrequencyResponse :	juce::Component,
 
     void labelTextChanged(juce::Label* labelThatHasChanged) override;
     
+	void actionListenerCallback(const juce::String& message);
+
+
     juce::Label freqLabelLow, freqLabelHigh;
     juce::TextEditor freqLabeLowEditor, freqLabelHighEditor;
     
@@ -149,7 +153,7 @@ private:
 
 
 	// COMPONENT FADES ==========================================================================================================================================================================================
-	bool fadeInButton{ false };		float fadeAlphaButton{ 1.f };		float fadeMaxButton = 1.f;		float fadeMinButton = 0.0f;		float fadeStepUpButton = 0.1f;		float fadeStepDownButton = 0.01f;
+	//bool fadeInButton{ false };		float fadeAlphaButton{ 1.f };		float fadeMaxButton = 1.f;		float fadeMinButton = 0.0f;		float fadeStepUpButton = 0.1f;		float fadeStepDownButton = 0.01f;
 	bool fadeInCursorLM{ false };	float fadeAlphaCursorLM{ 1.f };		float fadeMaxCursor = 1.f;		float fadeMinCursor = 0.25f;		float fadeStepUpCursor = 0.1f;		float fadeStepDownCursor = 0.01f;
 	bool fadeInCursorMH{ false };	float fadeAlphaCursorMH{ 1.f };
 	bool fadeInCursorLG{ false };	float fadeAlphaCursorLG{ 1.f };		float fadeMaxRegion = 0.85f;	float fadeMinRegion = 0.65f;	float fadeStepUpRegion = 0.001f;	float fadeStepDownRegion = 0.001f;
@@ -167,7 +171,7 @@ private:
     bool fadeCompleteRegionLow{false};
     bool fadeCompleteRegionMid{false};
     bool fadeCompleteRegionHigh{false};
-    bool fadeCompleteButton{false};
+    //bool fadeCompleteButton{false};
     
     bool updateAllPaint{true};
 	// COMPONENT FADES ==========================================================================================================================================================================================
@@ -210,21 +214,21 @@ private:
 	juce::ToggleButton mButton_FFT;
 
     bool updateDisplay{true};
-    int menuPaintCounter{0};
+    //int menuPaintCounter{0};
 
     /* Options Menu =================================== */
 
-    ButtonOptionsLookAndFeel optionsLookAndFeel;
-    juce::TextButton buttonOptions;
-    juce::Rectangle<float> buttonBounds;
-    bool showMenu{ false };
-    void drawToggles(bool showMenu);
+    //ButtonOptionsLookAndFeel optionsLookAndFeel;
+    //juce::TextButton buttonOptions;
+    //juce::Rectangle<float> buttonBounds;
+    //bool showMenu{ false };
+    //void drawToggles(bool showMenu);
     void buttonClicked(juce::Button* button) override;
     juce::ToggleButton    toggleShowRTA,
                         togglePickInput,
                         togglePickOutput;
     
-	bool checkMenuFocus(const juce::MouseEvent& event);
+	//bool checkMenuFocus(const juce::MouseEvent& event);
 	
 	
 	
@@ -242,14 +246,15 @@ private:
     
     
 	using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+	//std::unique_ptr<buttonAttachment>	showFftAttachment;
+	
+	//juce::AudioParameterBool* showFftParameter{ nullptr };
+	//juce::AudioParameterChoice* fftPickoffParameter{ nullptr };
 
-	juce::AudioParameterBool* showFftParameter{ nullptr };
-	juce::AudioParameterChoice* fftPickoffParameter{ nullptr };
-	std::unique_ptr<buttonAttachment>	showFftAttachment;
 
     // Variables Storing APVTS Parameters
-	int mPickOffID{ 0 };
-    bool mShowFFT{ true };
+	//int mPickOffID{ 0 };
+    //bool mShowFFT{ true };
     
     
 

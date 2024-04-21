@@ -21,30 +21,32 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
 
-    using namespace Params;
-    const auto& params = GetParams();
+    //using namespace Params;
+    //const auto& params = GetParams();
 
-    auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
-    {
-        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-        jassert(param != nullptr);                                                                      // Error Checking
-    };
+    //auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
+    //{
+    //    param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
+    //    jassert(param != nullptr);                                                                      // Error Checking
+    //};
 
-    boolHelper(showFftParameter, Names::Show_FFT);
+    //boolHelper(showFftParameter, Names::Show_FFT);
 
-    mShowFFT = showFftParameter->get();
+    //mShowFFT = showFftParameter->get();
 
     // Choice Helper To Attach Choice to Parameter ========
-    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-    {
-        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-        jassert(param != nullptr);
-    };
+    //auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+    //{
+    //    param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+    //    jassert(param != nullptr);
+    //};
 
-    choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
+    //choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
 
-    mPickOffID = fftPickoffParameter->getIndex();
-    updateToggleStates();
+
+
+    //mPickOffID = fftPickoffParameter->getIndex();
+    //updateToggleStates();
 
     //switch (pickOffID)
     //{
@@ -53,17 +55,17 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     //}
 
     // Array Maintenance ==========
-    fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
-    fftDrawingPoints.resize(audioProcessor.scopeSize);
+    //fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
+    //fftDrawingPoints.resize(audioProcessor.scopeSize);
 
-    for (int i = 0; i < audioProcessor.scopeSize; i++)
-        fftDrawingPoints.setUnchecked(i, 0);
+    //for (int i = 0; i < audioProcessor.scopeSize; i++)
+    //    fftDrawingPoints.setUnchecked(i, 0);
 
     // Button Options
-    buttonOptions.setLookAndFeel(&optionsLookAndFeel);
-    buttonOptions.addListener(this);
-    buttonOptions.addMouseListener(this, true);
-    addAndMakeVisible(buttonOptions);
+    //buttonOptions.setLookAndFeel(&optionsLookAndFeel);
+    //buttonOptions.addListener(this);
+    //buttonOptions.addMouseListener(this, true);
+    //addAndMakeVisible(buttonOptions);
 
     toggleShowRTA.addListener(this);
     togglePickInput.addListener(this);
@@ -123,18 +125,13 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     
     makeAttachments();
 
-
-    
     updateResponse();
-    ////startTimerHz(60);
-    
-    setBufferedToImage(true);
-    //setOpaque(true);
+
 }
 
 FrequencyResponse::~FrequencyResponse()
 {
-    buttonOptions.setLookAndFeel(nullptr);
+    //buttonOptions.setLookAndFeel(nullptr);
 }
 
 // Make component->parameter attachments
@@ -173,10 +170,10 @@ void FrequencyResponse::makeAttachments()
                         params.at(Names::Gain_High_Band),
                         sliderHighGain);
 
-    showFftAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-                        audioProcessor.apvts,
-                        params.at(Names::Show_FFT),
-                        toggleShowRTA);
+    //showFftAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+    //                    audioProcessor.apvts,
+    //                    params.at(Names::Show_FFT),
+    //                    toggleShowRTA);
 }
 
 // Called on Component Resize
@@ -205,8 +202,8 @@ void FrequencyResponse::resized()
     sliderHighGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
 
     /* Place Show-Menu Button */
-    buttonOptions.setSize(100, 25);
-    buttonOptions.setTopLeftPosition(4, 4);
+    //buttonOptions.setSize(100, 25);
+    //buttonOptions.setTopLeftPosition(4, 4);
 
 }
 
@@ -214,80 +211,80 @@ void FrequencyResponse::resized()
 void FrequencyResponse::timerCallback()
 {
     
-    if (globalControls.lowBandControls.hasBSMchanged() ||
-        globalControls.midBandControls.hasBSMchanged() ||
-        globalControls.highBandControls.hasBSMchanged() ||
-        updateAndCheckForChangesToFocus() ||
-        paintFlag)
-    {
-        repaint();
-        globalControls.lowBandControls.setBsmRead();
-        globalControls.midBandControls.setBsmRead();
-        globalControls.highBandControls.setBsmRead();
-    }
+    //if (globalControls.lowBandControls.hasBSMchanged() ||
+    //    globalControls.midBandControls.hasBSMchanged() ||
+    //    globalControls.highBandControls.hasBSMchanged() ||
+    //    updateAndCheckForChangesToFocus() ||
+    //    paintFlag)
+    //{
+    //    repaint();
+    //    globalControls.lowBandControls.setBsmRead();
+    //    globalControls.midBandControls.setBsmRead();
+    //    globalControls.highBandControls.setBsmRead();
+    //}
 
-    checkMousePosition();
+    //checkMousePosition();
 
     updateResponse();
     
-    fadeInOutCursorLM();
-    fadeInOutCursorMH();
+    //fadeInOutCursorLM();
+    //fadeInOutCursorMH();
     
-    fadeInOutCursorLG();
-    fadeInOutCursorMG();
-    fadeInOutCursorHG();
+    //fadeInOutCursorLG();
+    //fadeInOutCursorMG();
+    //fadeInOutCursorHG();
     
-    fadeInOutRegionLow();
-    fadeInOutRegionMid();
-    fadeInOutRegionHigh();
+    //fadeInOutRegionLow();
+    //fadeInOutRegionMid();
+    //fadeInOutRegionHigh();
 
-    fadeButton();
+    //fadeButton();
     
     //drawLabels();
     
     //checkExternalFocus();
     
 
-    if (!fadeCompleteCursorLM)
-    {
-        repaint(cursorLM.getStartX()-5, cursorLM.getStartY(), 10, cursorLM.getLength() );
-        repaint(freqLabelLow.getBounds().expanded(5, 5));
-    }
+    //if (!fadecompletecursorlm)
+    //{
+    //    repaint(cursorlm.getstartx()-5, cursorlm.getstarty(), 10, cursorlm.getlength() );
+    //    repaint(freqlabellow.getbounds().expanded(5, 5));
+    //}
 
-    
-    if (!fadeCompleteCursorMH)
-    {
-        repaint(cursorMH.getStartX()-5, cursorMH.getStartY(), 10, cursorMH.getLength() );
-        repaint(freqLabelHigh.getBounds().expanded(5, 5));
-    }
+    //
+    //if (!fadecompletecursormh)
+    //{
+    //    repaint(cursormh.getstartx()-5, cursormh.getstarty(), 10, cursormh.getlength() );
+    //    repaint(freqlabelhigh.getbounds().expanded(5, 5));
+    //}
 
-    
-    if (!fadeCompleteCursorLG)
-        repaint(cursorLG.getStartX(), cursorLG.getStartY()-5, cursorLG.getLength(), 10 );
-    
-    if (!fadeCompleteCursorMG)
-        repaint(cursorMG.getStartX(), cursorMG.getStartY()-5, cursorMG.getLength(), 10 );
-    
-    if (!fadeCompleteCursorHG)
-        repaint(cursorHG.getStartX(), cursorHG.getStartY()-5, cursorHG.getLength(), 10 );
-    
-    if (!fadeCompleteRegionLow || updateDisplay)
-        repaint();
-    
-    if (!fadeCompleteRegionMid|| updateDisplay)
-        repaint();
-    
-    if (!fadeCompleteRegionHigh || updateDisplay)
-        repaint();
-    
-    if (!fadeCompleteButton || updateDisplay)
-        repaint(buttonOptions.getBounds());
-    
-    if (updateDisplay)
-    {
-        repaint();
-        updateDisplay = false;
-    }
+    //
+    //if (!fadecompletecursorlg)
+    //    repaint(cursorlg.getstartx(), cursorlg.getstarty()-5, cursorlg.getlength(), 10 );
+    //
+    //if (!fadecompletecursormg)
+    //    repaint(cursormg.getstartx(), cursormg.getstarty()-5, cursormg.getlength(), 10 );
+    //
+    //if (!fadecompletecursorhg)
+    //    repaint(cursorhg.getstartx(), cursorhg.getstarty()-5, cursorhg.getlength(), 10 );
+    //
+    //if (!fadecompleteregionlow || updatedisplay)
+    //    repaint();
+    //
+    //if (!fadecompleteregionmid|| updatedisplay)
+    //    repaint();
+    //
+    //if (!fadecompleteregionhigh || updatedisplay)
+    //    repaint();
+    //
+    //if (!fadecompletebutton || updatedisplay)
+    //    repaint(buttonoptions.getbounds());
+    //
+    //if (updatedisplay)
+    //{
+    //    repaint();
+    //    updatedisplay = false;
+    //}
 
 
 
@@ -380,7 +377,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 
     /* Paint Menu */
     // =========================
-    paintMenu(g);
+    //paintMenu(g);
 
     /* Paint Border */
     // =========================
@@ -693,22 +690,22 @@ void FrequencyResponse::paintCursorsGain(juce::Graphics& g)
 }
 
 // Fade Components on Mouse Enter
-void FrequencyResponse::paintMenu(juce::Graphics& g)
-{
-    g.setColour(juce::Colours::white);
-    g.setOpacity(0.9f);
-    g.fillRoundedRectangle( buttonBounds.getX(),
-                            buttonBounds.getY(),
-                            buttonBounds.getWidth(),
-                            buttonBounds.getHeight(),
-                            2.f);
-
-    for (int i = 0; i < 5; i++)
-    {
-        g.setColour(juce::Colours::darkgrey.withMultipliedAlpha(1.f/((i*i)+0.75f)));
-        g.drawRect(buttonBounds.toFloat().reduced(i,i), 1.f);
-    }
-}
+//void FrequencyResponse::paintMenu(juce::Graphics& g)
+//{
+//    g.setColour(juce::Colours::white);
+//    g.setOpacity(0.9f);
+//    g.fillRoundedRectangle( buttonBounds.getX(),
+//                            buttonBounds.getY(),
+//                            buttonBounds.getWidth(),
+//                            buttonBounds.getHeight(),
+//                            2.f);
+//
+//    for (int i = 0; i < 5; i++)
+//    {
+//        g.setColour(juce::Colours::darkgrey.withMultipliedAlpha(1.f/((i*i)+0.75f)));
+//        g.drawRect(buttonBounds.toFloat().reduced(i,i), 1.f);
+//    }
+//}
 
 // Paint Labels
 void FrequencyResponse::paintLabels(juce::Graphics& g)
@@ -828,6 +825,8 @@ void FrequencyResponse::updateResponse()
     highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
 
     checkSolos();
+
+    repaint();
 }
 
 // Check if bands are soloed.  Negate mute if so.
@@ -840,12 +839,12 @@ void FrequencyResponse::checkSolos()
 
     switch (s)
     {
-    case 1:   {lowBandMute = true; midBandMute = true;  break; }
-    case 10:  {lowBandMute = true; highBandMute = true; break; }
-    case 11:  {lowBandMute = true;                        break; }
-    case 100: {midBandMute = true; highBandMute = true; break; }
-    case 101: {midBandMute = true;                        break; }
-    case 110: {highBandMute = true;                        break; }
+    case 1:   {lowBandMute = true; midBandMute = true;      break; }
+    case 10:  {lowBandMute = true; highBandMute = true;     break; }
+    case 11:  {lowBandMute = true;                          break; }
+    case 100: {midBandMute = true; highBandMute = true;     break; }
+    case 101: {midBandMute = true;                          break; }
+    case 110: {highBandMute = true;                         break; }
     }
 }
 
@@ -879,8 +878,7 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 
         if (slider == &sliderMidHighInterface)
         {
-            // Convert [0 to 1] (Interface) value to [20 to 20k] (Cutoff) value.
-            // Send to Cutoff slider to update params.
+            /* Convert[0 to 1](Interface) value to [20 to 20k](Cutoff) value. Send to Cutoff slider to update params. */
 
             auto y = slider->getValue();
             auto f = 20 * pow(2, std::log2(1000.f) * y);
@@ -889,9 +887,11 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 
     }
 
-    // 'Cutoff' slider is linear from 20 to 20k.
-    // Changed by user via attachment to external sliders.
-    // Slider is converted from [20 to 20k] to [0 to 1] for pixel representation
+    /*
+        'Cutoff' slider is linear from 20 to 20k.
+        Changed by user via attachment to external sliders.
+        Slider is converted from [20 to 20k] to [0 to 1] for pixel representation 
+     */ 
 
     if (slider == &sliderLowMidCutoff || slider == &sliderMidHighCutoff)
     {
@@ -912,114 +912,115 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
     }
     
     updateStringText();
-    repaint();
+    
+    updateResponse();
 }
 
-void FrequencyResponse::drawToggles(bool showMenu)
-{
-    using namespace juce;
+//void FrequencyResponse::drawToggles(bool showMenu)
+//{
+    //using namespace juce;
 
     /* Toggle Menu Visibility Based On Display Params */
-    if (showMenu)
-        buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
-    else
-    {
-        buttonBounds.setBounds(0, 0, 0, 0);
-        updateDisplay = true;
-    }
+    //if (showMenu)
+    //    buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
+    //else
+    //{
+    //    buttonBounds.setBounds(0, 0, 0, 0);
+    //    updateDisplay = true;
+    //}
 
 
-    FlexBox flexBox;
-    flexBox.flexDirection = FlexBox::Direction::column;
-    flexBox.flexWrap = FlexBox::Wrap::noWrap;
+    //FlexBox flexBox;
+    //flexBox.flexDirection = FlexBox::Direction::column;
+    //flexBox.flexWrap = FlexBox::Wrap::noWrap;
 
-    auto margin = FlexItem().withHeight(5);
-    auto spacer = FlexItem().withHeight(2.5);
-    auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
+    //auto margin = FlexItem().withHeight(5);
+    //auto spacer = FlexItem().withHeight(2.5);
+    //auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
 
-    flexBox.items.add(margin);
-    flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
-    flexBox.items.add(spacer);
-    flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
-    flexBox.items.add(spacer);
-    flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
-    flexBox.items.add(margin);
+    //flexBox.items.add(margin);
+    //flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
+    //flexBox.items.add(spacer);
+    //flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
+    //flexBox.items.add(spacer);
+    //flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
+    //flexBox.items.add(margin);
 
-    flexBox.performLayout(buttonBounds);
+    //flexBox.performLayout(buttonBounds);
 
-    toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-    togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-    togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    //toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    //togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
+    //togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
 
-    toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    
-    toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    //toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    //togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    //togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    //
+    //toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    //togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    //togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
 
-    toggleShowRTA.setButtonText("Show FFT");
-    togglePickInput.setButtonText("FFT In");
-    togglePickOutput.setButtonText("FFT Out");
+    //toggleShowRTA.setButtonText("Show FFT");
+    //togglePickInput.setButtonText("FFT In");
+    //togglePickOutput.setButtonText("FFT Out");
 
-    togglePickInput.setRadioGroupId(1);
-    togglePickOutput.setRadioGroupId(1);
+    //togglePickInput.setRadioGroupId(1);
+    //togglePickOutput.setRadioGroupId(1);
 
-    addAndMakeVisible(toggleShowRTA);
-    addAndMakeVisible(togglePickInput);
-    addAndMakeVisible(togglePickOutput);
-}
+    //addAndMakeVisible(toggleShowRTA);
+    //addAndMakeVisible(togglePickInput);
+    //addAndMakeVisible(togglePickOutput);
+//}
 
 void FrequencyResponse::buttonClicked(juce::Button* button)
 {
-    if (button == &buttonOptions)
-    {
-        showMenu = !showMenu;
-        drawToggles(showMenu);
-        DBG("freq clicked");
-    }
+    //if (button == &buttonOptions)
+    //{
+    //    showMenu = !showMenu;
+    //    drawToggles(showMenu);
+    //    DBG("freq clicked");
+    //}
 
-    if (button == &toggleShowRTA)
-    {
-        mShowFFT = toggleShowRTA.getToggleState();
-    }
-        
-    if (button == &togglePickInput || button == &togglePickOutput)
-    {
-        mPickOffID = togglePickOutput.getToggleState();
+    //if (button == &toggleShowRTA)
+    //{
+    //    mShowFFT = toggleShowRTA.getToggleState();
+    //}
+    //    
+    //if (button == &togglePickInput || button == &togglePickOutput)
+    //{
+    //    mPickOffID = togglePickOutput.getToggleState();
 
-        updateToggleStates();
-    }
-    
-    updateDisplay = true;
+    //    updateToggleStates();
+    //}
+    //
+    //updateDisplay = true;
 
 }
 
-void FrequencyResponse::updateToggleStates()
-{
-    // When Pickoff ID Changes,
-    // Update Toggle States
-    // Set Parameter
-
-    switch (mPickOffID)
-    {
-        case 0: // Pre
-        {
-            togglePickInput.setToggleState(true, false);
-            togglePickOutput.setToggleState(false, false); break;
-        }
-        case 1: // Post
-        {
-            togglePickOutput.setToggleState(true, false);
-            togglePickInput.setToggleState(false, false); break;
-        }
-    }
-
-    fftPickoffParameter->setValueNotifyingHost(mPickOffID);
-
-    audioProcessor.setFftPickoffPoint(mPickOffID);
-}
+//void FrequencyResponse::updateToggleStates()
+//{
+//    // When Pickoff ID Changes,
+//    // Update Toggle States
+//    // Set Parameter
+//
+//    switch (mPickOffID)
+//    {
+//        case 0: // Pre
+//        {
+//            togglePickInput.setToggleState(true, false);
+//            togglePickOutput.setToggleState(false, false); break;
+//        }
+//        case 1: // Post
+//        {
+//            togglePickOutput.setToggleState(true, false);
+//            togglePickInput.setToggleState(false, false); break;
+//        }
+//    }
+//
+//    fftPickoffParameter->setValueNotifyingHost(mPickOffID);
+//
+//    audioProcessor.setFftPickoffPoint(mPickOffID);
+//}
 
 
 
@@ -1145,29 +1146,25 @@ void FrequencyResponse::checkMousePosition()
         fadeRegionLG = false;
         fadeRegionMG = false;
         fadeRegionHG = false;
-        fadeInButton = false;
     }
 }
 
 // Called on Mouse Move
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
-    if (!checkMenuFocus(event))
-        checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 // Called on Mouse Enter
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
-    if (!checkMenuFocus(event))
-        checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 // Called on Mouse Exit
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
-    if (!checkMenuFocus(event))
-        checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 
@@ -1472,40 +1469,40 @@ void FrequencyResponse::fadeInOutRegionHigh()
 
 void FrequencyResponse::fadeButton()
 {
-    if (fadeInButton || showMenu) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaButton < fadeMaxButton)
-        {
-            fadeCompleteButton = false;
-            fadeAlphaButton += fadeStepUpButton;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaButton >= fadeMaxButton)
-        {
-            fadeAlphaButton = fadeMaxButton;
-            fadeCompleteButton = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaButton > fadeMinButton)
-        {
-            fadeCompleteButton = false;
-            fadeAlphaButton -= fadeStepDownButton;
-        }
+    //if (fadeInButton || showMenu) // If mouse entered... fade Toggles Alpha up
+    //{
+    //    /* Fade in until complete */
+    //    if (fadeAlphaButton < fadeMaxButton)
+    //    {
+    //        fadeCompleteButton = false;
+    //        fadeAlphaButton += fadeStepUpButton;
+    //    }
+    //        
+    //    /* Fade in complete */
+    //    if (fadeAlphaButton >= fadeMaxButton)
+    //    {
+    //        fadeAlphaButton = fadeMaxButton;
+    //        fadeCompleteButton = true;
+    //    }
+    //}
+    //else // If mouse exit... fade Toggles Alpha down
+    //{
+    //    /* Fade out until complete */
+    //    if (fadeAlphaButton > fadeMinButton)
+    //    {
+    //        fadeCompleteButton = false;
+    //        fadeAlphaButton -= fadeStepDownButton;
+    //    }
 
-        /* Fade out complete */
-        if (fadeAlphaButton < fadeMinButton)
-        {
-            fadeAlphaButton = fadeMinButton;
-            fadeCompleteButton = true;
-        }
-    }
+    //    /* Fade out complete */
+    //    if (fadeAlphaButton < fadeMinButton)
+    //    {
+    //        fadeAlphaButton = fadeMinButton;
+    //        fadeCompleteButton = true;
+    //    }
+    //}
     
-    buttonOptions.setAlpha(fadeAlphaButton);
+    //buttonOptions.setAlpha(fadeAlphaButton);
 }
 
 
@@ -1649,33 +1646,33 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 
 }
 
-bool FrequencyResponse::checkMenuFocus(const juce::MouseEvent& event)
-{
-    auto x = event.getPosition().getX();
-    auto y = event.getPosition().getY();
-
-    bool mouseIsInMenu{ false };
-
-    if (x > buttonBounds.getX() && x < buttonBounds.getRight() &&
-        y > buttonBounds.getY() && y < buttonBounds.getBottom())
-        mouseIsInMenu = true;
-
-    if (buttonOptions.isMouseOverOrDragging() || mouseIsInMenu)
-    {
-        fadeInButton = true;
-        fadeInCursorLM = false;
-        fadeInCursorMH = false;
-        fadeInCursorLG = false;
-        fadeInCursorMG = false;
-        fadeInCursorHG = false;
-        return true;
-    }
-    else
-    {
-        fadeInButton = false;
-        return false;
-    }
-}
+//bool FrequencyResponse::checkMenuFocus(const juce::MouseEvent& event)
+//{
+//    auto x = event.getPosition().getX();
+//    auto y = event.getPosition().getY();
+//
+//    bool mouseIsInMenu{ false };
+//
+//    if (x > buttonBounds.getX() && x < buttonBounds.getRight() &&
+//        y > buttonBounds.getY() && y < buttonBounds.getBottom())
+//        mouseIsInMenu = true;
+//
+//    if (buttonOptions.isMouseOverOrDragging() || mouseIsInMenu)
+//    {
+//        fadeInButton = true;
+//        fadeInCursorLM = false;
+//        fadeInCursorMH = false;
+//        fadeInCursorLG = false;
+//        fadeInCursorMG = false;
+//        fadeInCursorHG = false;
+//        return true;
+//    }
+//    else
+//    {
+//        fadeInButton = false;
+//        return false;
+//    }
+//}
 
 bool FrequencyResponse::updateAndCheckForChangesToFocus()
 {
@@ -1711,4 +1708,42 @@ bool FrequencyResponse::updateAndCheckForChangesToFocus()
     }
     
     return false;
+}
+
+
+
+// ========================================================
+void FrequencyResponse::actionListenerCallback(const juce::String& message)
+{
+
+    auto paramName = message.replaceSection(0, 10, "");
+    paramName = paramName.replaceSection(10, 25, "");
+    paramName = paramName.removeCharacters("x");
+
+    juce::String paramValue = message.replaceSection(0, 25, "");
+    paramValue = paramValue.removeCharacters("x");
+
+
+    DBG(paramName);
+
+    if (paramName == "GAIN")
+    {
+        updateResponse();
+    }
+
+    if (paramName == "BYPASS")
+    {
+        updateResponse();
+    }
+
+    if (paramName == "SOLO")
+    {
+        updateResponse();
+    }
+
+    if (paramName == "MUTE")
+    {
+        updateResponse();
+    }
+
 }

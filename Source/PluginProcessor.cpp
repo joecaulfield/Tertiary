@@ -547,7 +547,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
     layout.add(std::make_unique<AudioParameterChoice>(  ParameterID{params.at(Names::FFT_Pickoff), 1},  // Parameter ID & Hint
                                                         params.at(Names::FFT_Pickoff),                  // Parameter Name
                                                         sa,
-                                                        1));
+                                                        0));
 
     return layout;
 }
@@ -624,10 +624,10 @@ void TertiaryAudioProcessor::setFftPickoffPoint(int point)
 {
     switch (point)
     {
-    case 0: {fftPickoffPointIsInput = true;
+    case 0: {fftPickoffPointIsInput = false;
         break; }
 
-    case 1: {fftPickoffPointIsInput = false;
+    case 1: {fftPickoffPointIsInput = true;
         break; }
     }
 }

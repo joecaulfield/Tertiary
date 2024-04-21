@@ -12,7 +12,6 @@
 
 #include <JuceHeader.h>
 #include "Oscilloscope.h"
-
 #include "OptionsMenu.h"
 
 struct WindowWrapperOscilloscope :  juce::Component,

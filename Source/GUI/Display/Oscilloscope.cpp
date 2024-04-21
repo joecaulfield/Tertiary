@@ -566,5 +566,3 @@ void Oscilloscope::fadeInOutCursor()
         }
     }
 }
-
-
