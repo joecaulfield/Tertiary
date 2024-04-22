@@ -144,6 +144,7 @@
     <ClCompile Include="..\..\Source\GUI\Controls\InputOutputGain.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\BandControls.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\GlobalControls.cpp"/>
+    <ClCompile Include="..\..\Source\GUI\Display\Cursor.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\OptionsMenu.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\ScopeChannel.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\TopBanner.cpp"/>
@@ -2607,6 +2608,7 @@
     <ClInclude Include="..\..\Source\GUI\Controls\InputOutputGain.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\BandControls.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\GlobalControls.h"/>
+    <ClInclude Include="..\..\Source\GUI\Display\Cursor.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\OptionsMenu.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\ScopeChannel.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\TopBanner.h"/>

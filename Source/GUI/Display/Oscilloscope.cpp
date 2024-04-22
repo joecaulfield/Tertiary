@@ -38,10 +38,16 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc)
 
 	sliderScroll.initializePoints(scopePoint1Param->get(), scopePoint2Param->get());
 	
+    DBG("TRYING TO LOAD " << scopePoint1Param->get() << "   " << scopePoint2Param->get());
+
     addAndMakeVisible(lowScope);
     addAndMakeVisible(midScope);
     addAndMakeVisible(highScope);
     
+    lowScope.setName("LOW");
+    midScope.setName("MID");
+    highScope.setName("HIGH");
+
 	mCursorPosition = scopeCursorParam->get();
 
 	addAndMakeVisible(sliderScroll);
@@ -289,9 +295,9 @@ void Oscilloscope::timerCallback()
     // ========================================================
     if (checkForChangesToFocus())
     {
-        lowScope.setBandFocus(mLowFocus);
-        midScope.setBandFocus(mMidFocus);
-        highScope.setBandFocus(mHighFocus);
+        //lowScope.setBandFocus(mLowFocus);
+        //midScope.setBandFocus(mMidFocus);
+        //highScope.setBandFocus(mHighFocus);
         
         // Rebuild the overlapped band layout, to reorder in the Z-Direction
         if (!mStackAllBands)
@@ -447,7 +453,9 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 	float maxWidth = (float)sliderScroll.getMaxWidth();
 
     // Get rid?  Cursor is 86'ed
-	int cursorX = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
+	//int cursorX = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
+    int cursorX = 0;
+
 
     // Store the current pan & zoom settings in memory
 	float p1 = (float)(sliderScroll.getPoint1() - cursorX) / (float)maxWidth;
@@ -456,6 +464,8 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
     // Store the current pan & zoom settings in memory
 	scopePoint1Param->setValueNotifyingHost(p1);
 	scopePoint2Param->setValueNotifyingHost(p2);
+
+    DBG("SAVING " << p1 << "  " << p2);
 
     // Was used when playhead was active... still need since playhead is 86'ed?
 	panOrZoomChanging = false;

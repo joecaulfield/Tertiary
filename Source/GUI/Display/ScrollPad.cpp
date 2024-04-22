@@ -43,6 +43,8 @@ void ScrollPad::initializePoints(float newP1, float newP2)
 		makeDefaultPoints();
 
 	sendBroadcast("SCROLLBAR", "");
+
+	DBG("initialize points");
 }
 
 // Change Points & Calculate P/Z Upon Movement

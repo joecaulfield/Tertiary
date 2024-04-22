@@ -11,74 +11,60 @@
 #include "FrequencyResponse.h"
 
 // Constructor
+// ===========================================================================================
 FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
                                         juce::AudioProcessorValueTreeState& apv,
                                         GlobalControls& gc)
     : audioProcessor(p),
     globalControls(gc),
-    apvts(apv),
-    forwardFFT(audioProcessor.fftOrder),
-    window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
+    apvts(apv)
 {
 
-    //using namespace Params;
-    //const auto& params = GetParams();
+    buildLowMidFreqSlider();
+    buildMidHighFreqSlider();
+    buildLowGainSlider();
+    buildMidGainSlider();
+    buildHighGainSlider();
+    buildLabels();
+    
+    makeAttachments();
 
-    //auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
-    //{
-    //    param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-    //    jassert(param != nullptr);                                                                      // Error Checking
-    //};
+    updateResponse();
+}
 
-    //boolHelper(showFftParameter, Names::Show_FFT);
+//
+// ===========================================================================================
+FrequencyResponse::~FrequencyResponse()
+{
+}
 
-    //mShowFFT = showFftParameter->get();
-
-    // Choice Helper To Attach Choice to Parameter ========
-    //auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-    //{
-    //    param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-    //    jassert(param != nullptr);
-    //};
-
-    //choiceHelper(fftPickoffParameter, Names::FFT_Pickoff);
-
-
-
-    //mPickOffID = fftPickoffParameter->getIndex();
-    //updateToggleStates();
-
-    //switch (pickOffID)
-    //{
-    //    case 0: togglePickInput.setToggleState(true, false); break;        // Pre
-    //    case 1: togglePickOutput.setToggleState(true, false); break;    // Post
-    //}
-
-    // Array Maintenance ==========
-    //fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
-    //fftDrawingPoints.resize(audioProcessor.scopeSize);
-
-    //for (int i = 0; i < audioProcessor.scopeSize; i++)
-    //    fftDrawingPoints.setUnchecked(i, 0);
-
-    // Button Options
-    //buttonOptions.setLookAndFeel(&optionsLookAndFeel);
-    //buttonOptions.addListener(this);
-    //buttonOptions.addMouseListener(this, true);
-    //addAndMakeVisible(buttonOptions);
-
-    toggleShowRTA.addListener(this);
-    togglePickInput.addListener(this);
-    togglePickOutput.addListener(this);
-
+//
+// ===========================================================================================
+void FrequencyResponse::buildLowMidFreqSlider()
+{
     // Linear Slider from 0 to 1
     sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     sliderLowMidInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sliderLowMidInterface.addListener(this);
     sliderLowMidInterface.setRange(0, 1.f, 0.001f);
     sliderLowMidInterface.setAlpha(0.f);
+    ////sliderLowMidInterface.addMouseListener(this, true);
     addAndMakeVisible(sliderLowMidInterface);
 
+    // Linear Slider from 20 to 20k
+    sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    sliderLowMidCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sliderLowMidCutoff.addListener(this);
+
+    addAndMakeVisible(newCursorLM);
+    newCursorLM.addMouseListener(this, true);
+    newCursorLM.toBehind(&sliderLowMidInterface);
+}
+
+//
+// ===========================================================================================
+void FrequencyResponse::buildMidHighFreqSlider()
+{
     // Linear Slider from 0 to 1
     sliderMidHighInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     sliderMidHighInterface.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -88,16 +74,19 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     addAndMakeVisible(sliderMidHighInterface);
 
     // Linear Slider from 20 to 20k
-    sliderLowMidCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    sliderLowMidCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    sliderLowMidCutoff.addListener(this);
-
-    // Linear Slider from 20 to 20k
     sliderMidHighCutoff.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     sliderMidHighCutoff.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sliderMidHighCutoff.addListener(this);
 
-    // ==========================
+    addAndMakeVisible(newCursorMH);
+    newCursorMH.addMouseListener(this, true);
+    newCursorMH.toBehind(&sliderMidHighInterface);
+}
+
+//
+// ===========================================================================================
+void FrequencyResponse::buildLowGainSlider()
+{
     sliderLowGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderLowGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sliderLowGain.addListener(this);
@@ -105,7 +94,16 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     sliderLowGain.setAlpha(0.f);
     addAndMakeVisible(sliderLowGain);
 
-    // ==========================
+    addAndMakeVisible(newCursorLowGain);
+    newCursorLowGain.setHorizontalOrientation();
+    newCursorLowGain.addMouseListener(this, true);
+    newCursorLowGain.toBehind(&sliderLowGain);
+}
+
+//
+// ===========================================================================================
+void FrequencyResponse::buildMidGainSlider()
+{
     sliderMidGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderMidGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sliderMidGain.addListener(this);
@@ -113,7 +111,16 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     sliderMidGain.setAlpha(0.f);
     addAndMakeVisible(sliderMidGain);
 
-    // ==========================
+    addAndMakeVisible(newCursorMidGain);
+    newCursorMidGain.setHorizontalOrientation();
+    newCursorMidGain.addMouseListener(this, true);
+    newCursorMidGain.toBehind(&sliderMidGain);
+}
+
+//
+// ===========================================================================================
+void FrequencyResponse::buildHighGainSlider()
+{
     sliderHighGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderHighGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sliderHighGain.addListener(this);
@@ -121,20 +128,14 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     sliderHighGain.setAlpha(0.f);
     addAndMakeVisible(sliderHighGain);
 
-    buildLabels();
-    
-    makeAttachments();
-
-    updateResponse();
-
-}
-
-FrequencyResponse::~FrequencyResponse()
-{
-    //buttonOptions.setLookAndFeel(nullptr);
+    addAndMakeVisible(newCursorHighGain);
+    newCursorHighGain.setHorizontalOrientation();
+    newCursorHighGain.addMouseListener(this, true);
+    newCursorHighGain.toBehind(&sliderHighGain);
 }
 
 // Make component->parameter attachments
+// ===========================================================================================
 void FrequencyResponse::makeAttachments()
 {
     using namespace Params;
@@ -177,6 +178,7 @@ void FrequencyResponse::makeAttachments()
 }
 
 // Called on Component Resize
+// ===========================================================================================
 void FrequencyResponse::resized()
 {
     // =============================
@@ -200,96 +202,16 @@ void FrequencyResponse::resized()
     sliderLowGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
     sliderMidGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
     sliderHighGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
-
-    /* Place Show-Menu Button */
-    //buttonOptions.setSize(100, 25);
-    //buttonOptions.setTopLeftPosition(4, 4);
-
 }
 
 // Methods to call on a timed-basis
+// ===========================================================================================
 void FrequencyResponse::timerCallback()
 {
-    
-    //if (globalControls.lowBandControls.hasBSMchanged() ||
-    //    globalControls.midBandControls.hasBSMchanged() ||
-    //    globalControls.highBandControls.hasBSMchanged() ||
-    //    updateAndCheckForChangesToFocus() ||
-    //    paintFlag)
-    //{
-    //    repaint();
-    //    globalControls.lowBandControls.setBsmRead();
-    //    globalControls.midBandControls.setBsmRead();
-    //    globalControls.highBandControls.setBsmRead();
-    //}
-
-    //checkMousePosition();
-
-    updateResponse();
-    
-    //fadeInOutCursorLM();
-    //fadeInOutCursorMH();
-    
-    //fadeInOutCursorLG();
-    //fadeInOutCursorMG();
-    //fadeInOutCursorHG();
-    
-    //fadeInOutRegionLow();
-    //fadeInOutRegionMid();
-    //fadeInOutRegionHigh();
-
-    //fadeButton();
-    
-    //drawLabels();
-    
-    //checkExternalFocus();
-    
-
-    //if (!fadecompletecursorlm)
-    //{
-    //    repaint(cursorlm.getstartx()-5, cursorlm.getstarty(), 10, cursorlm.getlength() );
-    //    repaint(freqlabellow.getbounds().expanded(5, 5));
-    //}
-
-    //
-    //if (!fadecompletecursormh)
-    //{
-    //    repaint(cursormh.getstartx()-5, cursormh.getstarty(), 10, cursormh.getlength() );
-    //    repaint(freqlabelhigh.getbounds().expanded(5, 5));
-    //}
-
-    //
-    //if (!fadecompletecursorlg)
-    //    repaint(cursorlg.getstartx(), cursorlg.getstarty()-5, cursorlg.getlength(), 10 );
-    //
-    //if (!fadecompletecursormg)
-    //    repaint(cursormg.getstartx(), cursormg.getstarty()-5, cursormg.getlength(), 10 );
-    //
-    //if (!fadecompletecursorhg)
-    //    repaint(cursorhg.getstartx(), cursorhg.getstarty()-5, cursorhg.getlength(), 10 );
-    //
-    //if (!fadecompleteregionlow || updatedisplay)
-    //    repaint();
-    //
-    //if (!fadecompleteregionmid|| updatedisplay)
-    //    repaint();
-    //
-    //if (!fadecompleteregionhigh || updatedisplay)
-    //    repaint();
-    //
-    //if (!fadecompletebutton || updatedisplay)
-    //    repaint(buttonoptions.getbounds());
-    //
-    //if (updatedisplay)
-    //{
-    //    repaint();
-    //    updatedisplay = false;
-    //}
-
-
-
 }
 
+//
+// ===========================================================================================
 void FrequencyResponse::buildLabels()
 {
     // Initialize Low-Mid Cutoff Label =======
@@ -329,20 +251,8 @@ void FrequencyResponse::buildLabels()
 //    freqLabelHigh.setTopLeftPosition(0,50);
 }
 
-
-
-
-
-
-
-
-
-
-/* Graphics Functions =========================================================================== */
-/* ============================================================================================== */
-
-
 // Graphics class
+// ===========================================================================================
 void FrequencyResponse::paint(juce::Graphics& g)
 {
     using namespace juce;
@@ -373,7 +283,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 
     /* Draw the gain cursors */
     // =========================
-    paintCursorsGain(g);
+    //paintCursorsGain(g);
 
     /* Paint Menu */
     // =========================
@@ -391,6 +301,7 @@ void FrequencyResponse::paint(juce::Graphics& g)
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
+// ===========================================================================================
 void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
 {
     using namespace juce;
@@ -424,6 +335,7 @@ void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
 }
 
 // Draw horizontal gridlines and horizontal axis labels (frequency)
+// ===========================================================================================
 void FrequencyResponse::paintGridGain(juce::Graphics& g)
 {
     using namespace juce;
@@ -458,34 +370,37 @@ void FrequencyResponse::paintGridGain(juce::Graphics& g)
     }
 }
 
+//
+// ===========================================================================================
 void FrequencyResponse::paintResponseRegions(juce::Graphics& g)
 {
     /* If low-band is hovered, draw low-band on top with highlight */
     if (mLowFocus)
     {
-        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? fadeMaxRegion : fadeAlphaRegionHG);
-        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? fadeMaxRegion : fadeAlphaRegionMG);
-        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? fadeMaxRegion : fadeAlphaRegionLG);
+        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? focusAlpha : noFocusAlpha);
+        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? focusAlpha : noFocusAlpha);
+        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? focusAlpha : noFocusAlpha);
     }
 
     // If mid-band is hovered, draw mid-band on top with highlight.  Doubles as default view.
     if (mMidFocus || (!mLowFocus && !mMidFocus && !mHighFocus))
     {
-        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? fadeMaxRegion : fadeAlphaRegionHG);
-        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? fadeMaxRegion : fadeAlphaRegionLG);
-        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? fadeMaxRegion : fadeAlphaRegionMG);
+        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? focusAlpha : noFocusAlpha);
+        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? focusAlpha : noFocusAlpha);
+        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? focusAlpha : noFocusAlpha);
     }
 
     // If high-band is hovered, draw high-band on top with highlight.
     if (mHighFocus)
     {
-        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? fadeMaxRegion : fadeAlphaRegionLG);
-        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? fadeMaxRegion : fadeAlphaRegionMG);
-        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? fadeMaxRegion : fadeAlphaRegionHG);
+        paintLowRegion(  g,    responseArea, gainLowPixel,     freq1Pixel,                mLowFocus    ? focusAlpha : noFocusAlpha);
+        paintMidRegion(  g,    responseArea, gainMidPixel,     freq1Pixel, freq2Pixel,    mMidFocus    ? focusAlpha : noFocusAlpha);
+        paintHighRegion( g,    responseArea, gainHighPixel,    freq2Pixel,                mHighFocus    ? focusAlpha : noFocusAlpha);
     }
 }
 
 // Draw Low-Frequency Response Trapezoid
+// ===========================================================================================
 void FrequencyResponse::paintLowRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float alpha)
 {
     using namespace AllColors::FrequencyResponseColors;
@@ -523,6 +438,7 @@ void FrequencyResponse::paintLowRegion(juce::Graphics& g, juce::Rectangle<float>
 }
 
 // Draw Mid-Frequency Response Trapezoid
+// ===========================================================================================
 void FrequencyResponse::paintMidRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float freq2Pixel, float alpha)
 {
     using namespace AllColors::FrequencyResponseColors;
@@ -563,6 +479,7 @@ void FrequencyResponse::paintMidRegion(juce::Graphics& g, juce::Rectangle<float>
 }
 
 // Draw High-Frequency Response Trapezoid
+// ===========================================================================================
 void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq2Pixel, float alpha)
 {
     using namespace AllColors::FrequencyResponseColors;
@@ -597,27 +514,28 @@ void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float
     }
 }
 
+//
+// ===========================================================================================
 void FrequencyResponse::paintCursorsFrequency(juce::Graphics& g)
 {
 
-    // Draw Low-Mid Cursor
-    g.setColour(juce::Colours::white);
-    g.setOpacity(mLowMidFocus ? 1.f : fadeAlphaCursorLM);
-    g.drawLine(cursorLM, 3.f);
-    freqLabelLow.setAlpha(  freqLabelLow.isBeingEdited() ? 1.f :
-                            juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
+    /* This should get cleaned up and placed elsewhere */
 
-    // Draw Mid-High Cursor
-    g.setColour(juce::Colours::white);
-    g.setOpacity(mMidHighFocus ? 1.f : fadeAlphaCursorMH);
-    g.drawLine(cursorMH, 3.f);
-    freqLabelHigh.setAlpha(  freqLabelHigh.isBeingEdited() ? 1.f :
-                             juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
+    //freqLabelLow.setAlpha(  freqLabelLow.isBeingEdited() ? 1.f :
+    //                        juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
+
+    //freqLabelHigh.setAlpha(  freqLabelHigh.isBeingEdited() ? 1.f :
+    //                         juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
     
+    freqLabelLow.setAlpha(1.f);
+    freqLabelHigh.setAlpha(1.f);
+
     drawLabels();
     
 }
 
+//
+// ===========================================================================================
 void FrequencyResponse::drawLabels()
 {
     auto bounds = getLocalBounds();
@@ -625,18 +543,13 @@ void FrequencyResponse::drawLabels()
     int labelHeight = 25;
     
     int margin = 5;
-    
-//    int labelX1 = bounds.getRight() - labelWidth - margin;
-//    int labelX2 = bounds.getRight() - labelWidth - margin;
-//    int labelY1 = bounds.getY() + margin;
-//    int labelY2 = bounds.getY() + margin + labelHeight + margin;
-    
-    int labelX1 = cursorLM.getStartX() - labelWidth/2;
-    int labelX2 = cursorMH.getStartX() - labelWidth/2;
+
+    int labelX1 = newCursorLM.getX() + (newCursorLM.getWidth() / 2) - labelWidth / 2;
+    int labelX2 = newCursorMH.getX() + (newCursorMH.getWidth() / 2) - labelWidth / 2;
+
     int labelY1 = bounds.getY() + margin;
     int labelY2 = bounds.getY() + margin;
     
-
 
     // Bump at left bounds
     if (labelX1 <= responseArea.getX() + margin)
@@ -652,71 +565,32 @@ void FrequencyResponse::drawLabels()
     if (labelX2 + labelWidth  >= responseArea.getRight() - margin)
         labelX2 = responseArea.getRight() - labelWidth - margin;
     
+    // Bump near each other
     if (freqLabelLow.getRight() > freqLabelHigh.getX() - 2 * margin)
     {
-        //labelY1 += 30;
+        labelY1 += 30;
     }
-        
+       
+    // Send it
     freqLabelLow.setBounds(labelX1, labelY1 , labelWidth, labelHeight);
     freqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
 
 }
 
-void FrequencyResponse::paintCursorsGain(juce::Graphics& g)
-{
-    // Draw Low-Gain Cursor
-    if (!lowBandMute)
-    {
-        g.setColour(juce::Colours::white);
-        g.setOpacity(fadeAlphaCursorLG);
-        g.drawLine(cursorLG, 3.f);
-    }
-
-    // Draw Mid-Gain Cursor
-    if (!midBandMute)
-    {
-        g.setColour(juce::Colours::white);
-        g.setOpacity(fadeAlphaCursorMG);
-        g.drawLine(cursorMG, 3.f);
-    }
-
-    // Draw High-Gain Cursor
-    if (!highBandMute)
-    {
-        g.setColour(juce::Colours::white);
-        g.setOpacity(fadeAlphaCursorHG);
-        g.drawLine(cursorHG, 3.f);
-    }
-}
-
-// Fade Components on Mouse Enter
-//void FrequencyResponse::paintMenu(juce::Graphics& g)
-//{
-//    g.setColour(juce::Colours::white);
-//    g.setOpacity(0.9f);
-//    g.fillRoundedRectangle( buttonBounds.getX(),
-//                            buttonBounds.getY(),
-//                            buttonBounds.getWidth(),
-//                            buttonBounds.getHeight(),
-//                            2.f);
-//
-//    for (int i = 0; i < 5; i++)
-//    {
-//        g.setColour(juce::Colours::darkgrey.withMultipliedAlpha(1.f/((i*i)+0.75f)));
-//        g.drawRect(buttonBounds.toFloat().reduced(i,i), 1.f);
-//    }
-//}
-
 // Paint Labels
+// ===========================================================================================
 void FrequencyResponse::paintLabels(juce::Graphics& g)
 {
     /* Draw Low Frequency Label */
     // ====================================================
     g.setColour(juce::Colours::black);
     
-    auto opacityL = juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
-    auto opacityH = juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
+    //auto opacityL = juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
+    //auto opacityH = juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
     
+    auto opacityL = 1.f;
+    auto opacityH = 1.f;
+
     g.setOpacity(   freqLabelLow.isBeingEdited() ? 1.f : opacityL);
     
     g.fillRoundedRectangle(freqLabelLow.getBounds().toFloat(), 3.f);
@@ -742,24 +616,14 @@ void FrequencyResponse::paintLabels(juce::Graphics& g)
     g.drawRoundedRectangle(freqLabelHigh.getBounds().toFloat(), 3.f, 1.f);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Update the response prior to painting.
+// ===========================================================================================
 void FrequencyResponse::updateResponse()
 {
     using namespace Params;
     const auto& params = GetParams();
+
+    auto cursorWidth = 10;
 
     // Get cutoff frequency parameter values
     mLowMidCutoff = *apvts.getRawParameterValue(params.at(Names::Low_Mid_Crossover_Freq));
@@ -769,12 +633,11 @@ void FrequencyResponse::updateResponse()
     freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
     freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
-    // Set Low-Mid Crossover Cursor Bounds
-    cursorLM.setStart(freq1Pixel, responseArea.getY() + 1);
-    cursorLM.setEnd(freq1Pixel, responseArea.getBottom() - 1);
+    newCursorLM.setBounds(freq1Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
 
-    cursorMH.setStart(freq2Pixel, responseArea.getY() + 1);
-    cursorMH.setEnd(freq2Pixel, responseArea.getBottom() - 1);
+    newCursorMH.setBounds(freq2Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
+
+
 
     // Set Mid-High Crossover Cursor Bounds
     mLowGain = *apvts.getRawParameterValue(params.at(Names::Gain_Low_Band));
@@ -792,22 +655,36 @@ void FrequencyResponse::updateResponse()
     auto highWidth = (responseArea.getRight() - freq2Pixel) * 0.75f;
 
     // Set Low-Gain Cursor Bounds
+    // =========================================================================
     auto center = (responseArea.getX() + freq1Pixel) / 2.f;
 
-    cursorLG.setStart    (center - lowWidth / 2.f, gainLowPixel);
-    cursorLG.setEnd        (center + lowWidth / 2.f, gainLowPixel);
+    newCursorLowGain.setBounds  (   center - lowWidth / 2.f, 
+                                    gainLowPixel - cursorWidth / 2.f, 
+                                    lowWidth, 
+                                    cursorWidth
+                                );
+
 
     // Set Mid-Gain Cursor Bounds
+    // =========================================================================
     center = (freq1Pixel + freq2Pixel) / 2.f;
-    
-    cursorMG.setStart    (center - midWidth / 2.f, gainMidPixel);
-    cursorMG.setEnd        (center + midWidth / 2.f, gainMidPixel);
+
+    newCursorMidGain.setBounds  (   center - midWidth / 2.f, 
+                                    gainMidPixel - cursorWidth / 2.f, 
+                                    midWidth, 
+                                    cursorWidth
+                                );
 
     // Set High-Gain Cursor Bounds
+    // =========================================================================
     center = (freq2Pixel + responseArea.getRight()) / 2.f;
 
-    cursorHG.setStart    (center - highWidth / 2.f, gainHighPixel);
-    cursorHG.setEnd        (center + highWidth / 2.f, gainHighPixel);
+    newCursorHighGain.setBounds (   center - highWidth / 2.f, 
+                                    gainHighPixel - cursorWidth / 2.f, 
+                                    highWidth, 
+                                    cursorWidth
+                                );
+
 
     // Update Band Bypass States
     lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
@@ -830,6 +707,7 @@ void FrequencyResponse::updateResponse()
 }
 
 // Check if bands are soloed.  Negate mute if so.
+// ===========================================================================================
 void FrequencyResponse::checkSolos()
 {
     auto x = lowBandSolo * 100;
@@ -849,6 +727,7 @@ void FrequencyResponse::checkSolos()
 }
 
 // Map linear slider value to true octave-logarithmic value
+// ===========================================================================================
 float FrequencyResponse::mapLog2(float freq)
 {
     auto logMin = std::log2(20.f);
@@ -858,6 +737,7 @@ float FrequencyResponse::mapLog2(float freq)
 }
 
 // Called on slider value change
+// ===========================================================================================
 void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 {
     // 'Interface' slider is linear from 0 to 1.
@@ -916,115 +796,8 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
     updateResponse();
 }
 
-//void FrequencyResponse::drawToggles(bool showMenu)
-//{
-    //using namespace juce;
-
-    /* Toggle Menu Visibility Based On Display Params */
-    //if (showMenu)
-    //    buttonBounds.setBounds(buttonOptions.getX(), buttonOptions.getBottom(), buttonOptions.getWidth(), 75);
-    //else
-    //{
-    //    buttonBounds.setBounds(0, 0, 0, 0);
-    //    updateDisplay = true;
-    //}
-
-
-    //FlexBox flexBox;
-    //flexBox.flexDirection = FlexBox::Direction::column;
-    //flexBox.flexWrap = FlexBox::Wrap::noWrap;
-
-    //auto margin = FlexItem().withHeight(5);
-    //auto spacer = FlexItem().withHeight(2.5);
-    //auto height = (150.f - 2.f * 5.f - 5.f * 2.5f) / 6.f;
-
-    //flexBox.items.add(margin);
-    //flexBox.items.add(FlexItem(toggleShowRTA).withHeight(height));
-    //flexBox.items.add(spacer);
-    //flexBox.items.add(FlexItem(togglePickInput).withHeight(height));
-    //flexBox.items.add(spacer);
-    //flexBox.items.add(FlexItem(togglePickOutput).withHeight(height));
-    //flexBox.items.add(margin);
-
-    //flexBox.performLayout(buttonBounds);
-
-    //toggleShowRTA.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-    //togglePickInput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-    //togglePickOutput.setColour(ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::black);
-
-    //toggleShowRTA.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    //togglePickInput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    //togglePickOutput.setColour(ToggleButton::ColourIds::tickColourId, juce::Colours::black);
-    //
-    //toggleShowRTA.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    //togglePickInput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    //togglePickOutput.setColour(ToggleButton::ColourIds::textColourId, juce::Colours::black);
-
-    //toggleShowRTA.setButtonText("Show FFT");
-    //togglePickInput.setButtonText("FFT In");
-    //togglePickOutput.setButtonText("FFT Out");
-
-    //togglePickInput.setRadioGroupId(1);
-    //togglePickOutput.setRadioGroupId(1);
-
-    //addAndMakeVisible(toggleShowRTA);
-    //addAndMakeVisible(togglePickInput);
-    //addAndMakeVisible(togglePickOutput);
-//}
-
-void FrequencyResponse::buttonClicked(juce::Button* button)
-{
-    //if (button == &buttonOptions)
-    //{
-    //    showMenu = !showMenu;
-    //    drawToggles(showMenu);
-    //    DBG("freq clicked");
-    //}
-
-    //if (button == &toggleShowRTA)
-    //{
-    //    mShowFFT = toggleShowRTA.getToggleState();
-    //}
-    //    
-    //if (button == &togglePickInput || button == &togglePickOutput)
-    //{
-    //    mPickOffID = togglePickOutput.getToggleState();
-
-    //    updateToggleStates();
-    //}
-    //
-    //updateDisplay = true;
-
-}
-
-//void FrequencyResponse::updateToggleStates()
-//{
-//    // When Pickoff ID Changes,
-//    // Update Toggle States
-//    // Set Parameter
 //
-//    switch (mPickOffID)
-//    {
-//        case 0: // Pre
-//        {
-//            togglePickInput.setToggleState(true, false);
-//            togglePickOutput.setToggleState(false, false); break;
-//        }
-//        case 1: // Post
-//        {
-//            togglePickOutput.setToggleState(true, false);
-//            togglePickInput.setToggleState(false, false); break;
-//        }
-//    }
-//
-//    fftPickoffParameter->setValueNotifyingHost(mPickOffID);
-//
-//    audioProcessor.setFftPickoffPoint(mPickOffID);
-//}
-
-
-
-
+// ===========================================================================================
 void FrequencyResponse::labelTextChanged(juce::Label* labelThatHasChanged)
 {
     // Means of handling invalid input entries,
@@ -1092,6 +865,8 @@ void FrequencyResponse::labelTextChanged(juce::Label* labelThatHasChanged)
     paintFlag = true;
 }
 
+//
+// ===========================================================================================
 void FrequencyResponse::updateStringText()
 {
     juce::String stringLM;
@@ -1127,592 +902,112 @@ void FrequencyResponse::updateStringText()
 
 }
 
-
-
-
-/* Mouse Functions ============================================================================== */
-/* ============================================================================================== */
-
-
-// Check mouse position on timed-basis
-void FrequencyResponse::checkMousePosition()
-{
-    // If none apply, kill all fades
-
-    if (!isMouseOverOrDragging(true))
-    {
-        fadeInCursorLM = false;
-        fadeInCursorMH = false;
-        fadeRegionLG = false;
-        fadeRegionMG = false;
-        fadeRegionHG = false;
-    }
-}
-
 // Called on Mouse Move
+// ===========================================================================================
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
 // Called on Mouse Enter
+// ===========================================================================================
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
 // Called on Mouse Exit
+// ===========================================================================================
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
-
-
-
-
-
-
-/* Fade Functions =============================================================================== */
-/* ============================================================================================== */
-
-
-
-// Fade Cursor when within bounds
-void FrequencyResponse::fadeInOutCursorLM()
-{
-    if (fadeInCursorLM) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaCursorLM < fadeMaxCursor)
-        {
-            fadeCompleteCursorLM = false;
-            fadeAlphaCursorLM += fadeStepUpCursor;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaCursorLM > fadeMaxCursor)
-        {
-            fadeAlphaCursorLM = fadeMaxCursor;
-            fadeCompleteCursorLM = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaCursorLM > fadeMinCursor)
-        {
-            fadeCompleteCursorLM = false;
-            fadeAlphaCursorLM -= fadeStepDownCursor;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaCursorLM < fadeMinCursor)
-        {
-            fadeAlphaCursorLM = fadeMinCursor;
-            fadeCompleteCursorLM = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutCursorMH()
-{
-    if (fadeInCursorMH) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaCursorMH < fadeMaxCursor)
-        {
-            fadeCompleteCursorMH = false;
-            fadeAlphaCursorMH += fadeStepUpCursor;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaCursorMH > fadeMaxCursor)
-        {
-            fadeAlphaCursorMH = fadeMaxCursor;
-            fadeCompleteCursorMH = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaCursorMH > fadeMinCursor)
-        {
-            fadeCompleteCursorMH = false;
-            fadeAlphaCursorMH -= fadeStepDownCursor;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaCursorMH < fadeMinCursor)
-        {
-            fadeAlphaCursorMH = fadeMinCursor;
-            fadeCompleteCursorMH = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutCursorLG()
-{
-    if (fadeInCursorLG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaCursorLG < fadeMaxCursor)
-        {
-            fadeCompleteCursorLG = false;
-            fadeAlphaCursorLG += fadeStepUpCursor;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaCursorLG > fadeMaxCursor)
-        {
-            fadeAlphaCursorLG = fadeMaxCursor;
-            fadeCompleteCursorLG = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaCursorLG > fadeMinCursor)
-        {
-            fadeCompleteCursorLG = false;
-            fadeAlphaCursorLG -= fadeStepDownCursor;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaCursorLG < fadeMinCursor)
-        {
-            fadeAlphaCursorLG = fadeMinCursor;
-            fadeCompleteCursorLG = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutCursorMG()
-{
-    if (fadeInCursorMG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaCursorMG < fadeMaxCursor)
-        {
-            fadeCompleteCursorMG = false;
-            fadeAlphaCursorMG += fadeStepUpCursor;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaCursorMG > fadeMaxCursor)
-        {
-            fadeAlphaCursorMG = fadeMaxCursor;
-            fadeCompleteCursorMG = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaCursorMG > fadeMinCursor)
-        {
-            fadeCompleteCursorMG = false;
-            fadeAlphaCursorMG -= fadeStepDownCursor;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaCursorMG < fadeMinCursor)
-        {
-            fadeAlphaCursorMG = fadeMinCursor;
-            fadeCompleteCursorMG = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutCursorHG()
-{
-    if (fadeInCursorHG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaCursorHG < fadeMaxCursor)
-        {
-            fadeCompleteCursorHG = false;
-            fadeAlphaCursorHG += fadeStepUpCursor;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaCursorHG > fadeMaxCursor)
-        {
-            fadeAlphaCursorHG = fadeMaxCursor;
-            fadeCompleteCursorHG = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaCursorHG > fadeMinCursor)
-        {
-            fadeCompleteCursorHG = false;
-            fadeAlphaCursorHG -= fadeStepDownCursor;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaCursorHG < fadeMinCursor)
-        {
-            fadeAlphaCursorHG = fadeMinCursor;
-            fadeCompleteCursorHG = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutRegionLow()
-{
-    if (fadeRegionLG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaRegionLG <= fadeMaxRegion)
-        {
-            fadeCompleteRegionLow = false;
-            fadeAlphaRegionLG += fadeStepUpRegion;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaRegionLG >= fadeMaxRegion)
-        {
-            fadeAlphaRegionLG = fadeMaxRegion;
-            fadeCompleteRegionLow = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaRegionLG >= fadeMinRegion)
-        {
-            fadeCompleteRegionLow = false;
-            fadeAlphaRegionLG -= fadeStepDownRegion;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaRegionLG <= fadeMinRegion)
-        {
-            fadeAlphaRegionLG = fadeMinRegion;
-            fadeCompleteRegionLow = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutRegionMid()
-{
-    if (fadeRegionMG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaRegionMG <= fadeMaxRegion)
-        {
-            fadeCompleteRegionMid = false;
-            fadeAlphaRegionMG += fadeStepUpRegion;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaRegionMG >= fadeMaxRegion)
-        {
-            fadeAlphaRegionMG = fadeMaxRegion;
-            fadeCompleteRegionMid = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaRegionMG >= fadeMinRegion)
-        {
-            fadeCompleteRegionMid = false;
-            fadeAlphaRegionMG -= fadeStepDownRegion;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaRegionMG <= fadeMinRegion)
-        {
-            fadeAlphaRegionMG = fadeMinRegion;
-            fadeCompleteRegionMid = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeInOutRegionHigh()
-{
-    if (fadeRegionHG) // If mouse entered... fade Toggles Alpha up
-    {
-        /* Fade in until complete */
-        if (fadeAlphaRegionHG <= fadeMaxRegion)
-        {
-            fadeCompleteRegionHigh = false;
-            fadeAlphaRegionHG += fadeStepUpRegion;
-        }
-            
-        /* Fade in complete */
-        if (fadeAlphaRegionHG >= fadeMaxRegion)
-        {
-            fadeAlphaRegionHG = fadeMaxRegion;
-            fadeCompleteRegionHigh = true;
-        }
-    }
-    else // If mouse exit... fade Toggles Alpha down
-    {
-        /* Fade out until complete */
-        if (fadeAlphaRegionHG >= fadeMinRegion)
-        {
-            fadeCompleteRegionHigh = false;
-            fadeAlphaRegionHG -= fadeStepDownRegion;
-        }
-
-        /* Fade out complete */
-        if (fadeAlphaRegionHG <= fadeMinRegion)
-        {
-            fadeAlphaRegionHG = fadeMinRegion;
-            fadeCompleteRegionHigh = true;
-        }
-    }
-}
-
-void FrequencyResponse::fadeButton()
-{
-    //if (fadeInButton || showMenu) // If mouse entered... fade Toggles Alpha up
-    //{
-    //    /* Fade in until complete */
-    //    if (fadeAlphaButton < fadeMaxButton)
-    //    {
-    //        fadeCompleteButton = false;
-    //        fadeAlphaButton += fadeStepUpButton;
-    //    }
-    //        
-    //    /* Fade in complete */
-    //    if (fadeAlphaButton >= fadeMaxButton)
-    //    {
-    //        fadeAlphaButton = fadeMaxButton;
-    //        fadeCompleteButton = true;
-    //    }
-    //}
-    //else // If mouse exit... fade Toggles Alpha down
-    //{
-    //    /* Fade out until complete */
-    //    if (fadeAlphaButton > fadeMinButton)
-    //    {
-    //        fadeCompleteButton = false;
-    //        fadeAlphaButton -= fadeStepDownButton;
-    //    }
-
-    //    /* Fade out complete */
-    //    if (fadeAlphaButton < fadeMinButton)
-    //    {
-    //        fadeAlphaButton = fadeMinButton;
-    //        fadeCompleteButton = true;
-    //    }
-    //}
-    
-    //buttonOptions.setAlpha(fadeAlphaButton);
-}
-
-
-
-
-
-
-
-
-
-
-/* Focus Functions ============================================================================== */
-/* ============================================================================================== */
-
 // Check to see if mouse is focusing on any cursor for parameter change
+// ===========================================================================================
 void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 {
-    auto yM = event.getPosition().getY();
     auto xM = event.getPosition().getX();
-
-    auto xLM = cursorLM.getStartX();
-    auto xMH = cursorMH.getStartX();
-
-    auto yLG = cursorLG.getStartY();
-    auto yMG = cursorMG.getStartY();
-    auto yHG = cursorHG.getStartY();
-
-    auto xMargin = 10;
-    auto yMargin = 10;
-
-    auto x0 = responseArea.getX();
-    auto x1 = responseArea.getRight();
-    auto y0 = responseArea.getY();
-    auto y1 = responseArea.getBottom();
-
-    // Mouse is on Low-Mid Cursor or Label
-    if (abs(xM - xLM) < xMargin || freqLabelLow.isMouseOver())
-        fadeInCursorLM = true;
-    else
-        fadeInCursorLM = false;
-    
-    // Mouse is on Mid-High Cursor
-    if (abs((xM - xMH)) < xMargin || freqLabelHigh.isMouseOver())
-        fadeInCursorMH = true;
-    else fadeInCursorMH = false;
-
-    // Mouse is within Low Gain Region
-    if (xM < freq1Pixel - xMargin)
-    {
-        fadeRegionLG = true;
-
-        // Mouse is on Low Gain Cursor
-        if (abs(yM - yLG) < yMargin)
-        {
-            fadeInCursorLG = true;
-            fadeInCursorLM = false;
-            fadeInCursorMH = false;
-        }
-        else fadeInCursorLG = false;
-    }
-    else
-    {
-        fadeRegionLG = false;
-        fadeInCursorLG = false;
-    }
-
-    // Mouse is within Mid Gain Region
-    if (xM > freq1Pixel + xMargin && xM < freq2Pixel - xMargin)
-    {
-        fadeRegionMG = true;
-
-        // Mouse is on Mid Gain Cursor
-        if (abs(yM - yMG) < yMargin)
-        {
-            fadeInCursorMG = true;
-            fadeInCursorLM = false;
-            fadeInCursorMH = false;
-        }
-        else fadeInCursorMG = false;
-    }
-    else
-    {
-        fadeRegionMG = false;
-        fadeInCursorMG = false;
-    }
-
-    // Mouse is within High Gain Region
-    if (xM > freq2Pixel + xMargin)
-    {
-        fadeRegionHG = true;
-
-        // Mouse is on High Gain Cursor
-        if (abs(yM - yHG) < yMargin)
-        {
-            fadeInCursorHG = true;
-            fadeInCursorLM = false;
-            fadeInCursorMH = false;
-        } else fadeInCursorHG = false;
-    }
-    else
-    {
-        fadeRegionHG = false;
-        fadeInCursorHG = false;
-    }
+    auto yM = event.getPosition().getY();
 
 
-
-    // Mouse is out of window, kill all fades
-    if (xM < x0 || xM > x1 || yM < y0 || yM > y1)
-    {
-        fadeRegionLG = false;
-        fadeRegionMG = false;
-        fadeRegionHG = false;
-        //fadeInCursorLM = false;
-        //fadeInCursorMH = false;
-    }
+    //auto parentComponent = newCursorLM.getParentComponent(); // Assuming both have the same parent
+    auto mousePoint = getLocalPoint(event.eventComponent, event.getPosition());
 
     // Establish top-bottom bounds of Dummy Sliders
     auto sliderTop = responseArea.getY() + juce::jmap(24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())-5;
     auto sliderBot = responseArea.getY() + juce::jmap(-24.f, -30.f, 30.f, float(responseArea.getBottom()), responseArea.getY())+5;
 
-    // Mouse is on Low-Mid Cursor, place dummy slider underneath mouse
-    if (fadeInCursorLM)
-        sliderLowMidInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 1);
+    // Check if mouse is on cursor, place dummy slider underneath mouse
 
-    // Mouse is on Mid-High Cursor, place dummy slider underneath mouse
-    if (fadeInCursorMH)
-        sliderMidHighInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 1);
+    // Low-Mid
+    // =============================================================
+    if (newCursorLM.getBounds().contains(mousePoint))
+    {
+        sliderLowMidInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 5);
+        newCursorLM.setFocus(true);
+    }
+    else
+    {
+        sliderLowMidInterface.setBounds(0, 0, 0, 0);
+        newCursorLM.setFocus(false);
+    }
 
-    // Mouse is on Low Gain Cursor, place dummy slider underneath mouse
-    if (fadeInCursorLG)
-        sliderLowGain.setBounds(xM, sliderTop, 1, (sliderBot-sliderTop));
+    // Mid-High
+    // =============================================================
+    if (newCursorMH.getBounds().contains(mousePoint))
+    {
+        sliderMidHighInterface.setBounds(responseArea.getX(), yM, responseArea.getWidth(), 5);
+        newCursorMH.setFocus(true);
+    }
+    else
+    {
+        sliderMidHighInterface.setBounds(0, 0, 0, 0);
+        newCursorMH.setFocus(false);
+    }
 
-    // Mouse is on Mid Gain Cursor, place dummy slider underneath mouse
-    if (fadeInCursorMG)
-        sliderMidGain.setBounds(xM, sliderTop, 1, (sliderBot - sliderTop));
+    // Low Gain
+    // =============================================================
+    if (newCursorLowGain.getBounds().contains(mousePoint))
+    {
+        sliderLowGain.setBounds(newCursorLowGain.getX() + xM, sliderTop, 5, (sliderBot - sliderTop));
+        newCursorLowGain.setFocus(true);
+    }
+    else
+    {
+        sliderLowGain.setBounds(0, 0, 0, 0);
+        newCursorLowGain.setFocus(false);
+    }
 
-    // Mouse is on High Gain Cursor, place dummy slider underneath mouse
-    if (fadeInCursorHG)
-        sliderHighGain.setBounds(xM, sliderTop, 1, (sliderBot - sliderTop));
+    // Mid Gain
+    // =============================================================
+    if (newCursorMidGain.getBounds().contains(mousePoint))
+    {
+        sliderMidGain.setBounds(newCursorMidGain.getX() + xM, sliderTop, 5, (sliderBot - sliderTop));
+        newCursorMidGain.setFocus(true);
+    }
+    else
+    {
+        sliderMidGain.setBounds(0, 0, 0, 0);
+        newCursorMidGain.setFocus(false);
+    }
 
+    // High Gain
+    // =============================================================
+    if (newCursorHighGain.getBounds().contains(mousePoint))
+    {
+        sliderHighGain.setBounds(newCursorHighGain.getX() + xM, sliderTop, 5, (sliderBot - sliderTop));
+        newCursorHighGain.setFocus(true);
+    }
+    else
+    {
+        sliderHighGain.setBounds(0, 0, 0, 0);
+        newCursorHighGain.setFocus(false);
+    }
 }
 
-//bool FrequencyResponse::checkMenuFocus(const juce::MouseEvent& event)
-//{
-//    auto x = event.getPosition().getX();
-//    auto y = event.getPosition().getY();
 //
-//    bool mouseIsInMenu{ false };
-//
-//    if (x > buttonBounds.getX() && x < buttonBounds.getRight() &&
-//        y > buttonBounds.getY() && y < buttonBounds.getBottom())
-//        mouseIsInMenu = true;
-//
-//    if (buttonOptions.isMouseOverOrDragging() || mouseIsInMenu)
-//    {
-//        fadeInButton = true;
-//        fadeInCursorLM = false;
-//        fadeInCursorMH = false;
-//        fadeInCursorLG = false;
-//        fadeInCursorMG = false;
-//        fadeInCursorHG = false;
-//        return true;
-//    }
-//    else
-//    {
-//        fadeInButton = false;
-//        return false;
-//    }
-//}
-
-bool FrequencyResponse::updateAndCheckForChangesToFocus()
-{
-
-    oldFocus[0] = mLowFocus || fadeRegionLG;
-    mLowFocus = globalControls.lowBandControls.isMouseOverOrDragging(true);
-
-    oldFocus[1] = mMidFocus || fadeRegionMG;
-    mMidFocus = globalControls.midBandControls.isMouseOverOrDragging(true);
-
-    oldFocus[2] = mHighFocus || fadeRegionHG;
-    mHighFocus = globalControls.highBandControls.isMouseOverOrDragging(true);
-
-    /* Compare parameters */
-    if (oldFocus[0] != mLowFocus)
-    {
-        oldFocus[0] = mLowFocus;
-        return true;
-    }
-    
-    /* Compare parameters */
-    if (oldFocus[1] != mMidFocus)
-    {
-        oldFocus[1] = mMidFocus;
-        return true;
-    }
-    
-    /* Compare parameters */
-    if (oldFocus[2] != mHighFocus)
-    {
-        oldFocus[2] = mHighFocus;
-        return true;
-    }
-    
-    return false;
-}
-
-
-
-// ========================================================
+// ===========================================================================================
 void FrequencyResponse::actionListenerCallback(const juce::String& message)
 {
 
@@ -1724,26 +1019,34 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
     paramValue = paramValue.removeCharacters("x");
 
 
-    DBG(paramName);
+    DBG(paramName << "   " << paramValue);
 
     if (paramName == "GAIN")
-    {
         updateResponse();
-    }
 
     if (paramName == "BYPASS")
-    {
         updateResponse();
-    }
 
     if (paramName == "SOLO")
-    {
         updateResponse();
-    }
 
     if (paramName == "MUTE")
-    {
         updateResponse();
+
+    if (paramName == "FOCUS")
+    {
+        mLowFocus = false;
+        mMidFocus = false;
+        mHighFocus = false;
+
+        if (paramValue == "LOW")
+            mLowFocus = true;
+
+        if (paramValue == "MID")
+            mMidFocus = true;
+
+        if (paramValue == "HIGH")
+            mHighFocus = true;
     }
 
 }

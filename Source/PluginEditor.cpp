@@ -66,6 +66,12 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     globalControls.getMidControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
     globalControls.getHighControl().addActionListener   ( &wrapperFrequency.getFrequencyResponse() );
     
+    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeLow());
+    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeMid());
+    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeHigh());
+
+    globalControls.addActionListener(&wrapperFrequency.getFrequencyResponse());
+
     setBufferedToImage(true);
     setOpaque(true);
 }

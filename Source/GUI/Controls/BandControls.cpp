@@ -394,7 +394,6 @@ void BandControl::buttonClicked(juce::Button* button)
 
 void BandControl::mouseEnter(const juce::MouseEvent& event)
 {
-
 }
 
 void BandControl::mouseMove(const juce::MouseEvent& event)
@@ -403,9 +402,7 @@ void BandControl::mouseMove(const juce::MouseEvent& event)
 }
 
 void BandControl::mouseExit(const juce::MouseEvent& event)
-{
-
-    
+{    
 }
 
 // Guarantees a 30-Character long message

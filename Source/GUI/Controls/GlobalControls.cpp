@@ -22,8 +22,12 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
     addAndMakeVisible(midBandControls);
     addAndMakeVisible(highBandControls);
     
-
+    addMouseListener(this, true);
     
+    lowBandControls.addMouseListener(this, true);
+    midBandControls.addMouseListener(this, true);
+    highBandControls.addMouseListener(this, true);
+
     lowBandControls.setMode("LOW");
     midBandControls.setMode("MID");
     highBandControls.setMode("HIGH");
@@ -483,4 +487,56 @@ void GlobalControls::makeWaveControlAttachments()
                             apvts,
                             params.at(Names::Invert_High_LFO),
                             highBandControls.mToggleInvert.mToggleButton);
+}
+
+
+// Guarantees a 30-Character long message
+void GlobalControls::sendBroadcast(juce::String parameterName, juce::String parameterValue)
+{
+    juce::String delimiter = ":::::";
+
+    juce::String bandName = "xxxxx";
+
+    auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
+
+    DBG(message);
+
+    sendActionMessage(message);
+}
+
+
+
+void GlobalControls::mouseEnter(const juce::MouseEvent& event)
+{
+    checkForBandFocus();
+}
+
+void GlobalControls::mouseExit(const juce::MouseEvent& event)
+{
+    checkForBandFocus();
+}
+
+
+void GlobalControls::checkForBandFocus()
+{
+
+    auto whoHasFocus = "NONE";
+
+    if (lowBandControls.isMouseOver(true))
+    {
+        whoHasFocus = "LOW";
+    }
+
+    if (midBandControls.isMouseOver(true))
+    {
+        whoHasFocus = "MID";
+    }
+
+    if (highBandControls.isMouseOver(true))
+    {
+        whoHasFocus = "HIGH";
+    }
+
+    sendBroadcast("FOCUS", whoHasFocus);
+
 }

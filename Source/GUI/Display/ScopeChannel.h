@@ -36,7 +36,7 @@ struct ScopeChannel :   juce::Component,
     
     void updateBandBypass();
     
-    void setBandFocus(bool hasFocus);
+    //void setBandFocus(bool hasFocus);
     
     void setBandsStacked(bool areStacked) {bandsAreStacked = areStacked;}
     

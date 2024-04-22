@@ -30,6 +30,8 @@
               file="Source/GUI/Controls/GlobalControls.h"/>
       </GROUP>
       <GROUP id="{76A8763A-6712-BF7B-D604-A362203AC5EF}" name="Display">
+        <FILE id="OTuavb" name="Cursor.cpp" compile="1" resource="0" file="Source/GUI/Display/Cursor.cpp"/>
+        <FILE id="zHMaxf" name="Cursor.h" compile="0" resource="0" file="Source/GUI/Display/Cursor.h"/>
         <FILE id="TwWvE0" name="OptionsMenu.cpp" compile="1" resource="0" file="Source/GUI/Display/OptionsMenu.cpp"/>
         <FILE id="UsWfav" name="OptionsMenu.h" compile="0" resource="0" file="Source/GUI/Display/OptionsMenu.h"/>
         <FILE id="yVq3XW" name="ScopeChannel.cpp" compile="1" resource="0"

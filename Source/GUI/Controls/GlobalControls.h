@@ -17,7 +17,9 @@
 #include "../../Utility/UtilityFunctions.h"
 
 
-struct GlobalControls : juce::Component
+struct GlobalControls : juce::Component,
+                        juce::ActionBroadcaster,
+                        juce::MouseListener
 {
 	GlobalControls(TertiaryAudioProcessor& p);
 
@@ -42,6 +44,13 @@ struct GlobalControls : juce::Component
     BandControl& getMidControl() {return midBandControls; };
     BandControl& getHighControl() {return highBandControls; };
     
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
+
+    void checkForBandFocus();
+
+    void sendBroadcast(juce::String parameterName, juce::String parameterValue);
+
 private:
 
     bool shouldPaintOnceOnInit{true};

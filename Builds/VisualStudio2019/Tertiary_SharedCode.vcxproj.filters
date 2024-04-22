@@ -673,6 +673,9 @@
     <ClCompile Include="..\..\Source\GUI\Controls\GlobalControls.cpp">
       <Filter>Tertiary\GUI\Controls</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\Cursor.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\GUI\Display\OptionsMenu.cpp">
       <Filter>Tertiary\GUI\Display</Filter>
     </ClCompile>
@@ -3353,6 +3356,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Controls\GlobalControls.h">
       <Filter>Tertiary\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\Cursor.h">
+      <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Display\OptionsMenu.h">
       <Filter>Tertiary\GUI\Display</Filter>

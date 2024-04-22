@@ -221,6 +221,15 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         scrollCenter = sliderScroll.getScrollCenter();
     }
 
+    if (paramName == "FOCUS")
+    {
+        if (paramValue == getName())
+            isBandFocused = true;
+        else
+            isBandFocused = false;
+    }
+
+
 
     localLFO.updateLFO(mSampleRate, mHostBpm);
 
@@ -493,15 +502,6 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
             lfoFillPath.lineTo(bounds.getRight(), midY);
         }
     }
-}
-
-
-/* State of focus is set by parent Oscilloscope */
-// ========================================================
-void ScopeChannel::setBandFocus(bool hasFocus)
-{
-    isBandFocused = hasFocus;
-    focusHasChanged = true;
 }
 
 /* Check bypass state */
