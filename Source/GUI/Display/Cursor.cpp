@@ -15,6 +15,7 @@ using namespace juce;
 Cursor::Cursor()
 {
     setSize(5, 25);
+    startTimerHz(30);
 }
 
 Cursor::~Cursor()
@@ -27,7 +28,7 @@ void Cursor::resized()
     auto bounds = getLocalBounds();
 
     // Establish Horizontal Cursor Bounds
-    if (isVertical)
+    if (mIsVertical)
     {
         auto x = bounds.getCentreX();
 
@@ -50,32 +51,96 @@ void Cursor::resized()
 
 }
 
+void Cursor::timerCallback()
+{
+    // If this cursor has focus, timerCounter increases until at its max.  
+    // If no focus, timerCounter decreases until at its minimum.
+
+    if ((timerCounter > timerCounterMin) || (timerCounter < timerCounterMax))
+    {
+        if (mHasFocus || mForceFocus)
+        {
+            if (timerCounter < timerCounterMax)
+                timerCounter++;
+        }
+        else
+        {
+            if (timerCounter > timerCounterMin)
+                timerCounter--;
+        }
+    }
+
+}
+
 void Cursor::paint(juce::Graphics& g)
 {
 
     auto cursorWidth = 3.f;
-    auto cursorOpacity = 0.75f;
+
+    fadeValue = juce::jmap((float)timerCounter, (float)timerCounterMin, (float)timerCounterMax, fadeValueMin, fadeValueMax);
 
     if (mHasFocus)
     {
         cursorWidth = 4.f;
-        cursorOpacity = 1.f;
     }
     else {}
 
     g.setColour(juce::Colours::white);
-    g.setOpacity(cursorOpacity);
+    g.setOpacity(fadeValue);
     g.drawLine(mCursor, cursorWidth);
 }
 
 void Cursor::setHorizontalOrientation()
 {
-    isVertical = false;
+    mIsVertical = false;
 }
-
 
 void Cursor::setFocus(bool hasFocus)
 {
     mHasFocus = hasFocus;
+
+    juce::String bFocus;
+
+    if (hasFocus)
+        bFocus = "TRUE";
+    else
+        bFocus = "FALSE";
+
+    sendBroadcast("cFOCUS", bFocus);
+
     repaint();
+}
+
+
+//
+// ===========================================================================================
+void Cursor::actionListenerCallback(const juce::String& message)
+{
+    auto paramName = message.replaceSection(0, 10, "");
+    paramName = paramName.replaceSection(10, 25, "");
+    paramName = paramName.removeCharacters("x");
+
+    juce::String paramValue = message.replaceSection(0, 25, "");
+    paramValue = paramValue.removeCharacters("x");
+
+    if (paramName == "cFOCUS")
+    {
+        if (paramValue == "TRUE")
+            mForceFocus = true;
+        else
+            mForceFocus = false;
+    }
+}
+
+/* Send Broadcast Message */
+// ===========================================================================================
+void Cursor::sendBroadcast(juce::String parameterName, juce::String parameterValue)
+{
+    juce::String delimiter = ":::::";
+
+    juce::String bandName = "xxxxx";
+
+    auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
+
+    sendActionMessage(message);
 }

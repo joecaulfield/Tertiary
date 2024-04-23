@@ -30,6 +30,15 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     makeAttachments();
 
     updateResponse();
+
+    startTimerHz(30);
+
+    newFreqLabelLow.addActionListener(&newCursorLM);
+    newFreqLabelHigh.addActionListener(&newCursorMH);
+
+    newCursorLM.addActionListener(&newFreqLabelLow);
+    newCursorMH.addActionListener(&newFreqLabelHigh);
+    
 }
 
 //
@@ -48,7 +57,6 @@ void FrequencyResponse::buildLowMidFreqSlider()
     sliderLowMidInterface.addListener(this);
     sliderLowMidInterface.setRange(0, 1.f, 0.001f);
     sliderLowMidInterface.setAlpha(0.f);
-    ////sliderLowMidInterface.addMouseListener(this, true);
     addAndMakeVisible(sliderLowMidInterface);
 
     // Linear Slider from 20 to 20k
@@ -170,11 +178,6 @@ void FrequencyResponse::makeAttachments()
                         apvts,
                         params.at(Names::Gain_High_Band),
                         sliderHighGain);
-
-    //showFftAttachment =    std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
-    //                    audioProcessor.apvts,
-    //                    params.at(Names::Show_FFT),
-    //                    toggleShowRTA);
 }
 
 // Called on Component Resize
@@ -208,47 +211,32 @@ void FrequencyResponse::resized()
 // ===========================================================================================
 void FrequencyResponse::timerCallback()
 {
+    setLabelOpacity();
+}
+
+void FrequencyResponse::setLabelOpacity()
+{
+
+    auto cursorFadeValueMin = newCursorLM.getFadeValueMin();
+    auto cursorFadeValueMax = newCursorLM.getFadeValueMax();
+
+    lowCursorFadeValue = newCursorLM.getFadeValue();
+    highCursorFadeValue = newCursorMH.getFadeValue();
+
+    lowFreqLabelFadeValue = juce::jmap(lowCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
+    highFreqLabelFadeValue = juce::jmap(highCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
 }
 
 //
 // ===========================================================================================
 void FrequencyResponse::buildLabels()
 {
-    // Initialize Low-Mid Cutoff Label =======
-    freqLabelLow.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::black.withAlpha(0.f));
-    
-    freqLabelLow.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
-    freqLabelLow.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::antiquewhite);
-    
-    freqLabelLow.setJustificationType(juce::Justification::centred);
-    
-    
-    freqLabelLow.setEditable(false, true);
-    freqLabelLow.addListener(this);
-    freqLabelLow.addMouseListener(this, true);
-    addAndMakeVisible(freqLabelLow);
-
-    // Initialize Mid-High Cutoff Label =======
-    freqLabelHigh.setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::black.withAlpha(0.f));
-    
-    freqLabelHigh.setColour(juce::Label::ColourIds::textColourId, juce::Colours::white);
-    freqLabelHigh.setColour(juce::Label::ColourIds::textWhenEditingColourId, juce::Colours::antiquewhite);
-    
-    freqLabelHigh.setJustificationType(juce::Justification::centred);
-    
-    freqLabelHigh.setEditable(false, true);
-    freqLabelHigh.addListener(this);
-    freqLabelHigh.addMouseListener(this, true);
-    addAndMakeVisible(freqLabelHigh);
-    
-    
-    
-    //======== temp
-//    freqLabelLow.setSize(100, 25);
-//    freqLabelHigh.setSize(100, 25);
-//
-//    freqLabelLow.setTopLeftPosition(0, 0);
-//    freqLabelHigh.setTopLeftPosition(0,50);
+    newFreqLabelLow.addActionListener(this);
+    newFreqLabelHigh.addActionListener(this);
+    newFreqLabelLow.setName("LOWFREQ");
+    newFreqLabelHigh.setName("HIGHFREQ");
+    addAndMakeVisible(newFreqLabelLow);
+    addAndMakeVisible(newFreqLabelHigh);
 }
 
 // Graphics class
@@ -268,36 +256,19 @@ void FrequencyResponse::paint(juce::Graphics& g)
     paintGridGain(g);
     paintGridFrequency(g);
 
-    /* Paint fft */
-    // =========================
-    //if (mShowFFT)
-        //paintFFT(g, responseArea);
-
     /* Paint Response Regions */
     // =========================
     paintResponseRegions(g);
 
-    /* Draw the cursors */
+    /* Draw the frequency labels */
     // =========================
-    paintCursorsFrequency(g);
-
-    /* Draw the gain cursors */
-    // =========================
-    //paintCursorsGain(g);
-
-    /* Paint Menu */
-    // =========================
-    //paintMenu(g);
+    drawLabels();
 
     /* Paint Border */
     // =========================
     paintBorder(g, ColorScheme::WindowBorders::getWindowBorderColor(), bounds);
 
-    /* Paint Labels */
-    // =========================
-    paintLabels(g);
-    
-    paintFlag = false;
+
 }
 
 // Draw vertical gridlines and vertical axis labels (gain)
@@ -516,104 +487,54 @@ void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float
 
 //
 // ===========================================================================================
-void FrequencyResponse::paintCursorsFrequency(juce::Graphics& g)
-{
-
-    /* This should get cleaned up and placed elsewhere */
-
-    //freqLabelLow.setAlpha(  freqLabelLow.isBeingEdited() ? 1.f :
-    //                        juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
-
-    //freqLabelHigh.setAlpha(  freqLabelHigh.isBeingEdited() ? 1.f :
-    //                         juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f));
-    
-    freqLabelLow.setAlpha(1.f);
-    freqLabelHigh.setAlpha(1.f);
-
-    drawLabels();
-    
-}
-
-//
-// ===========================================================================================
 void FrequencyResponse::drawLabels()
 {
     auto bounds = getLocalBounds();
     int labelWidth = 65;
     int labelHeight = 25;
     
-    int margin = 5;
+    int marginX = 5;
+    int marginY = 3;
 
     int labelX1 = newCursorLM.getX() + (newCursorLM.getWidth() / 2) - labelWidth / 2;
     int labelX2 = newCursorMH.getX() + (newCursorMH.getWidth() / 2) - labelWidth / 2;
 
-    int labelY1 = bounds.getY() + margin;
-    int labelY2 = bounds.getY() + margin;
-    
+    int labelY1 = bounds.getY() + marginY;
+    int labelY2 = bounds.getY() + marginY;
 
     // Bump at left bounds
-    if (labelX1 <= responseArea.getX() + margin)
-        labelX1 = responseArea.getX() + margin;
+    if (labelX1 <= responseArea.getX() + marginX)
+        labelX1 = responseArea.getX() + marginX;
 
-    if (labelX2 <= responseArea.getX() + margin)
-        labelX2 = responseArea.getX() + margin ;
+    if (labelX2 <= responseArea.getX() + marginX)
+        labelX2 = responseArea.getX() + marginX;
 
     // Bump at right bounds
-    if (labelX1 + labelWidth  >= responseArea.getRight() - margin)
-        labelX1 = responseArea.getRight() - labelWidth - margin;
+    if (labelX1 + labelWidth  >= responseArea.getRight() - marginX)
+        labelX1 = responseArea.getRight() - labelWidth - marginX;
 
-    if (labelX2 + labelWidth  >= responseArea.getRight() - margin)
-        labelX2 = responseArea.getRight() - labelWidth - margin;
+    if (labelX2 + labelWidth  >= responseArea.getRight() - marginX)
+        labelX2 = responseArea.getRight() - labelWidth - marginX;
     
     // Bump near each other
-    if (freqLabelLow.getRight() > freqLabelHigh.getX() - 2 * margin)
+    auto distTooClose = labelWidth + marginX;
+    auto center = (labelX1 + labelX2) / 2;
+
+    if (labelX2 - labelX1 <= distTooClose)
     {
-        labelY1 += 30;
+        labelX1 = center - (labelWidth / 2) - marginX;
+        labelX2 = center + (labelWidth / 2) + marginX;
     }
+
+    //if (newFreqLabelLow.getRight() > newFreqLabelHigh.getX() - 2 * marginX)
+    //{
+    //    auto center = (labelX1 + labelX2) / 2;
+
+    //}
+
        
-    // Send it
-    freqLabelLow.setBounds(labelX1, labelY1 , labelWidth, labelHeight);
-    freqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
-
-}
-
-// Paint Labels
-// ===========================================================================================
-void FrequencyResponse::paintLabels(juce::Graphics& g)
-{
-    /* Draw Low Frequency Label */
-    // ====================================================
-    g.setColour(juce::Colours::black);
-    
-    //auto opacityL = juce::jmap(fadeAlphaCursorLM, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
-    //auto opacityH = juce::jmap(fadeAlphaCursorMH, fadeMinCursor, fadeMaxCursor, 0.f, 1.f);
-    
-    auto opacityL = 1.f;
-    auto opacityH = 1.f;
-
-    g.setOpacity(   freqLabelLow.isBeingEdited() ? 1.f : opacityL);
-    
-    g.fillRoundedRectangle(freqLabelLow.getBounds().toFloat(), 3.f);
-    
-    g.setColour(juce::Colours::darkgrey);
-    
-    g.setOpacity(   freqLabelLow.isBeingEdited() ? 1.f : opacityL);
-
-    g.drawRoundedRectangle(freqLabelLow.getBounds().toFloat(), 3.f, 1.f);
-    
-    /* Draw High Frequency Label */
-    // ====================================================
-    g.setColour(juce::Colours::black);
-    
-    g.setOpacity(   freqLabelHigh.isBeingEdited() ? 1.f : opacityH);
-    
-    g.fillRoundedRectangle(freqLabelHigh.getBounds().toFloat(), 3.f);
-    
-    g.setColour(juce::Colours::darkgrey);
-    
-    g.setOpacity(   freqLabelHigh.isBeingEdited() ? 1.f : opacityH);
-    
-    g.drawRoundedRectangle(freqLabelHigh.getBounds().toFloat(), 3.f, 1.f);
+    newFreqLabelLow.setBounds(labelX1, labelY1, labelWidth, labelHeight);
+    newFreqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
 }
 
 // Update the response prior to painting.
@@ -791,115 +712,11 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
             sliderLowMidCutoff.setValue(slider->getValue());
     }
     
-    updateStringText();
-    
+    //updateStringText();
+    newFreqLabelLow.setLabelValue(sliderLowMidCutoff.getValue());
+    newFreqLabelHigh.setLabelValue(sliderMidHighCutoff.getValue());
+
     updateResponse();
-}
-
-//
-// ===========================================================================================
-void FrequencyResponse::labelTextChanged(juce::Label* labelThatHasChanged)
-{
-    // Means of handling invalid input entries,
-    // while allowing some flexibility and auto-interpretation of user-entered values
-
-    juce::String original = labelThatHasChanged->getText();
-
-    juce::String entryString = labelThatHasChanged->getText();
-    float entryFloat{ 0.f };
-
-    // Simplify Text
-    entryString = entryString.toLowerCase();            // Lower Case
-    entryString = entryString.removeCharacters(" ");    // Remove Spaces
-    entryString = entryString.removeCharacters("hz");    // Remove Units
-
-    // Check for Non-Numerical Text ==================================================
-    bool containsText = false;
-    bool containsNum = false;
-
-    for (int i = 0; i < entryString.length(); i++)
-    {
-        if ((int)entryString[i] < 48 || (int)entryString[i] > 57)
-            containsText = true;
-
-        if ((int)entryString[i] >= 48 && (int)entryString[i] <= 57)
-            containsNum = true;
-    }
-
-    if (!containsText) // Handle entry as pure numerical
-        entryFloat = entryString.getFloatValue();
-    else // Handle entry as alphanumeric combination
-    {
-        if (entryString.containsChar('k'))
-        {
-            entryString.removeCharacters("k");
-            entryFloat = entryString.getFloatValue() * 1000.f;
-        }
-        else // Unaccepted entry, truncate the decimal
-            entryFloat = juce::roundToInt(entryString.getFloatValue());
-    }
-
-    if (labelThatHasChanged == &freqLabelLow)
-    {
-        if (!containsNum)
-        {
-            labelThatHasChanged->setText("20 Hz", juce::NotificationType::sendNotification);
-            sliderLowMidCutoff.setValue(20.f);
-        }
-        else
-            sliderLowMidCutoff.setValue(entryFloat);
-    }
-
-
-    if (labelThatHasChanged == &freqLabelHigh)
-    {
-        if (!containsNum)
-        {
-            labelThatHasChanged->setText("20 kHz", juce::NotificationType::dontSendNotification);
-            sliderMidHighCutoff.setValue(20000);
-        }
-        else
-            sliderMidHighCutoff.setValue(entryFloat);
-    }
-
-    paintFlag = true;
-}
-
-//
-// ===========================================================================================
-void FrequencyResponse::updateStringText()
-{
-    juce::String stringLM;
-    juce::String stringMH;
-
-    // Abbreviate Values In The Kilohertz
-    if (sliderLowMidCutoff.getValue() <= 999.f)
-        stringLM = (juce::String)sliderLowMidCutoff.getValue() + " Hz";
-    else
-    {
-        auto num = sliderLowMidCutoff.getValue();
-        num /= 10.f;
-        num = juce::roundFloatToInt(num);
-        num /= 100.f;
-        stringLM = (juce::String)(num) + " kHz";
-    }
-
-    
-    if (sliderMidHighCutoff.getValue() <= 999.f)
-        stringMH = (juce::String)sliderMidHighCutoff.getValue() + " Hz";
-    else
-    {
-        auto num = sliderMidHighCutoff.getValue();
-        num /= 10.f;
-        num = juce::roundFloatToInt(num);
-        num /= 100.f;
-        stringMH = (juce::String)(num) + " kHz";
-    }
-
-
-    freqLabelLow.setText(stringLM, juce::NotificationType::dontSendNotification);
-    freqLabelHigh.setText(stringMH, juce::NotificationType::dontSendNotification);
-
 }
 
 // Called on Mouse Move
@@ -930,8 +747,6 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
     auto xM = event.getPosition().getX();
     auto yM = event.getPosition().getY();
 
-
-    //auto parentComponent = newCursorLM.getParentComponent(); // Assuming both have the same parent
     auto mousePoint = getLocalPoint(event.eventComponent, event.getPosition());
 
     // Establish top-bottom bounds of Dummy Sliders
@@ -1018,9 +833,6 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
     juce::String paramValue = message.replaceSection(0, 25, "");
     paramValue = paramValue.removeCharacters("x");
 
-
-    DBG(paramName << "   " << paramValue);
-
     if (paramName == "GAIN")
         updateResponse();
 
@@ -1047,6 +859,18 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
 
         if (paramValue == "HIGH")
             mHighFocus = true;
+    }
+
+    if (paramName == "LOWFREQ")
+    {
+        auto value = paramValue.getFloatValue();
+        sliderLowMidCutoff.setValue(value);
+    }
+
+    if (paramName == "HIGHFREQ")
+    {
+        auto value = paramValue.getFloatValue();
+        sliderMidHighCutoff.setValue(value);
     }
 
 }

@@ -56,16 +56,24 @@ private:
     juce::TextButton mButtonOptions;
     ButtonOptionsLookAndFeel optionsLookAndFeel;
     
-    bool mouseIsWithinBounds {false};
-
-    bool shouldShowDropdown{false};
     void openDropdown();
     void closeDropdown();
     void buildDropdown();
 
     juce::OwnedArray<OptionItem> optionsArray;    
-    
-    void fadeInOut();
+ 
+    int timerCounter{ 0 };
+    int timerCounterMin{ 0 };
+    int timerCounterMax{ 14 };
+
+    float fadeValue{ 1.f };
+    float fadeValueMin{ 0.f };
+    float fadeValueMax{ 1.f };
+
+    bool mHasFocus{ false };
+    bool mForceFocus{ false };
+
+    bool shouldShowDropdown{ false };
 };
 
 

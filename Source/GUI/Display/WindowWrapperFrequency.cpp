@@ -18,8 +18,6 @@ WindowWrapperFrequency::WindowWrapperFrequency( TertiaryAudioProcessor& p,
 : audioProcessor(p),
 globalControls(gc),
 apvts(apv),
-lowFrequencyLabelRef(frequencyResponse.freqLabelLow),
-highFrequencyLabelRef(frequencyResponse.freqLabelHigh),
 forwardFFT(audioProcessor.fftOrder),
 window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {

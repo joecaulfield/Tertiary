@@ -43,8 +43,6 @@ void ScrollPad::initializePoints(float newP1, float newP2)
 		makeDefaultPoints();
 
 	sendBroadcast("SCROLLBAR", "");
-
-	DBG("initialize points");
 }
 
 // Change Points & Calculate P/Z Upon Movement
@@ -329,6 +327,4 @@ void ScrollPad::sendBroadcast(juce::String parameterName, juce::String parameter
 	auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
 
 	sendActionMessage(message);
-
-	//DBG("BROADCAST - " + message);
 }

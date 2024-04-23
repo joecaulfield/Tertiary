@@ -53,39 +53,33 @@ void OptionsMenu::paint(juce::Graphics& g)
     auto buttonBounds = getLocalBounds();
     
     g.setColour(juce::Colours::white);
-    g.setOpacity(0.9f);
+    g.setOpacity(fadeValue);
     g.fillRoundedRectangle( buttonBounds.getX(),
                             buttonBounds.getY(),
                             buttonBounds.getWidth(),
                             buttonBounds.getHeight(),
                             2.f);
     
+    // Draw beveled edges
     for (int i = 0; i < 5; i++)
     {
         g.setColour(juce::Colours::darkgrey.withMultipliedAlpha(1.f/((i*i)+0.75f)));
         g.drawRect(buttonBounds.toFloat().reduced(i,i), 1.f);
     }
+
+    setAlpha(fadeValue);
   
 }
 
 // ========================================================
 void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
 {
-    /*  If menu is not already open, fade in when mouse enters
-        But refrain from doing so if the mouse button is already down, as this
-        may indicate that the user is the middle of dragging a cursor */
-    
-    /* Implement Fade-In Later */
 
     if (!isMouseButtonDown())
     {
         if (shouldShowDropdown == false)
-        {
-            mouseIsWithinBounds = true; // Trigger for beginning timer (future implementation)
-            setAlpha(1.0f);
-        }
+            mHasFocus = true;
     }
-
 
 }
 
@@ -93,12 +87,9 @@ void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
 void OptionsMenu::mouseExit(const juce::MouseEvent& event)
 {
 
-    /* Implement Fade-Out Later */
-
     if (!isMouseOver(true)) {
         closeDropdown();
-        mouseIsWithinBounds = false;
-        setAlpha(0.0f);
+        mHasFocus = false;
     }
 
 }
@@ -106,7 +97,25 @@ void OptionsMenu::mouseExit(const juce::MouseEvent& event)
 // ========================================================
 void OptionsMenu::timerCallback()
 {
-    // Will do menu fade in & out here
+    // If this cursor has focus, timerCounter increases until at its max.  
+    // If no focus, timerCounter decreases until at its minimum.
+
+    if ((timerCounter > timerCounterMin) || (timerCounter < timerCounterMax))
+    {
+        if (mHasFocus || mForceFocus)
+        {
+            if (timerCounter < timerCounterMax)
+                timerCounter++;
+        }
+        else
+        {
+            if (timerCounter > timerCounterMin)
+                timerCounter--;
+        }
+
+        fadeValue = juce::jmap((float)timerCounter, (float)timerCounterMin, (float)timerCounterMax, fadeValueMin, fadeValueMax);
+        setAlpha(fadeValue);
+    }
 }
 
 // ========================================================

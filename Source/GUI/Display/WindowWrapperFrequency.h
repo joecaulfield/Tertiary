@@ -65,8 +65,4 @@ private:
     float fftConstant{ 9.9658f };
 
     juce::Rectangle<float> spectrumArea;
-    
-    juce::Label& lowFrequencyLabelRef;
-    juce::Label& highFrequencyLabelRef;
-
 };
