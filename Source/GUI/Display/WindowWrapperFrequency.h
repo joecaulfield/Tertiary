@@ -18,7 +18,8 @@ struct WindowWrapperFrequency : juce::Component,
                                 juce::Timer,
                                 juce::AudioProcessorValueTreeState::Listener
 {
-    WindowWrapperFrequency(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
+    //WindowWrapperFrequency(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
+    WindowWrapperFrequency(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv);
     ~WindowWrapperFrequency();
     
     void resized();
@@ -36,9 +37,10 @@ private:
 
     TertiaryAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& apvts;
-    GlobalControls& globalControls;
+    //GlobalControls& globalControls;
     
-    FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
+    //FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
+    FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts };
 
     void buildOptionsMenuParameters();
     void updateOptionsParameters();

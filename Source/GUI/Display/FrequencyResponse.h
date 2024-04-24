@@ -13,7 +13,9 @@
 #pragma once
 #include <JuceHeader.h>
 #include "../../PluginProcessor.h"
-#include "../../GUI/Controls/GlobalControls.h"
+//#include "../../GUI/Controls/GlobalControls.h"
+#include "../../Utility/UtilityFunctions.h"
+#include "../../Utility/AllColors.h"
 #include "../../GUI/Display/Cursor.h"
 #include "../../GUI/Display/FreqLabel.h"
 
@@ -25,7 +27,8 @@ struct FrequencyResponse :	juce::Component,
 							juce::ActionListener
 {
 
-	FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
+	//FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv, GlobalControls& gc);
+	FrequencyResponse(TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv);
 	~FrequencyResponse();
 
 	void paint(juce::Graphics& g) override;
@@ -80,7 +83,7 @@ struct FrequencyResponse :	juce::Component,
 	void checkSolos();
 
 	TertiaryAudioProcessor& audioProcessor;
-	GlobalControls& globalControls;
+	//GlobalControls& globalControls;
 
 	// Frequency Response Parameters
 	juce::AudioParameterFloat* lowMidCutoff{ nullptr };     // Pointer to the APVTS
@@ -94,8 +97,6 @@ struct FrequencyResponse :	juce::Component,
 	bool lowBandMute{ false },		midBandMute{ false },	highBandMute{ false };
 	bool lowBandBypass{ false },	midBandBypass{ false }, highBandBypass{ false };
 
-    //void labelTextChanged(juce::Label* labelThatHasChanged) override;
-    
 	void actionListenerCallback(const juce::String& message);
     
 private:

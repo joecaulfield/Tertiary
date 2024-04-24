@@ -62,7 +62,8 @@ private:
     WindowWrapperOscilloscope wrapperOscilloscope{ audioProcessor };
 
     /* Frequency-Domain & Crossover Display */
-    WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
+    //WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
+    WindowWrapperFrequency wrapperFrequency{ audioProcessor, audioProcessor.apvts };
     
     /* Company & Plugin Title Banner */
     //void buildTopBanner(juce::Graphics& g);

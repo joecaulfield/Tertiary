@@ -11,15 +11,20 @@
 #include "WindowWrapperFrequency.h"
 
 
-WindowWrapperFrequency::WindowWrapperFrequency( TertiaryAudioProcessor& p,
-                                                juce::AudioProcessorValueTreeState& apv,
-                                                GlobalControls& gc)
-                                                
-: audioProcessor(p),
-globalControls(gc),
-apvts(apv),
-forwardFFT(audioProcessor.fftOrder),
-window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
+//WindowWrapperFrequency::WindowWrapperFrequency( TertiaryAudioProcessor& p,
+//                                                juce::AudioProcessorValueTreeState& apv,
+//                                                GlobalControls& gc)
+//: audioProcessor(p),
+//globalControls(gc),
+//apvts(apv),
+//forwardFFT(audioProcessor.fftOrder),
+//window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
+WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
+    juce::AudioProcessorValueTreeState& apv)
+    : audioProcessor(p),
+    apvts(apv),
+    forwardFFT(audioProcessor.fftOrder),
+    window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
     addAndMakeVisible(frequencyResponse);
   

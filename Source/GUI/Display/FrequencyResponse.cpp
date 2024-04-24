@@ -12,12 +12,15 @@
 
 /* Constructor */
 // ===========================================================================================
-FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
-                                        juce::AudioProcessorValueTreeState& apv,
-                                        GlobalControls& gc)
-    : audioProcessor(p),
-    globalControls(gc),
-    apvts(apv)
+//FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
+//                                        juce::AudioProcessorValueTreeState& apv,
+//                                        GlobalControls& gc)
+//    : audioProcessor(p),
+//    globalControls(gc),
+//    apvts(apv)
+
+FrequencyResponse::FrequencyResponse(   TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv)
+    : audioProcessor(p), apvts(apv)
 {
 
     buildLowMidFreqSlider();
@@ -517,15 +520,8 @@ void FrequencyResponse::drawLabels()
         }
     }
 
-    //if (lowBandMute && midBandMute)
-    //    newFreqLabelLow.setBounds(0, 0, 0, 0);
-    //else
-        newFreqLabelLow.setBounds(labelX1, labelY1, labelWidth, labelHeight);
-
-    //if (midBandMute && highBandMute)
-    //    newFreqLabelHigh.setBounds(0, 0, 0, 0);
-    //else
-        newFreqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
+    newFreqLabelLow.setBounds(labelX1, labelY1, labelWidth, labelHeight);
+    newFreqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
 }
 
 /* Updates Label Opacity based on fades */
@@ -575,7 +571,7 @@ void FrequencyResponse::updateResponse()
     freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
     freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
-
+    checkSolos();
 
     if (lowBandMute && midBandMute)
         newCursorLM.setBounds(0, 0, 0, 0);
@@ -653,8 +649,6 @@ void FrequencyResponse::updateResponse()
     }
     else
         newCursorHighGain.setBounds(0,0,0,0);
-
-    checkSolos();
 
     repaint();
 }
@@ -861,8 +855,6 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
     auto bandName = message.replaceSection(5, 30, "");
     bandName = bandName.removeCharacters("x");
 
-    DBG(bandName);
-
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
     paramName = paramName.removeCharacters("x");
@@ -880,10 +872,7 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
         updateResponse();
 
     if (paramName == "MUTE")
-    {
         updateResponse();
-    }
-
 
     /* Reformat this code standard */
     if (paramName == "FOCUS")
