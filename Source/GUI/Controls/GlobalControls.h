@@ -106,9 +106,6 @@ private:
     std::unique_ptr<sliderAttachment>   rateLowAttachment,
                                         rateMidAttachment,
                                         rateHighAttachment,
-                                        //multLowAttachment,
-                                        //multMidAttachment,
-                                        //multHighAttachment,
                                         phaseLowAttachment,
                                         phaseMidAttachment,
                                         phaseHighAttachment;
@@ -123,10 +120,7 @@ private:
     
     /* From WaveControls */
     // ============================================================
-    std::unique_ptr<sliderAttachment>   //waveLowAttachment,
-                                        //waveMidAttachment,
-                                        //waveHighAttachment,
-                                        depthLowAttachment,
+    std::unique_ptr<sliderAttachment>   depthLowAttachment,
                                         depthMidAttachment,
                                         depthHighAttachment,
                                         symmetryLowAttachment,

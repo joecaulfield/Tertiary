@@ -30,7 +30,9 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void timerCallback() override;
+
+
+    void timerCallback() override {};
     void buttonClicked(juce::Button* button) override {};
     void mouseDoubleClick (const juce::MouseEvent &event) override {};
     
@@ -57,7 +59,7 @@ private:
 	GlobalControls globalControls{ audioProcessor };
     
     /* Time-Domain Display */
-    WindowWrapperOscilloscope wrapperOscilloscope{audioProcessor, globalControls};
+    WindowWrapperOscilloscope wrapperOscilloscope{ audioProcessor };
 
     /* Frequency-Domain & Crossover Display */
     WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
@@ -70,7 +72,7 @@ private:
 	juce::Label companyTitle;
 
     /* GPU Graphics Accerlation */
-    juce::OpenGLContext openGLContext;
+    //juce::OpenGLContext openGLContext;
 
 
     

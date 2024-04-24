@@ -15,20 +15,17 @@
 #include "OptionsMenu.h"
 
 struct WindowWrapperOscilloscope :  juce::Component,
-                                    juce::Timer,
                                     juce::AudioProcessorValueTreeState::Listener
 {
-    WindowWrapperOscilloscope(TertiaryAudioProcessor& p, GlobalControls& gc);
+    WindowWrapperOscilloscope(TertiaryAudioProcessor& p);
     ~WindowWrapperOscilloscope();
     
     void resized() override;
-    
-    void timerCallback() override;
-    
+
     void parameterChanged(const juce::String& parameterID, float newValue) override;
     
     void paint(juce::Graphics& g) override;
-    void paintOverChildren(juce::Graphics& g) override;
+    //void paintOverChildren(juce::Graphics& g) override;
 
     // Pass Scope Channels up to Plugin Editor
     ScopeChannel& getOscilloscopeLow() {return oscilloscope.getLowScope(); };
@@ -39,8 +36,7 @@ private:
     /* Reference to the Audio Processor & DSP Parameters */
 
     TertiaryAudioProcessor& audioProcessor;
-    GlobalControls& globalControls;
-    Oscilloscope oscilloscope{ audioProcessor, globalControls };
+    Oscilloscope oscilloscope{ audioProcessor };
 
     void buildOptionsMenuParameters();
     void updateOptionsParameters();
@@ -50,12 +46,8 @@ private:
     juce::AudioParameterBool* showMidBandParam{ nullptr };
     juce::AudioParameterBool* showHighBandParam{ nullptr };
     juce::AudioParameterBool* stackBandsParam{ nullptr };
-    juce::AudioParameterBool* showCursorParam{ nullptr };
-    juce::AudioParameterBool* showPlayheadParam{ nullptr };
+    //juce::AudioParameterBool* showCursorParam{ nullptr };
+    //juce::AudioParameterBool* showPlayheadParam{ nullptr };
     
-    void paintPlayhead(juce::Graphics& g);
-    bool mShowPlayhead;
-    float mPanOrZoomChanging{false};
-    float mPlayheadPositionPixel{0.f};
     juce::Rectangle<int> mLowRegion, mMidRegion, mHighRegion;
 };

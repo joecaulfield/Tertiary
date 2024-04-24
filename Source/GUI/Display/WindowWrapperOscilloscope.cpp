@@ -12,16 +12,13 @@
 
 /* Constructor */
 // ========================================================
-WindowWrapperOscilloscope::WindowWrapperOscilloscope( TertiaryAudioProcessor& p, GlobalControls& gc)
-                                : audioProcessor(p),globalControls(gc)
+WindowWrapperOscilloscope::WindowWrapperOscilloscope(TertiaryAudioProcessor& p) :  audioProcessor(p)
 {
 
     addAndMakeVisible(oscilloscope);
     addAndMakeVisible(optionsMenu);
     
     buildOptionsMenuParameters();
-    
-    startTimerHz(60);
 }
 
 /* Destructor */
@@ -48,8 +45,8 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
     boolHelper(showMidBandParam,    Names::Show_Mid_Scope);
     boolHelper(showHighBandParam,   Names::Show_High_Scope);
     boolHelper(stackBandsParam,     Names::Stack_Bands_Scope);
-    boolHelper(showCursorParam,     Names::Show_Cursor_Scope);
-    boolHelper(showPlayheadParam,   Names::Show_Playhead_Scope);
+    //boolHelper(showCursorParam,     Names::Show_Cursor_Scope);
+    //boolHelper(showPlayheadParam,   Names::Show_Playhead_Scope);
     
     optionsMenu.addOptionToList("Low",
                                 "Show Low Band",
@@ -71,16 +68,11 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
                                 audioProcessor.apvts,
                                 params.at(Names::Stack_Bands_Scope));
 
-//    optionsMenu.addOptionToList("Cursor",
-//                                "Show Cursor",
-//                                audioProcessor.apvts,
-//                                params.at(Names::Show_Cursor_Scope));
-    
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_Low_Scope), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_Mid_Scope), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_High_Scope), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::Stack_Bands_Scope), this);
-    audioProcessor.apvts.addParameterListener(params.at(Names::Show_Cursor_Scope), this);
+    //audioProcessor.apvts.addParameterListener(params.at(Names::Show_Cursor_Scope), this);
     
     updateOptionsParameters();
 }
@@ -112,45 +104,10 @@ void WindowWrapperOscilloscope::parameterChanged(const juce::String& parameterID
 {
     updateOptionsParameters();
 }
-  
-/* Timer callback.  Used primarily to animate playhead.  (Not in use) */
-// ========================================================
-void WindowWrapperOscilloscope::timerCallback()
-{
-    //mShowPlayhead = oscilloscope.getShowPlayhead();
-    //mPanOrZoomChanging = oscilloscope.getPanOrZoomChanging();
-    //mPlayheadPositionPixel = oscilloscope.getPlayheadPositionPixel();
-    
-    //mLowRegion = oscilloscope.getLowRegion();
-    //mMidRegion = oscilloscope.getMidRegion();
-    //mHighRegion = oscilloscope.getHighRegion();
-    
-    //repaint();
-}
 
+/* Paint graphics */
 // ========================================================
 void WindowWrapperOscilloscope::paint(juce::Graphics& g)
 {
     
-}
-
-/* Not current in use.  Animate the moving playhead. */
-// ========================================================
-void WindowWrapperOscilloscope::paintOverChildren(juce::Graphics& g)
-{
-    paintPlayhead(g);
-}
-
-/* Not currently in use.  Animate the moving playheead. */
-// ========================================================
-void WindowWrapperOscilloscope::paintPlayhead(juce::Graphics& g)
-{
-    if (mShowPlayhead && ! mPanOrZoomChanging)
-    {
-        g.setColour(juce::Colours::darkgrey);
-    
-        g.drawVerticalLine(mPlayheadPositionPixel, mLowRegion.getY(), mLowRegion.getBottom());
-        g.drawVerticalLine(mPlayheadPositionPixel, mMidRegion.getY(), mMidRegion.getBottom());
-        g.drawVerticalLine(mPlayheadPositionPixel, mHighRegion.getY(), mHighRegion.getBottom());
-    }
 }

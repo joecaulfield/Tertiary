@@ -46,7 +46,6 @@ BandControl::~BandControl()
 //============================================================
 void BandControl::paint(juce::Graphics& g)
 {
-    //DBG("BandControl::paint");
     g.fillAll(juce::Colours::transparentBlack.withAlpha(0.35f));
 }
 
@@ -374,7 +373,7 @@ void BandControl::buttonClicked(juce::Button* button)
         if (button->getToggleState())
             mToggleMute.mToggleButton.setToggleState(false, true);
         
-        mBsmChanged = true;
+        //mBsmChanged = true;
     }
 
     if (button == &mToggleMute.mToggleButton)
@@ -382,27 +381,14 @@ void BandControl::buttonClicked(juce::Button* button)
         if (button->getToggleState())
             mToggleSolo.mToggleButton.setToggleState(false, true);
         
-        mBsmChanged = true;
+        //mBsmChanged = true;
     }
     
-    if (button == &mToggleBypass.mToggleButton)
-    {
-        mBsmChanged = true;
-    }
+    //if (button == &mToggleBypass.mToggleButton)
+    //{
+    //    mBsmChanged = true;
+    //}
     
-}
-
-void BandControl::mouseEnter(const juce::MouseEvent& event)
-{
-}
-
-void BandControl::mouseMove(const juce::MouseEvent& event)
-{
-
-}
-
-void BandControl::mouseExit(const juce::MouseEvent& event)
-{    
 }
 
 // Guarantees a 30-Character long message

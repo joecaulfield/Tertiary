@@ -80,13 +80,11 @@ void Cursor::paint(juce::Graphics& g)
     fadeValue = juce::jmap((float)timerCounter, (float)timerCounterMin, (float)timerCounterMax, fadeValueMin, fadeValueMax);
 
     if (mHasFocus)
-    {
         cursorWidth = 4.f;
-    }
-    else {}
 
     g.setColour(juce::Colours::white);
     g.setOpacity(fadeValue);
+
     g.drawLine(mCursor, cursorWidth);
 }
 

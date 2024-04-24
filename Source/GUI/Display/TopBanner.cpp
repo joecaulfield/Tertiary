@@ -44,8 +44,6 @@ void TopBanner::resized()
 //==============================================================================
 void TopBanner::buildTopBanner(juce::Graphics& g)
 {
-    DBG ("TopBanner::buildTopBanner");
-    
     auto bounds = getLocalBounds().toFloat();
     
     /* Resize the PluginTitle image once and show */
@@ -88,8 +86,6 @@ void TopBanner::buildTopBanner(juce::Graphics& g)
 //==============================================================================
 void TopBanner::buildTrialTitle(juce::Graphics& g)
 {
-    DBG ("TopBanner::buildTrialTitle");
-    
     // SHOW TRIAL TITLE =======================
     auto trialLabelFontTypeface = FontEditor::ControlLabels::getTypeface();
     auto trialLabelFontSize = 24.f;

@@ -18,8 +18,9 @@
 
 struct BandControl :    juce::Component,
                         juce::Button::Listener,
-                        juce::MouseListener,
                         juce::ActionBroadcaster
+                        /*juce::MouseListener,*/
+                        
 {
     BandControl(juce::AudioProcessorValueTreeState& apv);
     ~BandControl();
@@ -29,17 +30,18 @@ struct BandControl :    juce::Component,
     void resized() override;
     void buttonClicked(juce::Button* button) override;
 
-    void mouseEnter(const juce::MouseEvent& event) override;
-    void mouseExit(const juce::MouseEvent& event) override;
-    void mouseMove(const juce::MouseEvent& event) override;
+    //void mouseEnter(const juce::MouseEvent& event) override {};
+    //void mouseExit(const juce::MouseEvent& event) override {};
+    //void mouseMove(const juce::MouseEvent& event) override {};
     
     void setMode(juce::String bandMode);
 
-    bool hasBSMchanged() {return mBsmChanged; }
-    void setBsmRead() {mBsmChanged = false;}
+    //bool hasBSMchanged() {return mBsmChanged; }
+    //void setBsmRead() {mBsmChanged = false;}
     
     void sendBroadcast(juce::String parameterName, juce::String parameterValue);
 
+    /* Called by GlobalControls for Positioning */
     juce::Rectangle<int> getWaveBounds() {return mDropWaveshape.getBoundsInParent(); }
     juce::Rectangle<int> getSkewBounds() {return mSliderSkew.getBoundsInParent(); }
     juce::Rectangle<int> getDepthBounds() {return mSliderDepth.getBoundsInParent(); }
@@ -72,8 +74,6 @@ private:
     
     bool runOnceOnConstructor{true};
 
-    bool focusToggleFlag{false};
-    
     void buildToggleSync();
     void buildToggleInvert();
     void buildRateOrRhythm();
@@ -87,8 +87,9 @@ private:
     void buildToggleMute();
     void updateFlexBox();
 
-    bool mBsmChanged{true};
+    //bool mBsmChanged{true};
 
+    /* Holds place of either Rate or Rhythm component */
     juce::Component* placeholder;
     
     WaveComboLookAndFeel waveComboLookAndFeel;

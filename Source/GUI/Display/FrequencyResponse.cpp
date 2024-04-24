@@ -10,7 +10,7 @@
 
 #include "FrequencyResponse.h"
 
-// Constructor
+/* Constructor */
 // ===========================================================================================
 FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
                                         juce::AudioProcessorValueTreeState& apv,
@@ -41,13 +41,13 @@ FrequencyResponse::FrequencyResponse(    TertiaryAudioProcessor& p,
     
 }
 
-//
+/* Destructor */
 // ===========================================================================================
 FrequencyResponse::~FrequencyResponse()
 {
 }
 
-//
+/* Build Low-Mid Slider */
 // ===========================================================================================
 void FrequencyResponse::buildLowMidFreqSlider()
 {
@@ -69,7 +69,7 @@ void FrequencyResponse::buildLowMidFreqSlider()
     newCursorLM.toBehind(&sliderLowMidInterface);
 }
 
-//
+/* Build Mid-High Slider */
 // ===========================================================================================
 void FrequencyResponse::buildMidHighFreqSlider()
 {
@@ -91,7 +91,7 @@ void FrequencyResponse::buildMidHighFreqSlider()
     newCursorMH.toBehind(&sliderMidHighInterface);
 }
 
-//
+/* Build Low Gain Slider */
 // ===========================================================================================
 void FrequencyResponse::buildLowGainSlider()
 {
@@ -108,7 +108,7 @@ void FrequencyResponse::buildLowGainSlider()
     newCursorLowGain.toBehind(&sliderLowGain);
 }
 
-//
+/* Build Mid Gain Slider */
 // ===========================================================================================
 void FrequencyResponse::buildMidGainSlider()
 {
@@ -125,7 +125,7 @@ void FrequencyResponse::buildMidGainSlider()
     newCursorMidGain.toBehind(&sliderMidGain);
 }
 
-//
+/* Build High Gain Slider */
 // ===========================================================================================
 void FrequencyResponse::buildHighGainSlider()
 {
@@ -142,7 +142,19 @@ void FrequencyResponse::buildHighGainSlider()
     newCursorHighGain.toBehind(&sliderHighGain);
 }
 
-// Make component->parameter attachments
+/* Build Labels */
+// ===========================================================================================
+void FrequencyResponse::buildLabels()
+{
+    newFreqLabelLow.addActionListener(this);
+    newFreqLabelHigh.addActionListener(this);
+    newFreqLabelLow.setName("LOWFREQ");
+    newFreqLabelHigh.setName("HIGHFREQ");
+    addAndMakeVisible(newFreqLabelLow);
+    addAndMakeVisible(newFreqLabelHigh);
+}
+
+/* Attach parameters to components */
 // ===========================================================================================
 void FrequencyResponse::makeAttachments()
 {
@@ -180,7 +192,7 @@ void FrequencyResponse::makeAttachments()
                         sliderHighGain);
 }
 
-// Called on Component Resize
+/* Called on component resize */
 // ===========================================================================================
 void FrequencyResponse::resized()
 {
@@ -207,39 +219,14 @@ void FrequencyResponse::resized()
     sliderHighGain.setBounds(responseArea.getX(), responseArea.getY(), 1, responseArea.getHeight());
 }
 
-// Methods to call on a timed-basis
+/* Timer Callback */
 // ===========================================================================================
 void FrequencyResponse::timerCallback()
 {
     setLabelOpacity();
 }
 
-void FrequencyResponse::setLabelOpacity()
-{
-
-    auto cursorFadeValueMin = newCursorLM.getFadeValueMin();
-    auto cursorFadeValueMax = newCursorLM.getFadeValueMax();
-
-    lowCursorFadeValue = newCursorLM.getFadeValue();
-    highCursorFadeValue = newCursorMH.getFadeValue();
-
-    lowFreqLabelFadeValue = juce::jmap(lowCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
-    highFreqLabelFadeValue = juce::jmap(highCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
-}
-
-//
-// ===========================================================================================
-void FrequencyResponse::buildLabels()
-{
-    newFreqLabelLow.addActionListener(this);
-    newFreqLabelHigh.addActionListener(this);
-    newFreqLabelLow.setName("LOWFREQ");
-    newFreqLabelHigh.setName("HIGHFREQ");
-    addAndMakeVisible(newFreqLabelLow);
-    addAndMakeVisible(newFreqLabelHigh);
-}
-
-// Graphics class
+/* Paint Graphics Class */
 // ===========================================================================================
 void FrequencyResponse::paint(juce::Graphics& g)
 {
@@ -267,11 +254,9 @@ void FrequencyResponse::paint(juce::Graphics& g)
     /* Paint Border */
     // =========================
     paintBorder(g, ColorScheme::WindowBorders::getWindowBorderColor(), bounds);
-
-
 }
 
-// Draw vertical gridlines and vertical axis labels (gain)
+/* Draw vertical grid lines (frequency) */
 // ===========================================================================================
 void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
 {
@@ -305,7 +290,7 @@ void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
     }
 }
 
-// Draw horizontal gridlines and horizontal axis labels (frequency)
+/* Draw horizontal grid lines (gain) */
 // ===========================================================================================
 void FrequencyResponse::paintGridGain(juce::Graphics& g)
 {
@@ -341,7 +326,7 @@ void FrequencyResponse::paintGridGain(juce::Graphics& g)
     }
 }
 
-//
+/* Parent function to paint the frequency response trapezoids */
 // ===========================================================================================
 void FrequencyResponse::paintResponseRegions(juce::Graphics& g)
 {
@@ -370,7 +355,7 @@ void FrequencyResponse::paintResponseRegions(juce::Graphics& g)
     }
 }
 
-// Draw Low-Frequency Response Trapezoid
+/* Paints the low-frequency trapezoid */
 // ===========================================================================================
 void FrequencyResponse::paintLowRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float alpha)
 {
@@ -405,10 +390,9 @@ void FrequencyResponse::paintLowRegion(juce::Graphics& g, juce::Rectangle<float>
 
         g.strokePath(lowRegion.createPathWithRoundedCorners(10), juce::PathStrokeType(2.f));
     }
-
 }
 
-// Draw Mid-Frequency Response Trapezoid
+/* Paints the mid-frequency trapezoid */
 // ===========================================================================================
 void FrequencyResponse::paintMidRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq1Pixel, float freq2Pixel, float alpha)
 {
@@ -449,7 +433,7 @@ void FrequencyResponse::paintMidRegion(juce::Graphics& g, juce::Rectangle<float>
 
 }
 
-// Draw High-Frequency Response Trapezoid
+/* Paints the high-frequency trapezoid */
 // ===========================================================================================
 void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float> bounds, float gainPixel, float freq2Pixel, float alpha)
 {
@@ -485,7 +469,7 @@ void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float
     }
 }
 
-//
+/* Calculates and repositions labels with respect to cursors */
 // ===========================================================================================
 void FrequencyResponse::drawLabels()
 {
@@ -520,24 +504,46 @@ void FrequencyResponse::drawLabels()
     auto distTooClose = labelWidth + marginX;
     auto center = (labelX1 + labelX2) / 2;
 
-    if (labelX2 - labelX1 <= distTooClose)
+    if ((lowBandMute && midBandMute) || (midBandMute && highBandMute))
     {
-        labelX1 = center - (labelWidth / 2) - marginX;
-        labelX2 = center + (labelWidth / 2) + marginX;
+        /* Then ignore the label-2-label boundary checks */
+    }
+    else
+    {
+        if (labelX2 - labelX1 <= distTooClose)
+        {
+            labelX1 = center - (labelWidth / 2) - marginX;
+            labelX2 = center + (labelWidth / 2) + marginX;
+        }
     }
 
-    //if (newFreqLabelLow.getRight() > newFreqLabelHigh.getX() - 2 * marginX)
-    //{
-    //    auto center = (labelX1 + labelX2) / 2;
+    //if (lowBandMute && midBandMute)
+    //    newFreqLabelLow.setBounds(0, 0, 0, 0);
+    //else
+        newFreqLabelLow.setBounds(labelX1, labelY1, labelWidth, labelHeight);
 
-    //}
-
-       
-    newFreqLabelLow.setBounds(labelX1, labelY1, labelWidth, labelHeight);
-    newFreqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
+    //if (midBandMute && highBandMute)
+    //    newFreqLabelHigh.setBounds(0, 0, 0, 0);
+    //else
+        newFreqLabelHigh.setBounds(labelX2, labelY2, labelWidth, labelHeight);
 }
 
-// Update the response prior to painting.
+/* Updates Label Opacity based on fades */
+// ===========================================================================================
+void FrequencyResponse::setLabelOpacity()
+{
+
+    auto cursorFadeValueMin = newCursorLM.getFadeValueMin();
+    auto cursorFadeValueMax = newCursorLM.getFadeValueMax();
+
+    lowCursorFadeValue = newCursorLM.getFadeValue();
+    highCursorFadeValue = newCursorMH.getFadeValue();
+
+    lowFreqLabelFadeValue = juce::jmap(lowCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
+    highFreqLabelFadeValue = juce::jmap(highCursorFadeValue, cursorFadeValueMin, cursorFadeValueMax, labelFadeMin, labelFadeMax);
+}
+
+/* Calculates the boundary values for the three frequency bands before painting */
 // ===========================================================================================
 void FrequencyResponse::updateResponse()
 {
@@ -550,13 +556,38 @@ void FrequencyResponse::updateResponse()
     mLowMidCutoff = *apvts.getRawParameterValue(params.at(Names::Low_Mid_Crossover_Freq));
     mMidHighCutoff = *apvts.getRawParameterValue(params.at(Names::Mid_High_Crossover_Freq));
 
+    // Update Band Bypass States
+    lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
+    midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
+    highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
+
+    // Update Band Solo States
+    lowBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Low_Band));
+    midBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Mid_Band));
+    highBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_High_Band));
+
+    // Update Band Mute States
+    lowBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Low_Band));
+    midBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Mid_Band));
+    highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
+
     // Convert cutoff values to relative pixel values
     freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
     freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
 
-    newCursorLM.setBounds(freq1Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
 
-    newCursorMH.setBounds(freq2Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
+
+    if (lowBandMute && midBandMute)
+        newCursorLM.setBounds(0, 0, 0, 0);
+    else
+        newCursorLM.setBounds(freq1Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
+        
+
+
+    if (midBandMute && highBandMute)
+        newCursorMH.setBounds(0, 0, 0, 0);
+    else
+        newCursorMH.setBounds(freq2Pixel - cursorWidth / 2, responseArea.getY(), cursorWidth, responseArea.getHeight());
 
 
 
@@ -579,55 +610,56 @@ void FrequencyResponse::updateResponse()
     // =========================================================================
     auto center = (responseArea.getX() + freq1Pixel) / 2.f;
 
-    newCursorLowGain.setBounds  (   center - lowWidth / 2.f, 
-                                    gainLowPixel - cursorWidth / 2.f, 
-                                    lowWidth, 
-                                    cursorWidth
-                                );
+    if (!lowBandMute)
+    {
+        newCursorLowGain.setBounds  (   center - lowWidth / 2.f, 
+                                        gainLowPixel - cursorWidth / 2.f, 
+                                        lowWidth, 
+                                        cursorWidth
+                                    );
+    }
+    else
+        newCursorLowGain.setBounds(0,0,0,0);
+
 
 
     // Set Mid-Gain Cursor Bounds
     // =========================================================================
     center = (freq1Pixel + freq2Pixel) / 2.f;
 
-    newCursorMidGain.setBounds  (   center - midWidth / 2.f, 
-                                    gainMidPixel - cursorWidth / 2.f, 
-                                    midWidth, 
-                                    cursorWidth
-                                );
+    if (!midBandMute)
+    {
+        newCursorMidGain.setBounds  (   center - midWidth / 2.f, 
+                                        gainMidPixel - cursorWidth / 2.f, 
+                                        midWidth, 
+                                        cursorWidth
+                                    );
+    }
+    else
+        newCursorMidGain.setBounds(0,0,0,0);
+
 
     // Set High-Gain Cursor Bounds
     // =========================================================================
     center = (freq2Pixel + responseArea.getRight()) / 2.f;
 
+    if (!highBandMute)
+    {
     newCursorHighGain.setBounds (   center - highWidth / 2.f, 
                                     gainHighPixel - cursorWidth / 2.f, 
                                     highWidth, 
                                     cursorWidth
                                 );
-
-
-    // Update Band Bypass States
-    lowBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Low_Band));
-    midBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_Mid_Band));
-    highBandBypass = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
-
-    // Update Band Solo States
-    lowBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Low_Band));
-    midBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_Mid_Band));
-    highBandSolo = *apvts.getRawParameterValue(params.at(Names::Solo_High_Band));
-
-    // Update Band Mute States
-    lowBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Low_Band));
-    midBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_Mid_Band));
-    highBandMute = *apvts.getRawParameterValue(params.at(Names::Mute_High_Band));
+    }
+    else
+        newCursorHighGain.setBounds(0,0,0,0);
 
     checkSolos();
 
     repaint();
 }
 
-// Check if bands are soloed.  Negate mute if so.
+/* Checks if a given band is soloed, and mutes the other bands if so */
 // ===========================================================================================
 void FrequencyResponse::checkSolos()
 {
@@ -647,7 +679,7 @@ void FrequencyResponse::checkSolos()
     }
 }
 
-// Map linear slider value to true octave-logarithmic value
+/* Map linear slider value to true octave-logarithmic value */
 // ===========================================================================================
 float FrequencyResponse::mapLog2(float freq)
 {
@@ -657,7 +689,7 @@ float FrequencyResponse::mapLog2(float freq)
     return (std::log2(freq) - logMin) / (logMax - logMin);
 }
 
-// Called on slider value change
+/* Called on slider value change */
 // ===========================================================================================
 void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 {
@@ -719,28 +751,28 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
     updateResponse();
 }
 
-// Called on Mouse Move
+/* Called on mouse move */
 // ===========================================================================================
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
-// Called on Mouse Enter
+/* Called when mouse enters parent or any child components */
 // ===========================================================================================
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
-// Called on Mouse Exit
+/* Called when mouse exits parent or any child components */
 // ===========================================================================================
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
     checkCursorFocus(event);
 }
 
-// Check to see if mouse is focusing on any cursor for parameter change
+/* Inspects mouse position to see if mouse is hovering over any cursor */
 // ===========================================================================================
 void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 {
@@ -821,10 +853,15 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
     }
 }
 
-//
+/* Receives broadcasts of parameter changes from relevant areas of program */
 // ===========================================================================================
 void FrequencyResponse::actionListenerCallback(const juce::String& message)
 {
+
+    auto bandName = message.replaceSection(5, 30, "");
+    bandName = bandName.removeCharacters("x");
+
+    DBG(bandName);
 
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
@@ -843,8 +880,12 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
         updateResponse();
 
     if (paramName == "MUTE")
+    {
         updateResponse();
+    }
 
+
+    /* Reformat this code standard */
     if (paramName == "FOCUS")
     {
         mLowFocus = false;
@@ -872,5 +913,4 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
         auto value = paramValue.getFloatValue();
         sliderMidHighCutoff.setValue(value);
     }
-
 }

@@ -79,9 +79,7 @@ void GlobalControls::paintWindowBorders(juce::Graphics& g)
 {
     using namespace juce;
     using namespace AllColors::GlobalControlsColors;
-    
-    //DBG("GlobalControls::paintBorders");
-    
+
     auto bounds = getLocalBounds().toFloat();
 
     g.setGradientFill(BACKGROUND_GRADIENT(bounds));
@@ -130,8 +128,6 @@ void GlobalControls::paintWindowBorders(juce::Graphics& g)
 
 void GlobalControls::paintBandLabels(juce::Graphics& g)
 {
-    //DBG("GlobalControls::paintOverChildren");
-    
     using namespace FontEditor;
  
     auto bounds = getLocalBounds();
@@ -494,16 +490,10 @@ void GlobalControls::makeWaveControlAttachments()
 void GlobalControls::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
     juce::String delimiter = ":::::";
-
     juce::String bandName = "xxxxx";
-
     auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
-
-    DBG(message);
-
     sendActionMessage(message);
 }
-
 
 
 void GlobalControls::mouseEnter(const juce::MouseEvent& event)

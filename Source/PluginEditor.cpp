@@ -16,7 +16,7 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
 	/* Provides GPU acceleration */
-	openGLContext.attachTo(*getTopLevelComponent());
+	//openGLContext.attachTo(*getTopLevelComponent());
 
     /* Container class for top banner */
     addAndMakeVisible(topBanner);
@@ -132,13 +132,13 @@ void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 }
 
 //==============================================================================
-void TertiaryAudioProcessorEditor::timerCallback()
-{
+//void TertiaryAudioProcessorEditor::timerCallback()
+//{
 ////    // Checks if user has clicked the 'Close' or 'Activate' buttons on the ActivatorWindow
 ////    if (buttonAction == true && activatorWindow.isOkToClose())
 ////        closeLicenseWindow();
 ////
-}
+//}
 
 /* Opens the license window */
 //==============================================================================

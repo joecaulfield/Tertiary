@@ -36,18 +36,13 @@
 
 #include "ScopeChannel.h"
 
+/* Constructor */
 // ========================================================
 ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, ScrollPad& scrollPad)
     :   apvts(apvts),
         lfo(lfo),
         sliderScroll(scrollPad)
 {
-    
-    // Initialize WaveTable Arrays
-    //auto wtSize = lfo.getWaveTableSize();
-    //waveTable.resize(wtSize);       // Initialize Wavetable
-    //waveTable.clearQuick();         // Initialize Wavetable
-    
     // Initializes the display's color-scheme based on band type
     setBandColors();
     
@@ -90,17 +85,16 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     updateBandBypass();
 
     localLFO.updateLFO(mSampleRate, mHostBpm);
-
-    //repaint();
-
 }
 
+/* Destructor */
 // ========================================================
 ScopeChannel::~ScopeChannel()
 {
     
 }
 
+/* Set color theme */
 // ========================================================
 void ScopeChannel::setBandColors()
 {
@@ -128,6 +122,7 @@ void ScopeChannel::setBandColors()
     }
 }
 
+/* Paint graphics */
 // ========================================================
 void ScopeChannel::paint(juce::Graphics& g)
 {
@@ -147,6 +142,7 @@ void ScopeChannel::paint(juce::Graphics& g)
     paintWaveform(g);
 }
 
+/* Recieves broadcasts of parameter changes */
 // ========================================================
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
@@ -233,32 +229,22 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 
     localLFO.updateLFO(mSampleRate, mHostBpm);
 
-    //DBG("PHASE " << localLFO.getRelativePhase());
-
     redrawScope();
     repaint();
     
 }
 
+/* Paint grid lines */
 // ========================================================
 void ScopeChannel::paintGridLines(juce::Graphics& g)
 {
 
-    //DBG("PAINT GRID LINES----------------");
-
     using namespace AllColors::OscilloscopeColors;
 
     auto bounds = getLocalBounds();
-    
-    /* Used to store current beat spacing, to detect a change based on new beat spacing */
-    //float oldBeatSpacing = beatSpacing;
 
     // DRAW VERTICAL LINES =============================
     juce::Line<float> verticalAxis;
-
-    // Convert Zoom Factor to Int
-    // Represents Number of Full Quarter-Notes to be Shown
-    //float zoomFactor = sliderScroll.getZoom();
 
     g.setColour(juce::Colours::lightgrey);
 
@@ -271,7 +257,6 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
 
     // Allows Grid to Split Center
     float mDisplayPhase = scrollCenter * bounds.getWidth();
-    //float mDisplayPhase = sliderScroll.getScrollCenter() * bounds.getWidth();
 
     auto c = bounds.getCentreX() + mDisplayPhase;
     int num = 0;
@@ -348,6 +333,7 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
     redrawScope();
 }
 
+/* Paint the LFO waveforms */
 // ========================================================
 void ScopeChannel::paintWaveform(juce::Graphics& g)
 {
@@ -367,22 +353,10 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
                                             juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
 }
 
-
-
-
+/* Parent method to recalculate scope waveform points*/
 // ========================================================
 void ScopeChannel::redrawScope()
 {
-    //DBG("REDRAW SCOPE ----------------");
-
-    //DBG(    "RATE\t" << localLFO.getWaveRate()          );
-    //DBG(    "PHASE " << localLFO.getRelativePhase()     );
-    //DBG(    "MULT\t" << localLFO.getWaveMultiplier()    );
-    //DBG(    "SKEW\t" << localLFO.getWaveSkew()          );
-    //DBG(    "DEPTH\t" << localLFO.getWaveDepth()        );
-    //DBG(    "INV\t" << localLFO.getWaveInvert()         );
-    //DBG(    "WAVE\t" << localLFO.getWaveform()          );
-
     waveTable = scaleWaveAmplitude();
     generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
 }
@@ -521,6 +495,7 @@ void ScopeChannel::updateBandBypass()
         isBandBypassed = *apvts.getRawParameterValue(params.at(Names::Bypass_High_Band));
 }
 
+/* Called on component resize */
 // ========================================================
 void ScopeChannel::resized()
 {
