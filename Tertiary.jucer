@@ -76,6 +76,8 @@
             file="Source/ActivatorWindow.cpp"/>
       <FILE id="GvnwsO" name="ActivatorWindow.h" compile="0" resource="0"
             file="Source/ActivatorWindow.h"/>
+      <FILE id="lGuCzU" name="perfetto.cc" compile="1" resource="0" file="../perfetto/sdk/perfetto.cc"/>
+      <FILE id="SO8pzb" name="perfetto.h" compile="0" resource="0" file="../perfetto/sdk/perfetto.h"/>
       <FILE id="cRi3XZ" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="Ta0Y4C" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
@@ -83,6 +85,8 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="zz2gtf" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
+      <FILE id="CHKoDU" name="WLDebugger.cpp" compile="1" resource="0" file="Source/WLDebugger.cpp"/>
+      <FILE id="q4n6wq" name="WLDebugger.h" compile="0" resource="0" file="Source/WLDebugger.h"/>
     </GROUP>
     <GROUP id="{6A9E6FF9-C77A-EE0E-09B4-9203C36E7583}" name="Assets">
       <FILE id="UMAQMe" name="CompanyLogo.png" compile="0" resource="1" file="Assets/CompanyLogo.png"/>
@@ -129,6 +133,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../&#96;JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../&#96;JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="../../JUCE/modules"/>
+        <MODULEPATH id="melatonin_perfetto" path="../melatonin_perfetto"/>
       </MODULEPATHS>
     </VS2019>
     <XCODE_MAC targetFolder="Builds/MacOSX" hardenedRuntime="1" externalLibraries="LexActivator"
@@ -153,12 +158,16 @@
         <MODULEPATH id="juce_gui_basics" path="../../juce"/>
         <MODULEPATH id="juce_gui_extra" path="../../juce"/>
         <MODULEPATH id="juce_opengl" path="../../JUCE/modules"/>
+        <MODULEPATH id="melatonin_perfetto" path="../melatonin_perfetto"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2022 targetFolder="Builds/VisualStudio2022">
+    <VS2022 targetFolder="Builds/VisualStudio2022" extraCompilerFlags="/bigobj&#10;/Zc:__cplusplus&#10;/permissive-"
+            extraDefs="NOMINMAX=1 &#10;WIN32_LEAN_AND_MEAN=1&#10;PERFETTO_ENABLE_TRACE_DSP=0">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION isDebug="0" name="Release" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="1" headerPath="C:\Users\jpcfo\Documents\_GitHub\perfetto\sdk"
+                       defines="PERFETTO=1"/>
+        <CONFIGURATION isDebug="0" name="Release" enablePluginBinaryCopyStep="1" headerPath="C:\Users\jpcfo\Documents\_GitHub\perfetto\sdk"
+                       defines="PERFETTO=1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="C:\JUCE\modules"/>
@@ -175,6 +184,7 @@
         <MODULEPATH id="juce_gui_basics" path="C:\JUCE\modules"/>
         <MODULEPATH id="juce_gui_extra" path="C:\JUCE\modules"/>
         <MODULEPATH id="juce_opengl" path="C:\JUCE\modules"/>
+        <MODULEPATH id="melatonin_perfetto" path="../melatonin_perfetto"/>
       </MODULEPATHS>
     </VS2022>
   </EXPORTFORMATS>
@@ -194,5 +204,6 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="melatonin_perfetto" showAllCode="1" useLocalCopy="1" useGlobalPath="0"/>
   </MODULES>
 </JUCERPROJECT>

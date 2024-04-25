@@ -15,6 +15,7 @@
 #include "GUI/Display/WindowWrapperOscilloscope.h"
 #include "GUI/Display/TopBanner.h"
 #include "Utility/UtilityFunctions.h"
+
 //#include "ActivatorWindow.h"
 
 //==============================================================================
@@ -38,6 +39,8 @@ public:
     
 private:
     
+    juce::String mNameSpace{ "PluginEditor" };
+
     /* Handles opening & closing of the license activator window */
     ////void checkIfShouldShowTrialTitle();
     ////void openLicenseWindow();
@@ -62,7 +65,6 @@ private:
     WindowWrapperOscilloscope wrapperOscilloscope{ audioProcessor };
 
     /* Frequency-Domain & Crossover Display */
-    //WindowWrapperFrequency wrapperFrequency {audioProcessor, audioProcessor.apvts, globalControls };
     WindowWrapperFrequency wrapperFrequency{ audioProcessor, audioProcessor.apvts };
     
     /* Company & Plugin Title Banner */
@@ -72,23 +74,8 @@ private:
     /* Header displayed in top corner */
 	juce::Label companyTitle;
 
-    /* GPU Graphics Accerlation */
-    //juce::OpenGLContext openGLContext;
-
-
-    
-
-    
-
-    
     void buildFlexboxLayout();
-    
 
-
-
-    
-
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TertiaryAudioProcessorEditor)
 
 };

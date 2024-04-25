@@ -1,39 +1,3 @@
-/*
-  ==============================================================================
-
-    ScopeChannel.cpp
-    Created: 29 Jan 2023 3:54:47pm
-    Author:  Joe Caulfield
-
-    ScopeChannel visually displays the LFO waveform of an assigned channel / frequency band.
- 
-    Requirements:
- 
-        1. Visually depict the LFO parameters
-            a. Waveshape + Invert
-            b. Skew
-            c. Depth
-            d. Rhythm (Sync) or Frequency
-            e. Phase
-            
-        2. Color-Code based on Band.  Color-Code based on bypass/enable.
-            a. Low = Green
-            b. Mid = Blue
-            c. High = Purple
-            d. Bypass = Grey
- 
-        3. Display grid lines at each 1/4 note of BPM
- 
-        4. Grid lines and waveform scale and move per scrollpad's pan & zoom
- 
-
- // Repair the slider scroll bar
- // Update band focus
- // Bypass color-coding
-
-  ==============================================================================
-*/
-
 #include "ScopeChannel.h"
 
 /* Constructor */
@@ -43,6 +7,17 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
         lfo(lfo),
         sliderScroll(scrollPad)
 {
+    /* DEBUG TRACING */
+    // ==================================================================
+    #if PERFETTO
+        MelatoninPerfetto::get().beginSession();
+    #endif
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
+    // ==================================================================
+
     // Initializes the display's color-scheme based on band type
     setBandColors();
     
@@ -98,6 +73,9 @@ ScopeChannel::~ScopeChannel()
 // ========================================================
 void ScopeChannel::setBandColors()
 {
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     auto bounds = getLocalBounds().toFloat();
     //using namespace AllColors::OscilloscopeColors;
     using namespace ColorScheme::BandColors;
@@ -126,10 +104,13 @@ void ScopeChannel::setBandColors()
 // ========================================================
 void ScopeChannel::paint(juce::Graphics& g)
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
     using namespace AllColors::OscilloscopeColors;
             
-    // Fill background
     // ==================================================
     auto bounds = getLocalBounds().toFloat();
     
@@ -147,6 +128,9 @@ void ScopeChannel::paint(juce::Graphics& g)
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
 
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
     paramName = paramName.removeCharacters("x");
@@ -154,12 +138,14 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
     juce::String paramValue = message.replaceSection(0, 25, "");
     paramValue = paramValue.removeCharacters("x");
 
+    bool shouldUpdateScope = false;
 
     if (paramName == "WAVESHAPE")
     {
         int waveform = 0;
         waveform = paramValue.getIntValue();
         localLFO.setWaveform(waveform);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "DEPTH")
@@ -167,6 +153,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         float depth = 0.0f;
         depth = paramValue.getFloatValue();
         localLFO.setWaveDepth(depth);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "SKEW")
@@ -174,6 +161,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         float skew = 50.0f;
         skew = paramValue.getFloatValue();
         localLFO.setWaveSkew(skew);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "PHASE")
@@ -181,6 +169,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         float phase = 0.0f;
         phase = paramValue.getFloatValue();
         localLFO.setRelativePhase(phase);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "RHYTHM")
@@ -188,6 +177,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         int rhythm = 0;
         rhythm = paramValue.getIntValue();
         localLFO.setWaveMultiplier(rhythm);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "RATE")
@@ -195,6 +185,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         float rate = 0.0f;
         rate = paramValue.getFloatValue();
         localLFO.setWaveRate(rate);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "INVERT")
@@ -202,6 +193,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         bool invert = false;
         invert = paramValue.getIntValue();
         localLFO.setWaveInvert(invert);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "SYNC")
@@ -209,12 +201,14 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         bool sync = false;
         sync = paramValue.getIntValue();
         localLFO.setSyncedToHost(sync);
+        shouldUpdateScope = true;
     }
 
     if (paramName == "SCROLLBAR")
     {
         scrollZoom = sliderScroll.getScrollZoom();
         scrollCenter = sliderScroll.getScrollCenter();
+        shouldUpdateScope = true;
     }
 
     if (paramName == "FOCUS")
@@ -223,14 +217,20 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
             isBandFocused = true;
         else
             isBandFocused = false;
+
+        shouldUpdateScope = true;
     }
 
 
+    if (shouldUpdateScope)
+    {
+        /* Parameters have changed, so recalculate them in the local LFO */
+        localLFO.updateLFO(mSampleRate, mHostBpm);
 
-    localLFO.updateLFO(mSampleRate, mHostBpm);
+        redrawScope();
+        repaint();
+    }
 
-    redrawScope();
-    repaint();
     
 }
 
@@ -238,6 +238,9 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 // ========================================================
 void ScopeChannel::paintGridLines(juce::Graphics& g)
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace AllColors::OscilloscopeColors;
 
@@ -337,6 +340,10 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::paintWaveform(juce::Graphics& g)
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
     using namespace AllColors::OscilloscopeColors;
     using namespace ColorScheme::BandColors;
@@ -357,6 +364,9 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::redrawScope()
 {
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     waveTable = scaleWaveAmplitude();
     generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
 }
@@ -365,6 +375,10 @@ void ScopeChannel::redrawScope()
 // ========================================================
 juce::Array<float> ScopeChannel::scaleWaveAmplitude()
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     auto waveTable = localLFO.getWaveTableForDisplay(waveTableDownSampleSize);
 
     float mDepth = localLFO.getWaveDepth() / 100.f;
@@ -399,6 +413,10 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
                                                 juce::Array<float> &waveTable,
                                                 LFO& lfo)
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
 
     auto bounds = getLocalBounds();
@@ -482,6 +500,10 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
 // ========================================================
 void ScopeChannel::updateBandBypass()
 {
+
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
     
@@ -499,7 +521,6 @@ void ScopeChannel::updateBandBypass()
 // ========================================================
 void ScopeChannel::resized()
 {
-    repaint();
+    TRACE_COMPONENT();
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 }
-
-

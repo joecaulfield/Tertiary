@@ -27,6 +27,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
+#include <melatonin_perfetto/melatonin_perfetto.h>
 
 #include "BinaryData.h"
 

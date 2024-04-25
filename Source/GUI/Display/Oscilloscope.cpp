@@ -21,6 +21,11 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p) : audioProcessor(p),
                                                         midScope(p.apvts, p.midLFO, sliderScroll),
                                                         highScope(p.apvts, p.highLFO, sliderScroll)
 {
+    #if PERFETTO
+        MelatoninPerfetto::get().beginSession();
+    #endif
+
+    TRACE_COMPONENT();
 
 	using namespace Params;             // Create a Local Reference to Parameter Mapping
 	const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
@@ -61,12 +66,16 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p) : audioProcessor(p),
 // ========================================================
 Oscilloscope::~Oscilloscope()
 {
+    #if PERFETTO
+        MelatoninPerfetto::get().endSession();
+    #endif
 }
 
 /* Called on component resize */
 // ========================================================
 void Oscilloscope::resized()
 {
+    TRACE_COMPONENT();
 
     /* Rebuild the current scope layout */
     buildScopeLayout();
@@ -74,9 +83,6 @@ void Oscilloscope::resized()
     /* Fixed Position for Slider */
     sliderScroll.setSize(getWidth(), 25);
     sliderScroll.setTopLeftPosition(getWidth()/2-sliderScroll.getWidth()/2, getBottom()-25);
-    
-
-
 
     /* Initialize the pan/zoom points for the scroll bar... a little rusty on this! */
 	int x = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
@@ -92,6 +98,8 @@ void Oscilloscope::resized()
 // ========================================================
 void Oscilloscope::updateScopeParameters(bool showLow, bool showMid, bool showHigh, bool stackBands)
 {
+    TRACE_COMPONENT();
+
     mShowLowBand = showLow;
     mShowMidBand = showMid;
     mShowHighBand = showHigh;
@@ -104,6 +112,8 @@ void Oscilloscope::updateScopeParameters(bool showLow, bool showMid, bool showHi
 // ========================================================
 void Oscilloscope::buildScopeLayout()
 {
+    TRACE_COMPONENT();
+
     // Perform the oscilloscope layout
     if (mStackAllBands)
         buildStackedScopeLayout();
@@ -115,6 +125,8 @@ void Oscilloscope::buildScopeLayout()
 // ========================================================
 void Oscilloscope::buildStackedScopeLayout()
 {
+    TRACE_COMPONENT();
+
     using namespace juce;
 
     /* Define the scope channels as 'stacked'.  Updates background color */
@@ -173,6 +185,8 @@ void Oscilloscope::buildStackedScopeLayout()
 // ========================================================
 void Oscilloscope::buildOverlappedScopeLayout()
 {
+    TRACE_COMPONENT();
+
     /* Defines the scope channels as 'not stacked', or 'overlapped'.  Adjusts background colors */
     lowScope.setBandsStacked(false);
     midScope.setBandsStacked(false);
@@ -237,6 +251,8 @@ void Oscilloscope::buildOverlappedScopeLayout()
 // ========================================================
 void Oscilloscope::paint(juce::Graphics& g)
 {
+    TRACE_COMPONENT();
+
 	using namespace juce;
 
     /* Paint Background */
@@ -250,6 +266,8 @@ void Oscilloscope::paint(juce::Graphics& g)
 // ========================================================
 void Oscilloscope::paintOverChildren(juce::Graphics& g)
 {
+    TRACE_COMPONENT();
+
 	using namespace juce;
 
 	auto bounds = getLocalBounds().toFloat();
@@ -263,9 +281,7 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 // ========================================================
 void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
-	//cursorDrag = false;
-
-	//scopeCursorParam->setValueNotifyingHost(mCursorPosition);   // Get Rid?
+    TRACE_COMPONENT();
 
 	float maxWidth = (float)sliderScroll.getMaxWidth();
 
@@ -282,6 +298,8 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 // ========================================================
 void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 {
+    TRACE_COMPONENT();
+
 	/* Force the display to continually update as the pan and zoom changes */
 	if (sliderScroll.isMouseOverOrDragging())
 		updateLfoDisplay = true;

@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WLDebugger.h"
 
 //==============================================================================
 TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcessor& p)
@@ -30,12 +31,14 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 	/* Frequency-Domain & Crossover Display */
     addAndMakeVisible(wrapperFrequency);
 
-
+    /* Debugging */
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
     
 	/* Sets window size */
     float scale = 1.f;
     setSize(750*scale, 515*scale);
 
+    WLDebugger::getInstance().setEnabled(true);
 
     startTimerHz(30);
 
@@ -47,7 +50,7 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
         // LICENSING WINDOW TEMPORARILY DISABLED...........
         //openLicenseWindow();
     ////}
-
+    
 
     /* Add mouse listeners */
     ////activatorWindow.mButtonActivateFull.addListener(this);
@@ -85,6 +88,8 @@ TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
 //==============================================================================
 void TertiaryAudioProcessorEditor::paint(juce::Graphics& g)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
 	/* Set the Gradient */
 	g.setGradientFill(AllColors::PluginEditorColors::BACKGROUND_GRADIENT(getLocalBounds().toFloat()));
 	g.fillAll();
@@ -93,6 +98,8 @@ void TertiaryAudioProcessorEditor::paint(juce::Graphics& g)
 //==============================================================================
 void TertiaryAudioProcessorEditor::resized()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
 	using namespace juce;
 
     buildFlexboxLayout();
@@ -102,6 +109,8 @@ void TertiaryAudioProcessorEditor::resized()
 //==============================================================================
 void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
     using namespace juce;
     
     auto bounds = getLocalBounds();

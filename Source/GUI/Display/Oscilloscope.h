@@ -20,6 +20,8 @@
 
 #include "OptionsMenu.h"
 
+#include <melatonin_perfetto/melatonin_perfetto.h>
+
 struct Oscilloscope :	juce::Component
 {
     Oscilloscope(TertiaryAudioProcessor& p);
@@ -27,6 +29,10 @@ struct Oscilloscope :	juce::Component
 
 	void resized() override;
     
+    #if PERFETTO
+        std::unique_ptr<perfetto::TracingSession> tracingSession;
+    #endif
+
 	void mouseUp(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override;
 

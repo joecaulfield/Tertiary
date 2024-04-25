@@ -13,29 +13,30 @@
 #include "../../PluginProcessor.h"
 #include "../../Utility/AllColors.h"
 #include "ScrollPad.h"
+#include <melatonin_perfetto/melatonin_perfetto.h>
+#include "../../WLDebugger.h"
 
 struct ScopeChannel :   juce::Component,
-                        juce::Timer,
                         juce::AudioProcessorValueTreeState::Listener,
                         juce::ActionListener
 {
     ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, ScrollPad& sliderScroll);
     ~ScopeChannel();
     
+    #if PERFETTO
+        std::unique_ptr<perfetto::TracingSession> tracingSession;
+    #endif
+
     void paint(juce::Graphics& g) override;
     void paintGridLines(juce::Graphics& g);
     void paintWaveform(juce::Graphics& g);
     
     void resized() override;
-    
     void parameterChanged(const juce::String& parameterID, float newValue) override {};
-        
     void actionListenerCallback(const juce::String& message) override;
-    
-    void timerCallback() override {};
-    
+
     void updateBandBypass();
-    
+
     void setBandsStacked(bool areStacked) {bandsAreStacked = areStacked;}
     
     void redrawScope();
@@ -44,10 +45,10 @@ private:
     
     juce::AudioProcessorValueTreeState& apvts;
 
-
     LFO& lfo;   // Chopping Block
     LFO localLFO;
 
+    juce::String mNameSpace { "ScopeChannel" };
 
     double mSampleRate;
     double mHostBpm;
