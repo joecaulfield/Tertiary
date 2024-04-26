@@ -808,8 +808,8 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
 // ===========================================================================================
 void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     //checkCursorFocus(event);
 }
@@ -821,7 +821,7 @@ void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
     if (setDebug)
         WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
-    //checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 /* Called when mouse exits parent or any child components */
@@ -831,7 +831,7 @@ void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
     if (setDebug)
         WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
-    //checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 /* Inspects mouse position to see if mouse is hovering over any cursor */
