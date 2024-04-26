@@ -15,6 +15,8 @@
 GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
 	:  apvts(p.apvts), audioProcessor(p)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	addAndMakeVisible(inputGain);
 	addAndMakeVisible(outputGain);
     
@@ -36,6 +38,9 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
 	inputGain.setPickOffPoint("INPUT");
 	outputGain.setPickOffPoint("OUTPUT");
 
+    inputGain.setName("INPUT");
+    outputGain.setName("OUTPUT");
+
 	makeAttachments();
     makeGainControlAttachments();
     makeTimingControlAttachments();
@@ -49,34 +54,32 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
     makeLabel(mLabelBandGain, "Gain");
     
 	setSize(250, 140);
-    
-    ////    addMouseListener(this, true);
-    
-    //setBufferedToImage(true);
-    //setOpaque(true);
 }
 
 void GlobalControls::paint(juce::Graphics& g)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
-}
-
-void GlobalControls::paintOverChildren(juce::Graphics& g)
-{
-    if (shouldPaintOnceOnInit)
-        paintOnceOnInit(g);
-}
-
-void GlobalControls::paintOnceOnInit(juce::Graphics& g)
-{
     paintWindowBorders(g);
     paintBandLabels(g);
-    
-    //shouldPaintOnceOnInit = false;
+
+    //if (shouldPaintOnceOnInit)
+    //    paintOnceOnInit(g);
 }
+
+//void GlobalControls::paintOnceOnInit(juce::Graphics& g)
+//{
+//    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+//
+//
+//    
+//    //shouldPaintOnceOnInit = false;
+//}
 
 void GlobalControls::paintWindowBorders(juce::Graphics& g)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
     using namespace AllColors::GlobalControlsColors;
 
@@ -128,6 +131,8 @@ void GlobalControls::paintWindowBorders(juce::Graphics& g)
 
 void GlobalControls::paintBandLabels(juce::Graphics& g)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace FontEditor;
  
     auto bounds = getLocalBounds();
@@ -169,6 +174,8 @@ void GlobalControls::paintBandLabels(juce::Graphics& g)
 
 void GlobalControls::resized()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
 
     auto bounds = getLocalBounds();
@@ -228,11 +235,13 @@ void GlobalControls::resized()
     
     labelBorder.setBounds(border2.getX(), mLabelWaveShape.getY()-5, getWidth()-meterWidth*2, mLabelWaveShape.getHeight()+10);
     
-    shouldPaintOnceOnInit = true;
+    //shouldPaintOnceOnInit = true;
 }
 
 void GlobalControls::makeAttachments()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace Params;
     const auto& params = GetParams();
 
@@ -249,6 +258,8 @@ void GlobalControls::makeAttachments()
 
 void GlobalControls::makeLabel(juce::Label& label, juce::String textToPrint)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace FontEditor::ControlLabels;
     
     auto controlLabelsFontJustification = FontEditor::ControlLabels::getJustification();
@@ -276,6 +287,8 @@ void GlobalControls::makeLabel(juce::Label& label, juce::String textToPrint)
 
 void GlobalControls::makeGainControlAttachments()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace Params;
     const auto& params = GetParams();
 
@@ -347,6 +360,8 @@ void GlobalControls::makeGainControlAttachments()
 
 void GlobalControls::makeTimingControlAttachments()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace Params;
     const auto& params = GetParams();
 
@@ -417,6 +432,8 @@ void GlobalControls::makeTimingControlAttachments()
 
 void GlobalControls::makeWaveControlAttachments()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace Params;
     const auto& params = GetParams();
 
@@ -489,6 +506,8 @@ void GlobalControls::makeWaveControlAttachments()
 // Guarantees a 30-Character long message
 void GlobalControls::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     juce::String delimiter = ":::::";
     juce::String bandName = "xxxxx";
     auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
@@ -498,34 +517,33 @@ void GlobalControls::sendBroadcast(juce::String parameterName, juce::String para
 
 void GlobalControls::mouseEnter(const juce::MouseEvent& event)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     checkForBandFocus();
 }
 
 void GlobalControls::mouseExit(const juce::MouseEvent& event)
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     checkForBandFocus();
 }
 
 
 void GlobalControls::checkForBandFocus()
 {
+    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto whoHasFocus = "NONE";
 
     if (lowBandControls.isMouseOver(true))
-    {
         whoHasFocus = "LOW";
-    }
 
     if (midBandControls.isMouseOver(true))
-    {
         whoHasFocus = "MID";
-    }
 
     if (highBandControls.isMouseOver(true))
-    {
         whoHasFocus = "HIGH";
-    }
 
     sendBroadcast("FOCUS", whoHasFocus);
 

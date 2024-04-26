@@ -1,7 +1,7 @@
 #pragma once
 #include <JuceHeader.h>
 
-struct WLDebugger : juce::DocumentWindow
+struct WLDebugger : juce::DocumentWindow, juce::Timer
 {
 
 public:
@@ -17,6 +17,8 @@ public:
     void printMessage(juce::String mNameSpace, juce::String functionName, juce::String message);
 
     void closeButtonPressed() override;
+
+    void timerCallback() override;
 
 private:
 

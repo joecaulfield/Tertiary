@@ -11,6 +11,7 @@
 #pragma once
 #include "../../PluginProcessor.h"
 #include "../../Utility/MyLookAndFeel.h"
+#include "../../WLDebugger.h"
 
 struct InputOutputGain : juce::Component, juce::Timer, juce::Slider::Listener
 {
@@ -45,6 +46,9 @@ struct InputOutputGain : juce::Component, juce::Timer, juce::Slider::Listener
 
 
 private:
+
+	juce::String mNameSpace{ "InputOutputGain" };
+	bool setDebug{ false };
 
 	float leftLevel = -60.f;
 	float rightLevel = -60.f;

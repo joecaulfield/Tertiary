@@ -27,7 +27,7 @@ WLDebugger::WLDebugger() :  juce::DocumentWindow("WL Debugger",
     setUsingNativeTitleBar(true);
     //setContentOwned(new juce::Component(), true); // You might want to replace 'new juce::Component()' with your actual content component
     //centreWithSize(400, 300);
-    setSize(400, 300);
+    setSize(500, 800);
     setTopLeftPosition(400, 300);
     setResizable(true, true);
     setVisible(true);
@@ -39,6 +39,8 @@ WLDebugger::WLDebugger() :  juce::DocumentWindow("WL Debugger",
     logDisplay.setScrollbarsShown(true);
     logDisplay.setPopupMenuEnabled(false);
     setContentOwned(&logDisplay, false);
+
+    startTimer(30000);
 }
 
 WLDebugger::~WLDebugger()
@@ -73,4 +75,13 @@ void WLDebugger::printMessage(juce::String mNameSpace, juce::String functionName
 void WLDebugger::closeButtonPressed()
 {
     setVisible(false);
+}
+
+void WLDebugger::timerCallback()
+{
+    if (mIsEnabled)
+    {
+        logDisplay.moveCaretToEnd();
+        logDisplay.insertTextAtCaret("\n\n\n");  // Add new message at the end with a newline
+    }
 }

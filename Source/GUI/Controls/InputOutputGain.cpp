@@ -13,16 +13,21 @@
 InputOutputGain::InputOutputGain(TertiaryAudioProcessor& p) :
 	audioProcessor(p)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	setSize(40, 150);
 
 	sliderGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
 	sliderGain.setLookAndFeel(&inOutLookAndFeel);
 	sliderGain.addListener(this);
+	sliderValue = sliderGain.getValue();
 	addAndMakeVisible(sliderGain);
 
-	startTimerHz(60);
-    
+	startTimerHz(30);
     setOpaque(true);
+	setBufferedToImage(true);
+
 }
 
 InputOutputGain::~InputOutputGain()
@@ -32,6 +37,9 @@ InputOutputGain::~InputOutputGain()
 
 void InputOutputGain::paint(juce::Graphics& g)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	auto bounds = getLocalBounds().toFloat();
 	bounds.reduce(4, 0);
 
@@ -63,11 +71,14 @@ void InputOutputGain::paint(juce::Graphics& g)
 	g.setColour(juce::Colours::white); /* Migrate to All Colors */
 	g.setFont(13);
 	g.drawFittedText(valueString, labelBounds.toNearestInt(), juce::Justification::centred, 1);
-					
+
 }
 
 void InputOutputGain::resized()
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	auto bounds = getLocalBounds().toFloat();
 
 	grillBounds = {	bounds.getX(), bounds.getY(),
@@ -76,7 +87,7 @@ void InputOutputGain::resized()
 	labelBounds = { bounds.getX(), grillBounds.getBottom(), bounds.getWidth(), 15 };
 
 	// Place The Slider ===========================================================
-	sliderGain.setSize(getWidth(), getHeight());
+	sliderGain.setSize(getWidth()-2, getHeight()-2);
 	sliderGain.setCentreRelative(0.5f, 0.465f);
 
 	ledOffGradient = makeMeterGradient(grillBounds, 0.75f);
@@ -88,6 +99,9 @@ void InputOutputGain::resized()
 
 juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	juce::ColourGradient gradient = juce::ColourGradient {	
 									juce::Colour(0xff084008).withMultipliedBrightness(brightness),	
 									bounds.getBottomLeft(),
@@ -103,13 +117,19 @@ juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> b
 
 void InputOutputGain::timerCallback()
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	getLevels();
 
-	repaint();
+	repaint(1,1,getWidth()-2,getHeight()-2);
 }
 
 void InputOutputGain::getLevels()
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	// Pull current audio-level values from processor
 
 	if (pickOffPoint == "INPUT")
@@ -159,11 +179,17 @@ void InputOutputGain::getLevels()
 
 void InputOutputGain::setPickOffPoint(juce::String pickoff)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	pickOffPoint = pickoff;
 }
 
 void InputOutputGain::buildGrill(juce::Rectangle<float> bounds)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	using namespace juce;
 
 	ledThresholds.clear();
@@ -220,5 +246,8 @@ void InputOutputGain::buildGrill(juce::Rectangle<float> bounds)
 
 void InputOutputGain::sliderValueChanged(juce::Slider* slider)
 {
+	if (setDebug)
+		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
 	sliderValue = slider->getValue();
 }

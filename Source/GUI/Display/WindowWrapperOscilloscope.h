@@ -35,6 +35,8 @@ struct WindowWrapperOscilloscope :  juce::Component,
 private:
     /* Reference to the Audio Processor & DSP Parameters */
 
+    juce::String mNameSpace{ "WindowWrapperOscilloscope" };
+
     TertiaryAudioProcessor& audioProcessor;
     Oscilloscope oscilloscope{ audioProcessor };
 

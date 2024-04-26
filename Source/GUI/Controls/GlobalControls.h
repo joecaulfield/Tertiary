@@ -15,6 +15,7 @@
 #include "../../../Source/PluginProcessor.h"
 #include "../../Utility/AllColors.h"
 #include "../../Utility/UtilityFunctions.h"
+#include "../../WLDebugger.h"
 
 
 struct GlobalControls : juce::Component,
@@ -24,7 +25,7 @@ struct GlobalControls : juce::Component,
 	GlobalControls(TertiaryAudioProcessor& p);
 
 	void paint(juce::Graphics& g) override;
-	void paintOverChildren(juce::Graphics& g) override;
+	//void paintOverChildren(juce::Graphics& g) override;
 	void resized() override;
 
 	void makeAttachments();
@@ -53,9 +54,10 @@ struct GlobalControls : juce::Component,
 
 private:
 
-    bool shouldPaintOnceOnInit{true};
-    void paintOnceOnInit(juce::Graphics& g);
-    
+    juce::String mNameSpace{ "GlobalControls" };
+
+    //bool shouldPaintOnceOnInit{true};
+    //void paintOnceOnInit(juce::Graphics& g);
     void paintWindowBorders(juce::Graphics& g);
     void paintBandLabels(juce::Graphics& g);
     
