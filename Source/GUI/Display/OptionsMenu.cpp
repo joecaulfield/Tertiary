@@ -14,6 +14,9 @@
 // ========================================================
 OptionsMenu::OptionsMenu()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     setSize(100,25);
     
     addMouseListener(this, true);
@@ -26,6 +29,7 @@ OptionsMenu::OptionsMenu()
     shouldShowDropdown = false;
     
     startTimerHz(30);
+
 }
 
 
@@ -39,6 +43,9 @@ OptionsMenu::~OptionsMenu()
 // ========================================================
 void OptionsMenu::resized()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     mButtonOptions.setTopLeftPosition(0,0);
     mButtonOptions.setSize(100,25);
     
@@ -49,6 +56,9 @@ void OptionsMenu::resized()
 // ========================================================
 void OptionsMenu::paint(juce::Graphics& g)
 {
+
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto buttonBounds = getLocalBounds();
     
@@ -74,6 +84,8 @@ void OptionsMenu::paint(juce::Graphics& g)
 // ========================================================
 void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     if (!isMouseButtonDown())
     {
@@ -86,6 +98,8 @@ void OptionsMenu::mouseEnter(const juce::MouseEvent& event)
 // ========================================================
 void OptionsMenu::mouseExit(const juce::MouseEvent& event)
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     if (!isMouseOver(true)) {
         closeDropdown();
@@ -121,7 +135,9 @@ void OptionsMenu::timerCallback()
 // ========================================================
 void OptionsMenu::buttonClicked(juce::Button* button)
 {
-    
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     if (button == &mButtonOptions)
     {
         shouldShowDropdown = !shouldShowDropdown;
@@ -138,6 +154,8 @@ void OptionsMenu::buttonClicked(juce::Button* button)
 // ========================================================
 void OptionsMenu::openDropdown()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     // Allocate 25 Pixels per populated option
     auto dropSize = optionsArray.size() * 25;
@@ -153,6 +171,9 @@ void OptionsMenu::openDropdown()
 // ========================================================
 void OptionsMenu::closeDropdown()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     setSize (   mButtonOptions.getWidth(),
                 mButtonOptions.getHeight()
             );
@@ -167,7 +188,9 @@ void OptionsMenu::addOptionToList(juce::String optionTitle,
                                   juce::String parameterID
                                   )
 {
-    
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
     
     auto newOption = std::make_unique<OptionItem>();
@@ -194,6 +217,9 @@ void OptionsMenu::addOptionToList(juce::String optionTitle,
 // ========================================================
 void OptionsMenu::buildDropdown()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
     using namespace juce;
     
     auto bounds = getLocalBounds();

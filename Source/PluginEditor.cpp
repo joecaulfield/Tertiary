@@ -6,25 +6,28 @@
 TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
+
 	/* Provides GPU acceleration */
 	//openGLContext.attachTo(*getTopLevelComponent());
 
     /* Container class for top banner */
     addAndMakeVisible(topBanner);
+    topBanner.addMouseListener(this, true);
     
 	/* Container class for all parameter controls */
 	addAndMakeVisible(globalControls);
 
     /* Time-Domain Display */
-    ////addAndMakeVisible(wrapperOscilloscope);
+    addAndMakeVisible(wrapperOscilloscope);
     
 	/* Frequency-Domain & Crossover Display */
-    ////addAndMakeVisible(wrapperFrequency);
+    addAndMakeVisible(wrapperFrequency);
 
-    /* Debugging */
-    WLDebugger::getInstance().setEnabled(true);
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-    
+
 	/* Sets window size */
     float scale = 1.f;
     setSize(750*scale, 515*scale);
@@ -49,7 +52,8 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 //==============================================================================
 TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
 {
-	
+    WLDebugger::getInstance().closeWindow();
+    juce::Logger::setCurrentLogger(nullptr);
 }
 
 //==============================================================================
@@ -105,4 +109,15 @@ void TertiaryAudioProcessorEditor::buildFlexboxLayout()
     flexBox.items.add(FlexItem(globalControls).withFlex(1.f));
     
     flexBox.performLayout(bounds);
+}
+
+/* Temporary Double-Click Callback*/
+void TertiaryAudioProcessorEditor::mouseDoubleClick(const juce::MouseEvent& event)
+{
+    openDebug = !openDebug;
+
+    if (openDebug)
+        WLDebugger::getInstance().openWindow();
+    else
+        WLDebugger::getInstance().closeWindow();
 }

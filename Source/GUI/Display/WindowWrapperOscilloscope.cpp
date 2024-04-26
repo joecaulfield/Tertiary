@@ -15,7 +15,8 @@
 WindowWrapperOscilloscope::WindowWrapperOscilloscope(TertiaryAudioProcessor& p) :  audioProcessor(p)
 {
 
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     addAndMakeVisible(oscilloscope);
     addAndMakeVisible(optionsMenu);
@@ -43,7 +44,8 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
         jassert(param != nullptr);                                                                      // Error Checking
     };
 
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     boolHelper(showLowBandParam,    Names::Show_Low_Scope);
     boolHelper(showMidBandParam,    Names::Show_Mid_Scope);
@@ -85,7 +87,8 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
 // ========================================================
 void WindowWrapperOscilloscope::updateOptionsParameters()
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     bool showLowBand = showLowBandParam->get();
     bool showMidBand = showMidBandParam->get();
@@ -99,7 +102,8 @@ void WindowWrapperOscilloscope::updateOptionsParameters()
 // ========================================================
 void WindowWrapperOscilloscope::resized()
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     optionsMenu.setTopLeftPosition(4,4);
     
@@ -110,7 +114,8 @@ void WindowWrapperOscilloscope::resized()
 // ========================================================
 void WindowWrapperOscilloscope::parameterChanged(const juce::String& parameterID, float newValue)
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     updateOptionsParameters();
 }
@@ -119,5 +124,6 @@ void WindowWrapperOscilloscope::parameterChanged(const juce::String& parameterID
 // ========================================================
 void WindowWrapperOscilloscope::paint(juce::Graphics& g)
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 }

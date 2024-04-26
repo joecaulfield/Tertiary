@@ -35,26 +35,14 @@ public:
 
     void timerCallback() override {};
     void buttonClicked(juce::Button* button) override {};
-    void mouseDoubleClick (const juce::MouseEvent &event) override {};
+    void mouseDoubleClick (const juce::MouseEvent &event) override;
     
 private:
     
     juce::String mNameSpace{ "PluginEditor" };
+    bool setDebug{ true };
+    bool openDebug{ false };
 
-    /* Handles opening & closing of the license activator window */
-    ////void checkIfShouldShowTrialTitle();
-    ////void openLicenseWindow();
-    ////void closeLicenseWindow();
-    
-    ////ActivatorWindow activatorWindow;
-    ////bool showTrialTitle{false};
-    ////int counterFade = 30;
-    ////int counterWait = 0;
-    
-    /* Actions used to close the Activator pop-up window */
-    ////bool buttonAction{false};
-    ////bool doNotWait{false};
-    
     /* Reference to the Audio Processor & DSP Parameters */
     TertiaryAudioProcessor& audioProcessor;
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "../../WLDebugger.h"
 
 struct Cursor : juce::Component,
 				juce::ActionBroadcaster,
@@ -44,6 +45,9 @@ public:
 private:
 
 	juce::Line<float> mCursor;
+
+	juce::String mNameSpace{ "Cursor" };
+	bool setDebug{ true };
 
 	bool mIsVertical{ true };
 

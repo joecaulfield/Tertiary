@@ -11,14 +11,6 @@
 #include "WindowWrapperFrequency.h"
 
 
-//WindowWrapperFrequency::WindowWrapperFrequency( TertiaryAudioProcessor& p,
-//                                                juce::AudioProcessorValueTreeState& apv,
-//                                                GlobalControls& gc)
-//: audioProcessor(p),
-//globalControls(gc),
-//apvts(apv),
-//forwardFFT(audioProcessor.fftOrder),
-//window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
     juce::AudioProcessorValueTreeState& apv)
     : audioProcessor(p),
@@ -26,8 +18,11 @@ WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
     forwardFFT(audioProcessor.fftOrder),
     window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
     addAndMakeVisible(frequencyResponse);
-  
+
     // Array Maintenance ==========
     fftDrawingPoints.ensureStorageAllocated(audioProcessor.scopeSize);
     fftDrawingPoints.resize(audioProcessor.scopeSize);
@@ -41,6 +36,7 @@ WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
 
     buildOptionsMenuParameters();
 
+    setOpaque(true);
 }
 
 WindowWrapperFrequency::~WindowWrapperFrequency()
@@ -50,6 +46,8 @@ WindowWrapperFrequency::~WindowWrapperFrequency()
 
 void WindowWrapperFrequency::resized()
 {
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
     frequencyResponse.setSize(getWidth(), getHeight());
 
     // =============================
@@ -59,30 +57,33 @@ void WindowWrapperFrequency::resized()
     spectrumArea.removeFromBottom(20);
     spectrumArea.removeFromLeft(32);
     spectrumArea.removeFromRight(6);
+
+    optionsMenu.setTopLeftPosition(1, 1);
 }
 
 void WindowWrapperFrequency::timerCallback()
 {
-    // Check for new FFT information
-    if (audioProcessor.nextFFTBlockReady)
+    if (mShouldShowFFT)
     {
-        drawNextFrameOfSpectrum();
-        audioProcessor.nextFFTBlockReady = false;
+        // Check for new FFT information
+        if (audioProcessor.nextFFTBlockReady)
+        {
+            calculateNextFrameOfSpectrum();
+            audioProcessor.nextFFTBlockReady = false;
+        }
+
+        repaint(1, 1, getLocalBounds().getWidth() - 2, getLocalBounds().getHeight() - 2);
     }
-    
-    /* Repaint the FFT Area */
-    repaint(spectrumArea.toNearestInt());
 }
 
 void WindowWrapperFrequency::paint(juce::Graphics& g)
 {
 
-}
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
-void WindowWrapperFrequency::paintOverChildren(juce::Graphics& g)
-{
-    /* FFT Animation goes here */
-    
+    g.fillAll(juce::Colours::black);
+
     ///* Paint fft */
     // =========================
     if (mShouldShowFFT)
@@ -91,6 +92,9 @@ void WindowWrapperFrequency::paintOverChildren(juce::Graphics& g)
  
 void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds)
 {
+
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     for (int i = 1; i < audioProcessor.scopeSize; ++i)
     {
@@ -157,12 +161,12 @@ void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> 
     gradient.addColour(p2, juce::Colours::whitesmoke.withBrightness(1.25f));
 
     g.setGradientFill(gradient);
-    g.setOpacity(0.75f);
+    g.setOpacity(0.9f);
     g.fillPath(f);
 
     // Fill FFT Outline
     g.setColour(juce::Colours::darkgrey);
-    g.setOpacity(0.8f);
+    g.setOpacity(0.95f);
     g.strokePath(f, juce::PathStrokeType(0.5f));
 
 }
@@ -170,7 +174,7 @@ void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> 
 
 
 
-void WindowWrapperFrequency::drawNextFrameOfSpectrum()
+void WindowWrapperFrequency::calculateNextFrameOfSpectrum()
 {
     // Apply Window Function to Data
     window.multiplyWithWindowingTable(audioProcessor.fftData, audioProcessor.fftSize);
@@ -217,6 +221,7 @@ void WindowWrapperFrequency::drawNextFrameOfSpectrum()
 void WindowWrapperFrequency::parameterChanged(const juce::String& parameterID, float newValue)
 {
     updateOptionsParameters();
+
 }
 
 
@@ -225,6 +230,10 @@ void WindowWrapperFrequency::parameterChanged(const juce::String& parameterID, f
 // ========================================================
 void WindowWrapperFrequency::buildOptionsMenuParameters()
 {
+
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
@@ -258,6 +267,8 @@ void WindowWrapperFrequency::buildOptionsMenuParameters()
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_FFT), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::FFT_Pickoff), this);
 
+    optionsMenu.setName("FREQ OPTIONS");
+
     updateOptionsParameters();
 }
 
@@ -265,6 +276,9 @@ void WindowWrapperFrequency::buildOptionsMenuParameters()
 
 void WindowWrapperFrequency::updateOptionsParameters()
 {
+
+    if (setDebug)
+        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     mShouldShowFFT = showFftParam->get();
 

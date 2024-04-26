@@ -11,6 +11,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "../../Utility/MyLookAndFeel.h"
+#include "../../WLDebugger.h"
 
 struct OptionItem
 {
@@ -56,6 +57,9 @@ private:
     juce::TextButton mButtonOptions;
     ButtonOptionsLookAndFeel optionsLookAndFeel;
     
+    juce::String mNameSpace{ "OptionsMenu" };
+    bool setDebug{ true };
+
     void openDropdown();
     void closeDropdown();
     void buildDropdown();

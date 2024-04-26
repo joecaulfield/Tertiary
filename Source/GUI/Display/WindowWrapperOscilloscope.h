@@ -36,6 +36,7 @@ private:
     /* Reference to the Audio Processor & DSP Parameters */
 
     juce::String mNameSpace{ "WindowWrapperOscilloscope" };
+    bool setDebug{ false };
 
     TertiaryAudioProcessor& audioProcessor;
     Oscilloscope oscilloscope{ audioProcessor };

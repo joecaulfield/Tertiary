@@ -11,6 +11,7 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "../../WLDebugger.h"
 
 struct FreqLabel :	juce::Component,
 					juce::Label::Listener,
@@ -30,7 +31,6 @@ public:
 
 	void setLabelValue(float newValue);
 
-
 	void timerCallback() override;
 
 	void mouseEnter(const juce::MouseEvent& event) override;
@@ -43,6 +43,9 @@ public:
 private:
 
 	juce::Label mLabel;
+
+	juce::String mNameSpace{ "FreqLabel" };
+	bool setDebug{ true };
 
 	bool isBeingEdited{ false };
 

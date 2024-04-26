@@ -54,6 +54,8 @@ struct GlobalControls : juce::Component,
 
 private:
 
+    bool setDebug{ false };
+
     juce::String mNameSpace{ "GlobalControls" };
 
     //bool shouldPaintOnceOnInit{true};

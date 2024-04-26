@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "FrequencyResponse.h"
 #include "OptionsMenu.h"
+#include "../../WLDebugger.h"
 
 struct WindowWrapperFrequency : juce::Component, 
                                 juce::Timer,
@@ -27,7 +28,6 @@ struct WindowWrapperFrequency : juce::Component,
     void timerCallback();
     
     void paint(juce::Graphics& g);
-    void paintOverChildren(juce::Graphics& g);
     void paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds);
 
     FrequencyResponse& getFrequencyResponse() { return frequencyResponse; };
@@ -35,11 +35,12 @@ struct WindowWrapperFrequency : juce::Component,
 private:
     /* Reference to the Audio Processor & DSP Parameters */
 
+    juce::String mNameSpace{ "WindowWrapperFrequency" };
+    bool setDebug{ true };
+
     TertiaryAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& apvts;
-    //GlobalControls& globalControls;
     
-    //FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts, globalControls };
     FrequencyResponse frequencyResponse{ audioProcessor, audioProcessor.apvts };
 
     void buildOptionsMenuParameters();
@@ -56,10 +57,8 @@ private:
 
     void parameterChanged(const juce::String& parameterID, float newValue) override;
 
-    //void makeAttachments();
-    
     // FFT Components =========
-    void drawNextFrameOfSpectrum();
+    void calculateNextFrameOfSpectrum();
     
     juce::Array<float> fftDrawingPoints;
     juce::dsp::FFT forwardFFT;
