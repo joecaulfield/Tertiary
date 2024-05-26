@@ -51,79 +51,91 @@ void TertiaryAudioProcessor::attachParametersToLayout()
     /* Local reference to parameter mapping */
     using namespace Params;
     const auto& params = GetParams();
-    
+
     /* Float Helper: "Attaches" float to APVTS Parameter */
     auto floatHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-    {
-        param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));
-        jassert(param != nullptr);
-    };
+        {
+            param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));
+            jassert(param != nullptr);
+        };
 
     /* Choice Helper: "Attaches" choice to APVTS Parameter */
     auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-    {
-        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-        jassert(param != nullptr);
-    };
+        {
+            param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+            jassert(param != nullptr);
+        };
 
     /* Bool Helper: "Attaches" bool to APVTS Parameter */
     auto boolHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-    {
-        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));
-        jassert(param != nullptr);
-    };
+        {
+            param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));
+            jassert(param != nullptr);
+        };
 
     /* Initialize Input & Output Gain */
     floatHelper(inputGainParam, Names::Input_Gain);
     floatHelper(outputGainParam, Names::Output_Gain);
-    
+
     /* Initialize Crossover Frequencies */
-    floatHelper(lowMidCrossover,    Names::Low_Mid_Crossover_Freq);
-    floatHelper(midHighCrossover,   Names::Mid_High_Crossover_Freq);
+    floatHelper(lowMidCrossover, Names::Low_Mid_Crossover_Freq);
+    floatHelper(midHighCrossover, Names::Mid_High_Crossover_Freq);
 
     /* Initialize Low Band Parameters */
-    boolHelper(lowBandTrem.bypassParam,     Names::Bypass_Low_Band);
-    boolHelper(lowBandTrem.muteParam,       Names::Mute_Low_Band);
-    boolHelper(lowBandTrem.soloParam,       Names::Solo_Low_Band);
-    floatHelper(lowBandTrem.bandGainParam,  Names::Gain_Low_Band);
-    floatHelper(lowLFO.symmetryParam,       Names::Symmetry_Low_LFO);
-    floatHelper(lowLFO.depthParam,          Names::Depth_Low_LFO);
-    choiceHelper(lowLFO.waveshapeParam,     Names::Wave_Low_LFO);
-    boolHelper(lowLFO.invertParam,          Names::Invert_Low_LFO);
-    floatHelper(lowLFO.relativePhaseParam,  Names::Relative_Phase_Low_LFO);
-    floatHelper(lowLFO.rateParam,           Names::Rate_Low_LFO);
-    boolHelper(lowLFO.syncToHostParam,      Names::Sync_Low_LFO);
-    choiceHelper(lowLFO.multiplierParam,    Names::Multiplier_Low_LFO);
+    boolHelper(lowBandTrem.bypassParam, Names::Bypass_Low_Band);
+    boolHelper(lowBandTrem.muteParam, Names::Mute_Low_Band);
+    boolHelper(lowBandTrem.soloParam, Names::Solo_Low_Band);
+    floatHelper(lowBandTrem.bandGainParam, Names::Gain_Low_Band);
+    floatHelper(lowLFO.symmetryParam, Names::Symmetry_Low_LFO);
+    floatHelper(lowLFO.depthParam, Names::Depth_Low_LFO);
+    choiceHelper(lowLFO.waveshapeParam, Names::Wave_Low_LFO);
+    boolHelper(lowLFO.invertParam, Names::Invert_Low_LFO);
+    floatHelper(lowLFO.relativePhaseParam, Names::Relative_Phase_Low_LFO);
+    floatHelper(lowLFO.rateParam, Names::Rate_Low_LFO);
+    boolHelper(lowLFO.syncToHostParam, Names::Sync_Low_LFO);
+    choiceHelper(lowLFO.multiplierParam, Names::Multiplier_Low_LFO);
 
     // Initialize Mid Band Parameters
-    boolHelper(midBandTrem.bypassParam,     Names::Bypass_Mid_Band);
-    boolHelper(midBandTrem.muteParam,       Names::Mute_Mid_Band);
-    boolHelper(midBandTrem.soloParam,       Names::Solo_Mid_Band);
-    floatHelper(midBandTrem.bandGainParam,  Names::Gain_Mid_Band);
+    boolHelper(midBandTrem.bypassParam, Names::Bypass_Mid_Band);
+    boolHelper(midBandTrem.muteParam, Names::Mute_Mid_Band);
+    boolHelper(midBandTrem.soloParam, Names::Solo_Mid_Band);
+    floatHelper(midBandTrem.bandGainParam, Names::Gain_Mid_Band);
 
-    floatHelper(midLFO.symmetryParam,       Names::Symmetry_Mid_LFO);
-    floatHelper(midLFO.depthParam,          Names::Depth_Mid_LFO);
-    choiceHelper(midLFO.waveshapeParam,     Names::Wave_Mid_LFO);
-    boolHelper(midLFO.invertParam,          Names::Invert_Mid_LFO);
-    floatHelper(midLFO.relativePhaseParam,  Names::Relative_Phase_Mid_LFO);
-    floatHelper(midLFO.rateParam,           Names::Rate_Mid_LFO);
-    boolHelper(midLFO.syncToHostParam,      Names::Sync_Mid_LFO);
-    choiceHelper(midLFO.multiplierParam,    Names::Multiplier_Mid_LFO);
+    floatHelper(midLFO.symmetryParam, Names::Symmetry_Mid_LFO);
+    floatHelper(midLFO.depthParam, Names::Depth_Mid_LFO);
+    choiceHelper(midLFO.waveshapeParam, Names::Wave_Mid_LFO);
+    boolHelper(midLFO.invertParam, Names::Invert_Mid_LFO);
+    floatHelper(midLFO.relativePhaseParam, Names::Relative_Phase_Mid_LFO);
+    floatHelper(midLFO.rateParam, Names::Rate_Mid_LFO);
+    boolHelper(midLFO.syncToHostParam, Names::Sync_Mid_LFO);
+    choiceHelper(midLFO.multiplierParam, Names::Multiplier_Mid_LFO);
 
     // Initialize High Band Parameters
-    boolHelper(highBandTrem.bypassParam,    Names::Bypass_High_Band);
-    boolHelper(highBandTrem.muteParam,      Names::Mute_High_Band);
-    boolHelper(highBandTrem.soloParam,      Names::Solo_High_Band);
+    boolHelper(highBandTrem.bypassParam, Names::Bypass_High_Band);
+    boolHelper(highBandTrem.muteParam, Names::Mute_High_Band);
+    boolHelper(highBandTrem.soloParam, Names::Solo_High_Band);
     floatHelper(highBandTrem.bandGainParam, Names::Gain_High_Band);
 
-    floatHelper(highLFO.symmetryParam,      Names::Symmetry_High_LFO);
-    floatHelper(highLFO.depthParam,         Names::Depth_High_LFO);
-    choiceHelper(highLFO.waveshapeParam,    Names::Wave_High_LFO);
-    boolHelper(highLFO.invertParam,         Names::Invert_High_LFO);
+    floatHelper(highLFO.symmetryParam, Names::Symmetry_High_LFO);
+    floatHelper(highLFO.depthParam, Names::Depth_High_LFO);
+    choiceHelper(highLFO.waveshapeParam, Names::Wave_High_LFO);
+    boolHelper(highLFO.invertParam, Names::Invert_High_LFO);
     floatHelper(highLFO.relativePhaseParam, Names::Relative_Phase_High_LFO);
-    floatHelper(highLFO.rateParam,          Names::Rate_High_LFO);
-    boolHelper(highLFO.syncToHostParam,     Names::Sync_High_LFO);
-    choiceHelper(highLFO.multiplierParam,   Names::Multiplier_High_LFO);
+    floatHelper(highLFO.rateParam, Names::Rate_High_LFO);
+    boolHelper(highLFO.syncToHostParam, Names::Sync_High_LFO);
+    choiceHelper(highLFO.multiplierParam, Names::Multiplier_High_LFO);
+
+    boolHelper(showLowBandParam, Names::Show_Low_Scope);
+    boolHelper(showMidBandParam, Names::Show_Mid_Scope);
+    boolHelper(showHighBandParam, Names::Show_High_Scope);
+    boolHelper(stackBandsParam, Names::Stack_Bands_Scope);
+
+    floatHelper(scopePoint1Param, Names::Scope_Point1);
+    floatHelper(scopePoint2Param, Names::Scope_Point2);
+
+    boolHelper(showFftParam, Names::Show_FFT);
+    choiceHelper(fftPickoffParam, Names::FFT_Pickoff);
+
 }
 
 /* Registers AudioProcessor as a listener to all parameters */
@@ -174,13 +186,6 @@ void TertiaryAudioProcessor::addParameterListeners()
     apvts.addParameterListener(params.at(Names::Rate_High_LFO), this);
     apvts.addParameterListener(params.at(Names::Multiplier_High_LFO), this);
     apvts.addParameterListener(params.at(Names::Relative_Phase_High_LFO), this);
-    apvts.addParameterListener(params.at(Names::Show_Low_Scope), this);
-    apvts.addParameterListener(params.at(Names::Show_Mid_Scope), this);
-    apvts.addParameterListener(params.at(Names::Show_High_Scope), this);
-    apvts.addParameterListener(params.at(Names::Stack_Bands_Scope), this);
-    apvts.addParameterListener(params.at(Names::Cursor_Position), this);
-    apvts.addParameterListener(params.at(Names::Scope_Point1), this);
-    apvts.addParameterListener(params.at(Names::Scope_Point2), this);
 }
 
 /* Recalls previously saved settings */
@@ -188,7 +193,7 @@ void TertiaryAudioProcessor::addParameterListeners()
 void TertiaryAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // USED TO SAVE PARAMETERS TO MEMORY
-    //
+    
     // Declare a Memory Output Stream variable called 'mos'
     juce::MemoryOutputStream mos(   destData,   // Destination
                                     true);      // It is appendable
@@ -200,6 +205,7 @@ void TertiaryAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 //==============================================================================
 void TertiaryAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
+
     // USED TO LOAD PARAMETERS FROM MEMORY
 
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);   // Pull the Value Tree from memory
@@ -502,23 +508,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout TertiaryAudioProcessor::crea
                                                         params.at(Names::Stack_Bands_Scope),                // Parameter Name
                                                         true));
 
-    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Cursor_Scope),1}, // Parameter ID & Hint
-                                                        params.at(Names::Show_Cursor_Scope),                // Parameter Name
-                                                        true));
-
-    layout.add(std::make_unique<AudioParameterBool>(    ParameterID{params.at(Names::Show_Playhead_Scope),1},   // Parameter ID & Hint
-                                                        params.at(Names::Show_Playhead_Scope),                  // Parameter Name
-                                                        true));
-
-    auto cursorRange = NormalisableRange<float> (0.f,   // Start
-                                                1.f,    // Stop
-                                                0.0001, // Step Size
-                                                1.f);   // Skew
-
-    layout.add(std::make_unique<AudioParameterFloat>(   ParameterID{params.at(Names::Cursor_Position),1},   // Parameter ID & Hint
-                                                        params.at(Names::Cursor_Position),                  // Parameter Name
-                                                        cursorRange,                                        // Range
-                                                        0.5f));                                             // Default Value
 
     auto pointRange = NormalisableRange<float> ( 0,     // Start
                                                 100.f,  // Stop
@@ -1182,5 +1171,4 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
     {
         parameterChangedLfoHigh = true;
     }
-
 }

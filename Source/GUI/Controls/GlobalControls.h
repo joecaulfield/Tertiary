@@ -15,7 +15,7 @@
 #include "../../../Source/PluginProcessor.h"
 #include "../../Utility/AllColors.h"
 #include "../../Utility/UtilityFunctions.h"
-#include "../../WLDebugger.h"
+//#include "../../WLDebugger.h"
 
 
 struct GlobalControls : juce::Component,

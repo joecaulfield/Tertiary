@@ -15,8 +15,8 @@
 FrequencyResponse::FrequencyResponse(   TertiaryAudioProcessor& p, juce::AudioProcessorValueTreeState& apv)
     : audioProcessor(p), apvts(apv)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     buildLowMidFreqSlider();
     buildMidHighFreqSlider();
@@ -69,8 +69,8 @@ FrequencyResponse::~FrequencyResponse()
 // ===========================================================================================
 void FrequencyResponse::buildLowMidFreqSlider()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     // Linear Slider from 0 to 1
     sliderLowMidInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
@@ -94,8 +94,8 @@ void FrequencyResponse::buildLowMidFreqSlider()
 // ===========================================================================================
 void FrequencyResponse::buildMidHighFreqSlider()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     // Linear Slider from 0 to 1
     sliderMidHighInterface.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
@@ -119,8 +119,8 @@ void FrequencyResponse::buildMidHighFreqSlider()
 // ===========================================================================================
 void FrequencyResponse::buildLowGainSlider()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     sliderLowGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderLowGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -139,8 +139,8 @@ void FrequencyResponse::buildLowGainSlider()
 // ===========================================================================================
 void FrequencyResponse::buildMidGainSlider()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     sliderMidGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderMidGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -159,8 +159,8 @@ void FrequencyResponse::buildMidGainSlider()
 // ===========================================================================================
 void FrequencyResponse::buildHighGainSlider()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     sliderHighGain.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     sliderHighGain.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -179,8 +179,8 @@ void FrequencyResponse::buildHighGainSlider()
 // ===========================================================================================
 void FrequencyResponse::buildLabels()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     newFreqLabelLow.addActionListener(this);
     newFreqLabelHigh.addActionListener(this);
@@ -194,8 +194,8 @@ void FrequencyResponse::buildLabels()
 // ===========================================================================================
 void FrequencyResponse::makeAttachments()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     using namespace Params;
     const auto& params = GetParams();
@@ -235,8 +235,8 @@ void FrequencyResponse::makeAttachments()
 // ===========================================================================================
 void FrequencyResponse::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     // =============================
     responseArea = getLocalBounds().toFloat();
@@ -274,8 +274,9 @@ void FrequencyResponse::paint(juce::Graphics& g)
 {
     using namespace juce;
     using namespace AllColors::FrequencyResponseColors;
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto bounds = getLocalBounds().toFloat();
 
@@ -304,8 +305,8 @@ void FrequencyResponse::paint(juce::Graphics& g)
 // ===========================================================================================
 void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     using namespace juce;
     const auto textWidth = 30;
@@ -341,8 +342,8 @@ void FrequencyResponse::paintGridFrequency(juce::Graphics& g)
 // ===========================================================================================
 void FrequencyResponse::paintGridGain(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     using namespace juce;
     const auto textWidth = 26;
@@ -380,8 +381,8 @@ void FrequencyResponse::paintGridGain(juce::Graphics& g)
 // ===========================================================================================
 void FrequencyResponse::paintResponseRegions(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     /* If low-band is hovered, draw low-band on top with highlight */
     if (mLowFocus)
@@ -416,8 +417,8 @@ void FrequencyResponse::paintLowRegion(juce::Graphics& g, juce::Rectangle<float>
     using namespace ColorScheme::BandColors;
     using namespace Gradients::FrequencyResponse;
     
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto slope = 10;
 
@@ -456,8 +457,8 @@ void FrequencyResponse::paintMidRegion(juce::Graphics& g, juce::Rectangle<float>
     using namespace ColorScheme::BandColors;
     using namespace Gradients::FrequencyResponse;
     
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto slope = 10;
 
@@ -500,8 +501,8 @@ void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float
     using namespace ColorScheme::BandColors;
     using namespace Gradients::FrequencyResponse;
     
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto slope = 10;
 
@@ -535,8 +536,8 @@ void FrequencyResponse::paintHighRegion(juce::Graphics& g, juce::Rectangle<float
 // ===========================================================================================
 void FrequencyResponse::drawLabels()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto bounds = getLocalBounds();
     int labelWidth = 65;
@@ -591,8 +592,10 @@ void FrequencyResponse::drawLabels()
 // ===========================================================================================
 void FrequencyResponse::updateResponse()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
+    checkSolos();
 
     auto killLowBand = lowBandMute || lowBandSoloMute;
     auto killMidBand = midBandMute || midBandSoloMute;
@@ -614,8 +617,6 @@ void FrequencyResponse::updateResponse()
     // Convert cutoff values to relative pixel values
     freq1Pixel = responseArea.getX() + mapLog2(mLowMidCutoff) * responseArea.getWidth();
     freq2Pixel = responseArea.getX() + mapLog2(mMidHighCutoff) * responseArea.getWidth();
-
-    checkSolos();
 
     if (killLowBand && killMidBand)
         newCursorLM.setBounds(0, 0, 0, 0);
@@ -701,8 +702,8 @@ void FrequencyResponse::updateResponse()
 // ===========================================================================================
 void FrequencyResponse::checkSolos()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
 
 
@@ -730,8 +731,8 @@ void FrequencyResponse::checkSolos()
 // ===========================================================================================
 float FrequencyResponse::mapLog2(float freq)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto logMin = std::log2(20.f);
     auto logMax = std::log2(20000.f);
@@ -747,8 +748,8 @@ void FrequencyResponse::sliderValueChanged(juce::Slider* slider)
     // Changed by user by dragging Cutoff Cursors
     // Slider is converted from [0 to 1] to [20 to 20k] to store frequency
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     if (slider == &sliderLowMidInterface || slider == &sliderMidHighInterface)
     {
@@ -818,8 +819,8 @@ void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
 // ===========================================================================================
 void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     checkCursorFocus(event);
 }
@@ -828,8 +829,8 @@ void FrequencyResponse::mouseEnter(const juce::MouseEvent& event)
 // ===========================================================================================
 void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     checkCursorFocus(event);
 }
@@ -838,8 +839,8 @@ void FrequencyResponse::mouseExit(const juce::MouseEvent& event)
 // ===========================================================================================
 void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto xM = event.getPosition().getX();
     auto yM = event.getPosition().getY();
@@ -923,8 +924,8 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 void FrequencyResponse::actionListenerCallback(const juce::String& message)
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto bandName = message.replaceSection(5, 30, "");
     bandName = bandName.removeCharacters("x");
@@ -939,7 +940,6 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
     if (paramName == "GAIN") 
     {
     }
-        //updateResponse();
 
     if (paramName == "BYPASS")
     {

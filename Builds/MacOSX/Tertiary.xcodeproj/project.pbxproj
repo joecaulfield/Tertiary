@@ -41,7 +41,6 @@
 		3E0D80890D78B14BF8053085 /* RecentFilesMenuTemplate.nib */ = {isa = PBXBuildFile; fileRef = D76DB3A90A79576A82ACA5C9; };
 		42E4F039C9701127E08D651A /* VST3 */ = {isa = PBXBuildFile; fileRef = B8D9ED6F5CDB8D824A9D67B8; };
 		46882A055465E0B5BC3A6CEF /* MyLookAndFeel.cpp */ = {isa = PBXBuildFile; fileRef = E1791E24718CC42059C82E10; };
-		469F9AD958D9E77C3FA75AD3 /* include_melatonin_perfetto.cpp */ = {isa = PBXBuildFile; fileRef = 94AD741805C6AABDE5789BF1; };
 		476CA46606BB6AFC2759F953 /* WebKit.framework */ = {isa = PBXBuildFile; fileRef = 6FB4AC73D92B162576DBEACC; };
 		4A293D3A2679DE5A17567433 /* QuartzCore.framework */ = {isa = PBXBuildFile; fileRef = 86F5D5EFDBF4F7750EF9BEBF; };
 		4B3DF4A1506347B515A0CF4C /* include_juce_audio_plugin_client_Standalone.cpp */ = {isa = PBXBuildFile; fileRef = 64D75EB4A7881CADBBE9EC77; };
@@ -73,7 +72,6 @@
 		96FB87C968EB41EA8A86E91D /* include_juce_audio_processors_ara.cpp */ = {isa = PBXBuildFile; fileRef = DD6FDE05CF2EB8D64C6C9596; };
 		9CDB648C0636C5C073637E51 /* BinaryData.cpp */ = {isa = PBXBuildFile; fileRef = 0ED341FB7BBE8E3731220933; };
 		A1B02686F0E8A03F127ED008 /* Cursor.cpp */ = {isa = PBXBuildFile; fileRef = AF016661F6DEF83A2E3605C1; };
-		B0482736D77B55EE280986D1 /* perfetto.cc */ = {isa = PBXBuildFile; fileRef = 512129C6FDB2860D5CDDB3E3; };
 		B1305A701E0CFAE75B72A029 /* CoreAudio.framework */ = {isa = PBXBuildFile; fileRef = 29ADC0DA58A3A1C6E67DABD8; };
 		B23E388C3DF96335C9B02A46 /* ScrollPad.cpp */ = {isa = PBXBuildFile; fileRef = FE32A04A7DB8DFCC31FC91F9; };
 		BE18F6C67F51F193C0B85E0B /* MetalKit.framework */ = {isa = PBXBuildFile; fileRef = BE2C4AF85A3A76A5182CD9D4; settings = { ATTRIBUTES = (Weak, ); }; };
@@ -133,11 +131,9 @@
 		413BD224133C2E571E0629BC /* CoreFoundation.framework */ /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		416A532FBC483114612DF148 /* TitleWaveShape.png */ /* TitleWaveShape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TitleWaveShape.png; path = ../../Assets/TitleWaveShape.png; sourceTree = SOURCE_ROOT; };
 		43F4CD51518479134DEF4F43 /* FreqLabel.h */ /* FreqLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FreqLabel.h; path = ../../Source/GUI/Display/FreqLabel.h; sourceTree = SOURCE_ROOT; };
-		460F213188F96B21B66FD14B /* melatonin_perfetto */ /* melatonin_perfetto */ = {isa = PBXFileReference; lastKnownFileType = folder; name = melatonin_perfetto; path = ../../JuceLibraryCode/modules/melatonin_perfetto; sourceTree = SOURCE_ROOT; };
 		4749AEF5F8FCC0F3E00B35D7 /* include_juce_graphics.mm */ /* include_juce_graphics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_graphics.mm; path = ../../JuceLibraryCode/include_juce_graphics.mm; sourceTree = SOURCE_ROOT; };
 		476D79104EBA2EE7131F2830 /* TopBanner.h */ /* TopBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TopBanner.h; path = ../../Source/GUI/Display/TopBanner.h; sourceTree = SOURCE_ROOT; };
 		4D13C36880D56B40F0F15ECC /* include_juce_opengl.mm */ /* include_juce_opengl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_opengl.mm; path = ../../JuceLibraryCode/include_juce_opengl.mm; sourceTree = SOURCE_ROOT; };
-		512129C6FDB2860D5CDDB3E3 /* perfetto.cc */ /* perfetto.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = perfetto.cc; path = ../../../perfetto/sdk/perfetto.cc; sourceTree = SOURCE_ROOT; };
 		54EC9C1F508B0E4D7F403E88 /* Shared Code */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTertiaryDBG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		55F041322E2E5A39CE51188F /* include_juce_gui_basics.mm */ /* include_juce_gui_basics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_gui_basics.mm; path = ../../JuceLibraryCode/include_juce_gui_basics.mm; sourceTree = SOURCE_ROOT; };
 		56FE4844FC239B9F0A8E52CE /* TopBanner.cpp */ /* TopBanner.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TopBanner.cpp; path = ../../Source/GUI/Display/TopBanner.cpp; sourceTree = SOURCE_ROOT; };
@@ -170,11 +166,9 @@
 		913A9E494ADA96950ADEDD81 /* Mult0.png */ /* Mult0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Mult0.png; path = ../../Assets/Mult0.png; sourceTree = SOURCE_ROOT; };
 		923709C0C7EDD93D9748B6C8 /* Info-AU.plist */ /* Info-AU.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info-AU.plist"; path = "Info-AU.plist"; sourceTree = SOURCE_ROOT; };
 		931FC0E03C5CD320CE9FD6C2 /* ScopeChannel.cpp */ /* ScopeChannel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ScopeChannel.cpp; path = ../../Source/GUI/Display/ScopeChannel.cpp; sourceTree = SOURCE_ROOT; };
-		94AD741805C6AABDE5789BF1 /* include_melatonin_perfetto.cpp */ /* include_melatonin_perfetto.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = include_melatonin_perfetto.cpp; path = ../../JuceLibraryCode/include_melatonin_perfetto.cpp; sourceTree = SOURCE_ROOT; };
 		95172B05DABB1CFB6C70DAFD /* TitleWaveTiming.png */ /* TitleWaveTiming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TitleWaveTiming.png; path = ../../Assets/TitleWaveTiming.png; sourceTree = SOURCE_ROOT; };
 		95BDF830A4FFA8D4D4C9C6AC /* juce_audio_processors */ /* juce_audio_processors */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_audio_processors; path = "~/JUCE/modules/juce_audio_processors"; sourceTree = "<absolute>"; };
 		99292B308C8D0F372BEFCBAC /* PluginEditor.h */ /* PluginEditor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PluginEditor.h; path = ../../Source/PluginEditor.h; sourceTree = SOURCE_ROOT; };
-		9ED3EE7E32F5AE942AD7141F /* perfetto.h */ /* perfetto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = perfetto.h; path = ../../../perfetto/sdk/perfetto.h; sourceTree = SOURCE_ROOT; };
 		A40023901322EE78BE90154A /* UtilityFunctions.cpp */ /* UtilityFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = UtilityFunctions.cpp; path = ../../Source/Utility/UtilityFunctions.cpp; sourceTree = SOURCE_ROOT; };
 		A6147875693C09C60E9A3243 /* InputOutputGain.cpp */ /* InputOutputGain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = InputOutputGain.cpp; path = ../../Source/GUI/Controls/InputOutputGain.cpp; sourceTree = SOURCE_ROOT; };
 		A736D5C9E884A3CD97E2CBF7 /* juce_gui_basics */ /* juce_gui_basics */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_gui_basics; path = "~/JUCE/modules/juce_gui_basics"; sourceTree = "<absolute>"; };
@@ -365,8 +359,6 @@
 			children = (
 				9009E93B1FEBD3696B1093A5,
 				F84F62BA7E32228EC280F8C9,
-				512129C6FDB2860D5CDDB3E3,
-				9ED3EE7E32F5AE942AD7141F,
 				3A4452EC97F6F07E357F460F,
 				99292B308C8D0F372BEFCBAC,
 				8E8AEF607E11A2D690F58A3E,
@@ -545,7 +537,6 @@
 				55F041322E2E5A39CE51188F,
 				F51218E4B7E585A9054B7C7F,
 				4D13C36880D56B40F0F15ECC,
-				94AD741805C6AABDE5789BF1,
 				CE91A64F028634D27B85DB4D,
 				28CAFA623EF62D0EAFE635CA,
 			);
@@ -569,7 +560,6 @@
 				A736D5C9E884A3CD97E2CBF7,
 				25E13694F6105987A3A0A2EC,
 				5BFCF49E841218190D1EE068,
-				460F213188F96B21B66FD14B,
 			);
 			name = "JUCE Modules";
 			sourceTree = "<group>";
@@ -918,7 +908,6 @@
 				46882A055465E0B5BC3A6CEF,
 				F5A7DA334D39D232635033EB,
 				E62DFE880D7293AE198AB043,
-				B0482736D77B55EE280986D1,
 				537E6EBEA03249F438243BA9,
 				69F8363F95975B2B59EFAD3B,
 				075E9B9A35344E43B19725E9,
@@ -939,7 +928,6 @@
 				16397EB1B1795A7C89014E3C,
 				128B01F5803D13976880E046,
 				DA05830175CF69DE2318D102,
-				469F9AD958D9E77C3FA75AD3,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1050,7 +1038,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1116,14 +1103,13 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Info-VST3_Manifest_Helper.plist;
 				INFOPLIST_PREPROCESS = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "juce_vst3_helper";
@@ -1167,7 +1153,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1233,7 +1218,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -1241,7 +1225,7 @@
 				INFOPLIST_PREPROCESS = NO;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-lTertiary -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "Tertiary";
@@ -1333,7 +1317,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1399,14 +1382,13 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Info-Standalone_Plugin.plist;
 				INFOPLIST_PREPROCESS = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-lTertiaryDBG -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "TertiaryDBG";
@@ -1450,7 +1432,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1517,7 +1498,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -1527,7 +1507,7 @@
 				LIBRARY_STYLE = Bundle;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-bundle -lTertiary -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -d arm64_$arm64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\" -I \"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
@@ -1622,7 +1602,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1689,7 +1668,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -1698,7 +1676,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-bundle -lTertiaryDBG -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -d arm64_$arm64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\" -I \"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
@@ -1752,7 +1730,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1819,7 +1796,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -1829,7 +1805,7 @@
 				LIBRARY_STYLE = Bundle;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-bundle -lTertiary -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "Tertiary";
@@ -1882,7 +1858,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -1949,7 +1924,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -1958,7 +1932,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/VST3/";
 				LIBRARY_STYLE = Bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-bundle -lTertiaryDBG -lLexActivator -L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "TertiaryDBG";
@@ -2001,7 +1975,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -2067,7 +2040,6 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
@@ -2075,7 +2047,7 @@
 				INFOPLIST_PREPROCESS = NO;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "juce_vst3_helper";
@@ -2119,7 +2091,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -2186,13 +2157,12 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "TertiaryDBG";
@@ -2237,7 +2207,6 @@
 					"JUCE_MODULE_AVAILABLE_juce_gui_basics=1",
 					"JUCE_MODULE_AVAILABLE_juce_gui_extra=1",
 					"JUCE_MODULE_AVAILABLE_juce_opengl=1",
-					"JUCE_MODULE_AVAILABLE_melatonin_perfetto=1",
 					"JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1",
 					"JUCE_VST3_CAN_REPLACE_VST2=0",
 					"JUCE_STRICT_REFCOUNTEDPOINTER=1",
@@ -2304,14 +2273,13 @@
 					"$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"$(SRCROOT)/../../JuceLibraryCode",
 					"$(HOME)/JUCE/modules",
-					"$(SRCROOT)/../../JuceLibraryCode/modules",
 					"$(HOME)/JUCE/modules/juce_audio_plugin_client/AU",
 					"$(inherited)",
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(SRCROOT)/../../JuceLibraryCode/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
+				MTL_HEADER_SEARCH_PATHS = "$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK $(SRCROOT)/../../JuceLibraryCode $(HOME)/JUCE/modules $(HOME)/JUCE/modules/juce_audio_plugin_client/AU";
 				OTHER_LDFLAGS = "-L${PROJECT_DIR}/LexActivator-Static-Mac/libs/clang/universal";
 				PRODUCT_BUNDLE_IDENTIFIER = com.WonderlandAudio.Tertiary;
 				PRODUCT_NAME = "Tertiary";

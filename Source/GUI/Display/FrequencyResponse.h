@@ -17,7 +17,6 @@
 #include "../../Utility/AllColors.h"
 #include "../../GUI/Display/Cursor.h"
 #include "../../GUI/Display/FreqLabel.h"
-#include "../../WLDebugger.h"
 
 
 /* ============================================================== */

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../WLDebugger.h"
 
 struct FreqLabel :	juce::Component,
 					juce::Label::Listener,

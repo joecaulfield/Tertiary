@@ -15,8 +15,8 @@
 WindowWrapperOscilloscope::WindowWrapperOscilloscope(TertiaryAudioProcessor& p) :  audioProcessor(p)
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     addAndMakeVisible(oscilloscope);
     addAndMakeVisible(optionsMenu);
@@ -28,7 +28,13 @@ WindowWrapperOscilloscope::WindowWrapperOscilloscope(TertiaryAudioProcessor& p) 
 // ========================================================
 WindowWrapperOscilloscope::~WindowWrapperOscilloscope()
 {
-    
+    using namespace Params;             // Create a Local Reference to Parameter Mapping
+    const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
+
+    audioProcessor.apvts.removeParameterListener(params.at(Names::Show_Low_Scope), this);
+    audioProcessor.apvts.removeParameterListener(params.at(Names::Show_Mid_Scope), this);
+    audioProcessor.apvts.removeParameterListener(params.at(Names::Show_High_Scope), this);
+    audioProcessor.apvts.removeParameterListener(params.at(Names::Stack_Bands_Scope), this);
 }
 
 /* Links menu options to parameters */
@@ -38,22 +44,6 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
-    auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
-    {
-        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-        jassert(param != nullptr);                                                                      // Error Checking
-    };
-
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
-
-    boolHelper(showLowBandParam,    Names::Show_Low_Scope);
-    boolHelper(showMidBandParam,    Names::Show_Mid_Scope);
-    boolHelper(showHighBandParam,   Names::Show_High_Scope);
-    boolHelper(stackBandsParam,     Names::Stack_Bands_Scope);
-    //boolHelper(showCursorParam,     Names::Show_Cursor_Scope);
-    //boolHelper(showPlayheadParam,   Names::Show_Playhead_Scope);
-    
     optionsMenu.addOptionToList("Low",
                                 "Show Low Band",
                                 audioProcessor.apvts,
@@ -78,7 +68,6 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_Mid_Scope), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_High_Scope), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::Stack_Bands_Scope), this);
-    //audioProcessor.apvts.addParameterListener(params.at(Names::Show_Cursor_Scope), this);
     
     updateOptionsParameters();
 }
@@ -87,13 +76,18 @@ void WindowWrapperOscilloscope::buildOptionsMenuParameters()
 // ========================================================
 void WindowWrapperOscilloscope::updateOptionsParameters()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
-    bool showLowBand = showLowBandParam->get();
-    bool showMidBand = showMidBandParam->get();
-    bool showHighBand = showHighBandParam->get();
-    bool stackBands = stackBandsParam->get();
+    //bool showLowBand = showLowBandParam->get();
+    //bool showMidBand = showMidBandParam->get();
+    //bool showHighBand = showHighBandParam->get();
+    //bool stackBands = stackBandsParam->get();
+
+    bool showLowBand = audioProcessor.getShowLowBandParam()->get();
+    bool showMidBand = audioProcessor.getShowMidBandParam()->get();
+    bool showHighBand = audioProcessor.getShowHighBandParam()->get();
+    bool stackBands = audioProcessor.getStackBandsParam()->get();
 
     oscilloscope.updateScopeParameters(showLowBand, showMidBand, showHighBand, stackBands);
 }
@@ -102,8 +96,8 @@ void WindowWrapperOscilloscope::updateOptionsParameters()
 // ========================================================
 void WindowWrapperOscilloscope::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     optionsMenu.setTopLeftPosition(4,4);
     
@@ -114,8 +108,8 @@ void WindowWrapperOscilloscope::resized()
 // ========================================================
 void WindowWrapperOscilloscope::parameterChanged(const juce::String& parameterID, float newValue)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     updateOptionsParameters();
 }
@@ -124,6 +118,6 @@ void WindowWrapperOscilloscope::parameterChanged(const juce::String& parameterID
 // ========================================================
 void WindowWrapperOscilloscope::paint(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 }

@@ -13,8 +13,6 @@
 #include "../../PluginProcessor.h"
 #include "../../Utility/AllColors.h"
 #include "ScrollPad.h"
-#include <melatonin_perfetto/melatonin_perfetto.h>
-#include "../../WLDebugger.h"
 
 struct ScopeChannel :   juce::Component,
                         juce::AudioProcessorValueTreeState::Listener,
@@ -22,10 +20,6 @@ struct ScopeChannel :   juce::Component,
 {
     ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, ScrollPad& sliderScroll);
     ~ScopeChannel();
-    
-    #if PERFETTO
-        std::unique_ptr<perfetto::TracingSession> tracingSession;
-    #endif
 
     void paint(juce::Graphics& g) override;
     void paintGridLines(juce::Graphics& g);

@@ -14,8 +14,6 @@ using namespace juce;
 
 Cursor::Cursor()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     setSize(5, 25);
     startTimerHz(30);
@@ -27,8 +25,6 @@ Cursor::~Cursor()
 
 void Cursor::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto bounds = getLocalBounds();
 
@@ -86,8 +82,8 @@ void Cursor::timerCallback()
 
 void Cursor::paint(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto cursorWidth = 3.f;
 
@@ -104,16 +100,12 @@ void Cursor::paint(juce::Graphics& g)
 
 void Cursor::setHorizontalOrientation()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     mIsVertical = false;
 }
 
 void Cursor::setFocus(bool hasFocus)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     mHasFocus = hasFocus;
 
@@ -134,8 +126,6 @@ void Cursor::setFocus(bool hasFocus)
 // ===========================================================================================
 void Cursor::actionListenerCallback(const juce::String& message)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
@@ -157,8 +147,6 @@ void Cursor::actionListenerCallback(const juce::String& message)
 // ===========================================================================================
 void Cursor::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     juce::String delimiter = ":::::";
 

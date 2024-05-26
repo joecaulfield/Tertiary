@@ -15,8 +15,8 @@
 GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
 	:  apvts(p.apvts), audioProcessor(p)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	addAndMakeVisible(inputGain);
 	addAndMakeVisible(outputGain);
@@ -59,8 +59,8 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
 
 void GlobalControls::paint(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     paintWindowBorders(g);
     paintBandLabels(g);
@@ -80,8 +80,8 @@ void GlobalControls::paint(juce::Graphics& g)
 
 void GlobalControls::paintWindowBorders(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace juce;
     using namespace AllColors::GlobalControlsColors;
@@ -134,8 +134,8 @@ void GlobalControls::paintWindowBorders(juce::Graphics& g)
 
 void GlobalControls::paintBandLabels(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace FontEditor;
  
@@ -178,8 +178,8 @@ void GlobalControls::paintBandLabels(juce::Graphics& g)
 
 void GlobalControls::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace juce;
 
@@ -245,8 +245,8 @@ void GlobalControls::resized()
 
 void GlobalControls::makeAttachments()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace Params;
     const auto& params = GetParams();
@@ -264,8 +264,8 @@ void GlobalControls::makeAttachments()
 
 void GlobalControls::makeLabel(juce::Label& label, juce::String textToPrint)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace FontEditor::ControlLabels;
     
@@ -294,8 +294,8 @@ void GlobalControls::makeLabel(juce::Label& label, juce::String textToPrint)
 
 void GlobalControls::makeGainControlAttachments()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace Params;
     const auto& params = GetParams();
@@ -368,8 +368,8 @@ void GlobalControls::makeGainControlAttachments()
 
 void GlobalControls::makeTimingControlAttachments()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace Params;
     const auto& params = GetParams();
@@ -441,8 +441,8 @@ void GlobalControls::makeTimingControlAttachments()
 
 void GlobalControls::makeWaveControlAttachments()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace Params;
     const auto& params = GetParams();
@@ -516,8 +516,8 @@ void GlobalControls::makeWaveControlAttachments()
 // Guarantees a 30-Character long message
 void GlobalControls::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     juce::String delimiter = ":::::";
     juce::String bandName = "xxxxx";
@@ -528,16 +528,16 @@ void GlobalControls::sendBroadcast(juce::String parameterName, juce::String para
 
 void GlobalControls::mouseEnter(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     checkForBandFocus();
 }
 
 void GlobalControls::mouseExit(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     checkForBandFocus();
 }
@@ -545,8 +545,8 @@ void GlobalControls::mouseExit(const juce::MouseEvent& event)
 
 void GlobalControls::checkForBandFocus()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto whoHasFocus = "NONE";
 

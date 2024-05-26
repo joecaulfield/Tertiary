@@ -22,8 +22,8 @@ public:
     juce::AudioParameterFloat* rateParam{ nullptr };
     juce::AudioParameterChoice* waveshapeParam{ nullptr };
     juce::AudioParameterChoice* multiplierParam{ nullptr };
-    juce::AudioParameterBool* invertParam{ nullptr };
-    juce::AudioParameterBool* syncToHostParam{ nullptr };
+    juce::AudioParameterBool* invertParam{ nullptr };      // BOOL
+    juce::AudioParameterBool* syncToHostParam{ nullptr };  // BOOL
 
 
 

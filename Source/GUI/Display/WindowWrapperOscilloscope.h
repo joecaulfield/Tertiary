@@ -36,7 +36,7 @@ private:
     /* Reference to the Audio Processor & DSP Parameters */
 
     juce::String mNameSpace{ "WindowWrapperOscilloscope" };
-    bool setDebug{ false };
+    bool setDebug{ true };
 
     TertiaryAudioProcessor& audioProcessor;
     Oscilloscope oscilloscope{ audioProcessor };
@@ -45,12 +45,7 @@ private:
     void updateOptionsParameters();
 
     OptionsMenu optionsMenu;
-    juce::AudioParameterBool* showLowBandParam{ nullptr };
-    juce::AudioParameterBool* showMidBandParam{ nullptr };
-    juce::AudioParameterBool* showHighBandParam{ nullptr };
-    juce::AudioParameterBool* stackBandsParam{ nullptr };
-    //juce::AudioParameterBool* showCursorParam{ nullptr };
-    //juce::AudioParameterBool* showPlayheadParam{ nullptr };
+
     
     juce::Rectangle<int> mLowRegion, mMidRegion, mHighRegion;
 };

@@ -137,10 +137,10 @@ namespace Params    // Mapping between Parameter Names and Unique ID's
 			{Show_Mid_Scope,			"Show Mid Band In Scope"},
 			{Show_High_Scope,			"Show High Band In Scope"},
 			{Stack_Bands_Scope,			"Stack All Bands"},
-			{Show_Cursor_Scope,			"Show Cursor In Scope"},
-			{Show_Playhead_Scope,		"Show Playhead In Scope"},
+			//{Show_Cursor_Scope,		"Show Cursor In Scope"},	// Deprecated
+			//{Show_Playhead_Scope,		"Show Playhead In Scope"},	// Deprecated
 
-			{Cursor_Position,			"Scope Cursor Position"},
+			//{Cursor_Position,			"Scope Cursor Position"},	// Deprecated
 
 			{Scope_Point1,				"Scope Point 1"},
 			{Scope_Point2,				"Scope Point 2"},

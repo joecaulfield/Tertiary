@@ -20,18 +20,15 @@
 
 #include "OptionsMenu.h"
 
-#include <melatonin_perfetto/melatonin_perfetto.h>
-
 struct Oscilloscope :	juce::Component
 {
     Oscilloscope(TertiaryAudioProcessor& p);
 	~Oscilloscope() override;
 
+    juce::String mNameSpace{ "Oscilloscope" };
+    bool setDebug{ true };
+
 	void resized() override;
-    
-    #if PERFETTO
-        std::unique_ptr<perfetto::TracingSession> tracingSession;
-    #endif
 
 	void mouseUp(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override;
@@ -79,9 +76,5 @@ private:
 
     bool mShowLowBand{ true }, mShowMidBand{ true }, mShowHighBand{ true }, mStackAllBands{ false };
     bool mLowFocus{ false }, mMidFocus{ false }, mHighFocus{ false };
-
-	juce::AudioParameterFloat* scopeCursorParam{ nullptr };
-	juce::AudioParameterFloat* scopePoint1Param{ nullptr };
-	juce::AudioParameterFloat* scopePoint2Param{ nullptr };
 
 };

@@ -30,8 +30,6 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-    
-
 
     void timerCallback() override {};
     void buttonClicked(juce::Button* button) override {};

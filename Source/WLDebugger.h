@@ -19,10 +19,14 @@ public:
     void closeWindow();
     void printMessage(const juce::String& mNameSpace, const juce::String& functionName, const juce::String& message);
 
+    void cleanupInstance();
+
 private:
 
     WLDebugger();
     ~WLDebugger();
+
+
 
     static WLDebugger* instance;    // Singleton instance
     juce::CriticalSection messageLock; // To ensure thread safety

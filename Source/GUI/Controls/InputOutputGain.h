@@ -11,7 +11,6 @@
 #pragma once
 #include "../../PluginProcessor.h"
 #include "../../Utility/MyLookAndFeel.h"
-#include "../../WLDebugger.h"
 
 struct InputOutputGain : juce::Component, juce::Timer, juce::Slider::Listener
 {

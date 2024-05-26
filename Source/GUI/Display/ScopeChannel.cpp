@@ -7,17 +7,6 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
         lfo(lfo),
         sliderScroll(scrollPad)
 {
-    /* DEBUG TRACING */
-    // ==================================================================
-    #if PERFETTO
-        MelatoninPerfetto::get().beginSession();
-    #endif
-
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
-
-    // ==================================================================
-
     // Initializes the display's color-scheme based on band type
     setBandColors();
     
@@ -66,15 +55,23 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
 // ========================================================
 ScopeChannel::~ScopeChannel()
 {
-    
+    using namespace Params;             // Create a Local Reference to Parameter Mapping
+    const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
+
+    apvts.removeParameterListener(params.at(Names::Scope_Point1), this);
+    apvts.removeParameterListener(params.at(Names::Scope_Point2), this);
+
+    apvts.removeParameterListener(params.at(Names::Show_Low_Scope), this);
+    apvts.removeParameterListener(params.at(Names::Show_Mid_Scope), this);
+    apvts.removeParameterListener(params.at(Names::Show_High_Scope), this);
+    apvts.removeParameterListener(params.at(Names::Stack_Bands_Scope), this);
 }
 
 /* Set color theme */
 // ========================================================
 void ScopeChannel::setBandColors()
 {
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto bounds = getLocalBounds().toFloat();
     //using namespace AllColors::OscilloscopeColors;
@@ -105,8 +102,7 @@ void ScopeChannel::setBandColors()
 void ScopeChannel::paint(juce::Graphics& g)
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace juce;
     using namespace AllColors::OscilloscopeColors;
@@ -128,8 +124,8 @@ void ScopeChannel::paint(juce::Graphics& g)
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
@@ -239,8 +235,7 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 void ScopeChannel::paintGridLines(juce::Graphics& g)
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace AllColors::OscilloscopeColors;
 
@@ -341,8 +336,7 @@ void ScopeChannel::paintGridLines(juce::Graphics& g)
 void ScopeChannel::paintWaveform(juce::Graphics& g)
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace juce;
     using namespace AllColors::OscilloscopeColors;
@@ -364,8 +358,7 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::redrawScope()
 {
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     waveTable = scaleWaveAmplitude();
     generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
@@ -376,8 +369,7 @@ void ScopeChannel::redrawScope()
 juce::Array<float> ScopeChannel::scaleWaveAmplitude()
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     auto waveTable = localLFO.getWaveTableForDisplay(waveTableDownSampleSize);
 
@@ -414,8 +406,7 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
                                                 LFO& lfo)
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace juce;
 
@@ -501,8 +492,7 @@ void ScopeChannel::generateLFOPathForDrawing(   juce::Path &lfoStrokePath,
 void ScopeChannel::updateBandBypass()
 {
 
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
@@ -521,6 +511,5 @@ void ScopeChannel::updateBandBypass()
 // ========================================================
 void ScopeChannel::resized()
 {
-    TRACE_COMPONENT();
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 }

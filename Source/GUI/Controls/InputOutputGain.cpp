@@ -13,8 +13,8 @@
 InputOutputGain::InputOutputGain(TertiaryAudioProcessor& p) :
 	audioProcessor(p)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	setSize(40, 150);
 
@@ -37,8 +37,8 @@ InputOutputGain::~InputOutputGain()
 
 void InputOutputGain::paint(juce::Graphics& g)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	auto bounds = getLocalBounds().toFloat();
 	bounds.reduce(4, 0);
@@ -76,8 +76,8 @@ void InputOutputGain::paint(juce::Graphics& g)
 
 void InputOutputGain::resized()
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	auto bounds = getLocalBounds().toFloat();
 
@@ -99,8 +99,8 @@ void InputOutputGain::resized()
 
 juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> bounds, float brightness)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	juce::ColourGradient gradient = juce::ColourGradient {	
 									juce::Colour(0xff084008).withMultipliedBrightness(brightness),	
@@ -117,8 +117,8 @@ juce::ColourGradient InputOutputGain::makeMeterGradient(juce::Rectangle<float> b
 
 void InputOutputGain::timerCallback()
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	getLevels();
 
@@ -127,8 +127,8 @@ void InputOutputGain::timerCallback()
 
 void InputOutputGain::getLevels()
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	// Pull current audio-level values from processor
 
@@ -179,16 +179,16 @@ void InputOutputGain::getLevels()
 
 void InputOutputGain::setPickOffPoint(juce::String pickoff)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	pickOffPoint = pickoff;
 }
 
 void InputOutputGain::buildGrill(juce::Rectangle<float> bounds)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	using namespace juce;
 
@@ -246,8 +246,8 @@ void InputOutputGain::buildGrill(juce::Rectangle<float> bounds)
 
 void InputOutputGain::sliderValueChanged(juce::Slider* slider)
 {
-	if (setDebug)
-		WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+	//if (setDebug)
+	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	sliderValue = slider->getValue();
 }

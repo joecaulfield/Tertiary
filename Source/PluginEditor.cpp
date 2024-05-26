@@ -1,18 +1,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "WLDebugger.h"
 
 //==============================================================================
 TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-
-
-	/* Provides GPU acceleration */
-	//openGLContext.attachTo(*getTopLevelComponent());
 
     /* Container class for top banner */
     addAndMakeVisible(topBanner);
@@ -52,15 +44,12 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
 //==============================================================================
 TertiaryAudioProcessorEditor::~TertiaryAudioProcessorEditor()
 {
-    WLDebugger::getInstance().closeWindow();
-    juce::Logger::setCurrentLogger(nullptr);
+
 }
 
 //==============================================================================
 void TertiaryAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-
 	/* Set the Gradient */
 	g.setGradientFill(AllColors::PluginEditorColors::BACKGROUND_GRADIENT(getLocalBounds().toFloat()));
     g.fillAll();
@@ -69,8 +58,6 @@ void TertiaryAudioProcessorEditor::paint(juce::Graphics& g)
 //==============================================================================
 void TertiaryAudioProcessorEditor::resized()
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-
 	using namespace juce;
 
     buildFlexboxLayout();
@@ -80,7 +67,6 @@ void TertiaryAudioProcessorEditor::resized()
 //==============================================================================
 void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 {
-    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     using namespace juce;
     
@@ -114,10 +100,5 @@ void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 /* Temporary Double-Click Callback*/
 void TertiaryAudioProcessorEditor::mouseDoubleClick(const juce::MouseEvent& event)
 {
-    openDebug = !openDebug;
 
-    if (openDebug)
-        WLDebugger::getInstance().openWindow();
-    else
-        WLDebugger::getInstance().closeWindow();
 }

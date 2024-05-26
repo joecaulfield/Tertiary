@@ -13,7 +13,6 @@
 #include <JuceHeader.h>
 #include "FrequencyResponse.h"
 #include "OptionsMenu.h"
-#include "../../WLDebugger.h"
 
 struct WindowWrapperFrequency : juce::Component, 
                                 juce::Timer,
@@ -47,8 +46,8 @@ private:
     void updateOptionsParameters();
 
     OptionsMenu optionsMenu;
-    juce::AudioParameterBool* showFftParam{ nullptr };
-    juce::AudioParameterChoice* fftPickoffParam{ nullptr };
+    ////juce::AudioParameterFloat* showFftParam{ nullptr }; // BOOL
+    ////juce::AudioParameterChoice* fftPickoffParam{ nullptr };
 
     using buttonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     std::unique_ptr<buttonAttachment>	showFftAttachment;

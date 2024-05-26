@@ -650,9 +650,6 @@
     <Filter Include="JUCE Modules\juce_opengl">
       <UniqueIdentifier>{9FBFF5E5-56F1-34A1-2C85-F760DA2B1EB7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="JUCE Modules\melatonin_perfetto">
-      <UniqueIdentifier>{56796DC8-E56F-69FA-398A-C18B2DBDE255}</UniqueIdentifier>
-    </Filter>
     <Filter Include="JUCE Modules">
       <UniqueIdentifier>{FE955B6B-68AC-AA07-70D8-2413F6DB65C8}</UniqueIdentifier>
     </Filter>
@@ -716,9 +713,6 @@
       <Filter>Tertiary\GUI\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ActivatorWindow.cpp">
-      <Filter>Tertiary\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\perfetto\sdk\perfetto.cc">
       <Filter>Tertiary\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PluginEditor.cpp">
@@ -3298,9 +3292,6 @@
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_opengl\juce_opengl.mm">
       <Filter>JUCE Modules\juce_opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\JuceLibraryCode\modules\melatonin_perfetto\melatonin_perfetto.cpp">
-      <Filter>JUCE Modules\melatonin_perfetto</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\JuceLibraryCode\BinaryData.cpp">
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
@@ -3350,9 +3341,6 @@
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp">
-      <Filter>JUCE Library Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\JuceLibraryCode\include_melatonin_perfetto.cpp">
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3415,9 +3403,6 @@
       <Filter>Tertiary\GUI\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ActivatorWindow.h">
-      <Filter>Tertiary\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\perfetto\sdk\perfetto.h">
       <Filter>Tertiary\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginEditor.h">
@@ -6515,9 +6500,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_opengl\juce_opengl.h">
       <Filter>JUCE Modules\juce_opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\JuceLibraryCode\modules\melatonin_perfetto\melatonin_perfetto.h">
-      <Filter>JUCE Modules\melatonin_perfetto</Filter>
     </ClInclude>
     <ClInclude Include="..\..\JuceLibraryCode\BinaryData.h">
       <Filter>JUCE Library Code</Filter>

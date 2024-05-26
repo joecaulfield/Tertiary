@@ -11,9 +11,10 @@ struct TremoloBand
 {
     
     /* Pointers to the APVTS */
-    juce::AudioParameterBool* bypassParam{ nullptr };
-    juce::AudioParameterBool* muteParam{ nullptr };
-    juce::AudioParameterBool* soloParam{ nullptr };
+    juce::AudioParameterBool* bypassParam{ nullptr }; 
+    juce::AudioParameterBool* muteParam{ nullptr };   
+    juce::AudioParameterBool* soloParam{ nullptr };   
+
     juce::AudioParameterFloat* bandGainParam{ nullptr };
 
     juce::dsp::Gain<float> bandGain;
@@ -35,6 +36,9 @@ public:
     //==============================================================================
     TertiaryAudioProcessor();
     ~TertiaryAudioProcessor() override;
+
+    juce::String mNameSpace{ "PluginProcessor" };
+    bool setDebug{ true };
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -83,6 +87,16 @@ public:
                     createParameterLayout() };              // parameterLayout
 
 
+    juce::AudioParameterBool* getShowLowBandParam() { return showLowBandParam; }
+    juce::AudioParameterBool* getShowMidBandParam() { return showMidBandParam; }
+    juce::AudioParameterBool* getShowHighBandParam() { return showHighBandParam; }
+    juce::AudioParameterBool* getStackBandsParam() { return stackBandsParam; }
+
+    juce::AudioParameterFloat* getScopePoint1Param() { return scopePoint1Param; }
+    juce::AudioParameterFloat* getScopePoint2Param() { return scopePoint2Param; }
+
+    juce::AudioParameterBool* getShowFftParam() {return showFftParam;}
+    juce::AudioParameterChoice* getFftPickofIdParam() { return fftPickoffParam; }
     
     /* Input & Output Meters */
     // =========================================================================
@@ -171,6 +185,18 @@ private:
     juce::AudioParameterFloat* inputGainParam{ nullptr };               // Pointer to the APVTS
     juce::AudioParameterFloat* outputGainParam{ nullptr };              // Pointer to the APVTS
     
+    /* TEST: GUI PARAMS */
+    juce::AudioParameterBool* showLowBandParam{ nullptr };     // BOOL
+    juce::AudioParameterBool* showMidBandParam{ nullptr };     // BOOL
+    juce::AudioParameterBool* showHighBandParam{ nullptr };    // BOOL
+    juce::AudioParameterBool* stackBandsParam{ nullptr };      // BOOL
+
+    juce::AudioParameterFloat* scopePoint1Param{ nullptr };
+    juce::AudioParameterFloat* scopePoint2Param{ nullptr };
+
+    juce::AudioParameterBool* showFftParam{ nullptr };
+    juce::AudioParameterChoice* fftPickoffParam{ nullptr };     
+
     /* Input & Output Meters */
     // =========================================================================
     juce::LinearSmoothedValue<float> rmsLevelInputLeft, rmsLevelInputRight, rmsLevelOutputLeft, rmsLevelOutputRight;

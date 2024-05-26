@@ -11,7 +11,6 @@
 #pragma once
 #include <JuceHeader.h>
 #include "../../Utility/MyLookAndFeel.h"
-#include "../../WLDebugger.h"
 
 struct OptionItem
 {

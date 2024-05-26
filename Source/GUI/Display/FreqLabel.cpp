@@ -12,8 +12,8 @@
 
 FreqLabel::FreqLabel()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     setSize(65, 25);
 
@@ -36,16 +36,16 @@ FreqLabel::~FreqLabel()
 
 void FreqLabel::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     mLabel.setBounds(getBounds());
 }
 
 void FreqLabel::paint(juce::Graphics& g)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     // Fill Rectangle
     g.setColour(juce::Colours::black);
@@ -62,8 +62,8 @@ void FreqLabel::paint(juce::Graphics& g)
 // ===========================================================================================
 void FreqLabel::labelTextChanged(juce::Label* labelThatHasChanged)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     // Means of handling invalid input entries,
     // while allowing some flexibility and auto-interpretation of user-entered values
@@ -127,8 +127,8 @@ void FreqLabel::labelTextChanged(juce::Label* labelThatHasChanged)
 // ===========================================================================================
 void FreqLabel::setLabelValue(float newValue)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     juce::String string;
 
@@ -152,8 +152,8 @@ void FreqLabel::setLabelValue(float newValue)
 // ===========================================================================================
 void FreqLabel::sendBroadcast(juce::String parameterName, juce::String parameterValue)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     juce::String delimiter = ":::::";
 
@@ -194,8 +194,8 @@ void FreqLabel::timerCallback()
 // ===========================================================================================
 void FreqLabel::mouseEnter(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     if (!isMouseButtonDown())
     {
@@ -208,8 +208,8 @@ void FreqLabel::mouseEnter(const juce::MouseEvent& event)
 // ===========================================================================================
 void FreqLabel::mouseExit(const juce::MouseEvent& event)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     if (!isMouseOver(true))
     {
@@ -222,8 +222,8 @@ void FreqLabel::mouseExit(const juce::MouseEvent& event)
 // ===========================================================================================
 void FreqLabel::actionListenerCallback(const juce::String& message)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");

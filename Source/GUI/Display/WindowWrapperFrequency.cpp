@@ -18,8 +18,8 @@ WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
     forwardFFT(audioProcessor.fftOrder),
     window(audioProcessor.fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     addAndMakeVisible(frequencyResponse);
 
@@ -41,13 +41,18 @@ WindowWrapperFrequency::WindowWrapperFrequency(TertiaryAudioProcessor& p,
 
 WindowWrapperFrequency::~WindowWrapperFrequency()
 {
+    using namespace Params;             
+    const auto& params = GetParams();
 
+    audioProcessor.apvts.removeParameterListener(params.at(Names::Show_FFT), this);
+    audioProcessor.apvts.removeParameterListener(params.at(Names::FFT_Pickoff), this);
 }
 
 void WindowWrapperFrequency::resized()
 {
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+
     frequencyResponse.setSize(getWidth(), getHeight());
 
     // =============================
@@ -74,13 +79,14 @@ void WindowWrapperFrequency::timerCallback()
 
         repaint(1, 1, getLocalBounds().getWidth() - 2, getLocalBounds().getHeight() - 2);
     }
+
 }
 
 void WindowWrapperFrequency::paint(juce::Graphics& g)
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     g.fillAll(juce::Colours::black);
 
@@ -93,8 +99,8 @@ void WindowWrapperFrequency::paint(juce::Graphics& g)
 void WindowWrapperFrequency::paintFFT(juce::Graphics& g, juce::Rectangle<float> bounds)
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
     for (int i = 1; i < audioProcessor.scopeSize; ++i)
     {
@@ -220,8 +226,8 @@ void WindowWrapperFrequency::calculateNextFrameOfSpectrum()
 
 void WindowWrapperFrequency::parameterChanged(const juce::String& parameterID, float newValue)
 {
+    DBG("PARAMETER CHANGED WWF");
     updateOptionsParameters();
-
 }
 
 
@@ -231,38 +237,18 @@ void WindowWrapperFrequency::parameterChanged(const juce::String& parameterID, f
 void WindowWrapperFrequency::buildOptionsMenuParameters()
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
-    auto boolHelper = [&apvts = this->audioProcessor.apvts, &params](auto& param, const auto& paramName)    // Bool Helper --> Part 8 Param Namespace
-        {
-            param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));      // Attach Value to Parameter
-            jassert(param != nullptr);                                                                      // Error Checking
-        };
+    optionsMenu.addOptionToList(    "Showz FFT",
+                                    "Showz FFT",
+                                    audioProcessor.apvts,
+                                    params.at(Names::Show_FFT));
 
-    boolHelper(showFftParam, Names::Show_FFT);
-
-    // Choice Helper To Attach Choice to Parameter ========
-    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-        {
-            param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-            jassert(param != nullptr);
-        };
-
-    choiceHelper(fftPickoffParam, Names::FFT_Pickoff);
-
-    optionsMenu.addOptionToList("Show FFT",
-        "Show FFT",
-        audioProcessor.apvts,
-        params.at(Names::Show_FFT));
-
-    optionsMenu.addOptionToList("FFT Pre",
-        "FFT Pre",
-        audioProcessor.apvts,
-        params.at(Names::FFT_Pickoff));
+    optionsMenu.addOptionToList(    "FFT Pre",
+                                    "FFT Pre",
+                                    audioProcessor.apvts,
+                                    params.at(Names::FFT_Pickoff));
 
     audioProcessor.apvts.addParameterListener(params.at(Names::Show_FFT), this);
     audioProcessor.apvts.addParameterListener(params.at(Names::FFT_Pickoff), this);
@@ -277,11 +263,14 @@ void WindowWrapperFrequency::buildOptionsMenuParameters()
 void WindowWrapperFrequency::updateOptionsParameters()
 {
 
-    if (setDebug)
-        WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
+    using namespace Params;             // Create a Local Reference to Parameter Mapping
+    const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
-    mShouldShowFFT = showFftParam->get();
+    //if (setDebug)
+    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
-    auto mPickoffID = fftPickoffParam->getIndex();
+    mShouldShowFFT = audioProcessor.getShowFftParam()->get();
+
+    auto mPickoffID = audioProcessor.getFftPickofIdParam()->getIndex();
     audioProcessor.setFftPickoffPoint(mPickoffID);
 }
