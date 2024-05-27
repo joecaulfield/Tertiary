@@ -44,12 +44,12 @@ private:
     /* Reference to the Audio Processor & DSP Parameters */
     TertiaryAudioProcessor& audioProcessor;
 
-    /* Contains Lower-Half of Parameters */
-	GlobalControls globalControls{ audioProcessor };
-    
     /* Time-Domain Display */
     WindowWrapperOscilloscope wrapperOscilloscope{ audioProcessor };
 
+    /* Contains Lower-Half of Parameters */
+	GlobalControls globalControls{ audioProcessor };
+    
     /* Frequency-Domain & Crossover Display */
     WindowWrapperFrequency wrapperFrequency{ audioProcessor, audioProcessor.apvts };
     

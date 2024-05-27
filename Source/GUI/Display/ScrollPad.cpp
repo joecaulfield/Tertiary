@@ -13,8 +13,44 @@
 using namespace juce;
 
 // Scroll Pad
-ScrollPad::ScrollPad()
+ScrollPad::ScrollPad(TertiaryAudioProcessor& p) : audioProcessor(p)
 {
+
+	using namespace Params;
+	const auto& params = GetParams();
+
+	point1Slider.setSliderStyle(juce::Slider::LinearHorizontal);
+	point1Slider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+	point1Slider.addListener(this);
+	//addAndMakeVisible(point1Slider);
+
+	point2Slider.setSliderStyle(juce::Slider::LinearHorizontal);
+	point2Slider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+	point2Slider.addListener(this);
+	//addAndMakeVisible(point2Slider);
+
+	point1Attachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
+							(
+								audioProcessor.apvts,
+								params.at(Names::Scope_Point1),
+								point1Slider
+							);
+
+	point2Attachment =		std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
+							(
+								audioProcessor.apvts,
+								params.at(Names::Scope_Point2),
+								point2Slider
+							);
+
+
+
+	//if (!isMouseButtonDown())
+	//{
+	//	point1 = convertSliderToPixelValue(point1Slider.getValue());
+	//	point2 = convertSliderToPixelValue(point2Slider.getValue());
+	//	initializePoints(point1, point2);
+	//}
 }
 
 ScrollPad::~ScrollPad()
@@ -23,37 +59,42 @@ ScrollPad::~ScrollPad()
 
 void ScrollPad::resized()
 {
+	point1Slider.setBounds(0, 0, 100, getHeight());
+	point2Slider.setBounds(getRight()-100, 0, 100, getHeight());
+
+	// Update points values from sliders (Stored Parameters)
+	point1 = convertSliderToPixelValue(point1Slider.getValue());
+	point2 = convertSliderToPixelValue(point2Slider.getValue());
+	forceNewPointValues(point1, point2);
+
 }
 
 // Takes In Saved Points For Initialization
-void ScrollPad::initializePoints(float newP1, float newP2)
+void ScrollPad::forceNewPointValues(float newP1, float newP2)
 {
+
 	// Prevent Crossing Points via Parameters List
-	if (point2 - point1 >= minWidth)
-	{
-		point1 = newP1;
-		point2 = newP2;
+	point1 = newP1;
+	point2 = newP2;
 
-		currentCenter = float(point1 + point2) / 2.f;
-		currentWidth = point2 - point1;
+	currentCenter = float(point1 + point2) / 2.f;
+	currentWidth = point2 - point1;
 
-		calculateZoomFactor();
-	}
-	else
-		makeDefaultPoints();
+	calculateZoomFactor();
 
-	sendBroadcast("SCROLLBAR", "");
+	//sendBroadcast("SCROLLBAR", "");
 }
 
 // Change Points & Calculate P/Z Upon Movement
 void ScrollPad::updatePoints(int x1, int y1)
 {
+
 	auto bounds = getLocalBounds();
 
 	int edgeTolerance = bounds.getX() + bounds.getCentreX() - maxWidth / 2.f;
 
 	// Mouse is clicked on or beyond left thumb
-	if (shouldUpdatePoint1)
+	if (shouldUpdatePoint1Only)
 	{
 		point1 = x1;
 
@@ -66,10 +107,14 @@ void ScrollPad::updatePoints(int x1, int y1)
 
 		currentCenter = (float)(point1 + point2) / 2.f;
 		currentWidth = point2 - point1;
+
+		// Update sliders, attached to points
+		float sliderValue = convertPixelToSliderValue(point1);
+		point1Slider.setValue(sliderValue);
 	}
 
 	// Mouse is clicked on or beyond right thumb
-	if (shouldUpdatePoint2)
+	if (shouldUpdatePoint2Only)
 	{
 		point2 = x1;
 
@@ -82,6 +127,10 @@ void ScrollPad::updatePoints(int x1, int y1)
 
 		currentCenter = (float)(point1 + point2) / 2.f;
 		currentWidth = point2 - point1;
+
+		// Update sliders, attached to points
+		float sliderValue = convertPixelToSliderValue(point2);
+		point2Slider.setValue(sliderValue);
 	}
 
 	// Mouse is clicked in between thumbs
@@ -138,9 +187,6 @@ void ScrollPad::updatePoints(int x1, int y1)
 
 		currentCenter = x1 - offset;		// Center of points as a function of mouse position
 
-		//// Disable Panning Function
-		//currentCenter = bounds.getCentreX();
-
 		// Prevent Panning Beyond Left Edge
 		if (currentCenter < bounds.getX() + edgeTolerance + currentWidth / 2.f)
 			currentCenter = bounds.getX() + edgeTolerance + currentWidth / 2.f;
@@ -152,6 +198,15 @@ void ScrollPad::updatePoints(int x1, int y1)
 		// Update Points
 		point1 = currentCenter - currentWidth / 2.f;
 		point2 = currentCenter + currentWidth / 2.f;
+
+		// Update sliders, attached to points
+		float sliderValue = 0.f;
+
+		sliderValue = convertPixelToSliderValue(point1);
+		point1Slider.setValue(sliderValue);
+
+		sliderValue = convertPixelToSliderValue(point2);
+		point2Slider.setValue(sliderValue);
 
 		// 'Current' Mouse Position become 'Old' position
 		x0 = x1;
@@ -211,8 +266,6 @@ void ScrollPad::paint(juce::Graphics& g)
     
     
     
-    
-    
     //g.setColour(getScrollPadBaseColor().withMultipliedBrightness(0.1f));
     //g.drawRoundedRectangle(range.getBounds(), 4.f, 1.f);
 
@@ -222,11 +275,21 @@ void ScrollPad::paint(juce::Graphics& g)
 // Reset Pan & Zoom to Default
 void ScrollPad::makeDefaultPoints()
 {
+
 	auto bounds = getLocalBounds();
 
 	currentCenter = bounds.getCentreX();
 	point1 = currentCenter - defaultWidth / 2;
 	point2 = currentCenter + defaultWidth / 2;
+
+	// Update sliders, attached to points
+	float sliderValue = 0.f;
+
+	sliderValue = 100 * (point1 / bounds.getWidth());
+	point1Slider.setValue(sliderValue);
+
+	sliderValue = 100 * (point2 / bounds.getWidth());
+	point2Slider.setValue(sliderValue);
 
 	calculateZoomFactor();
 }
@@ -247,15 +310,15 @@ void ScrollPad::mouseDown(const juce::MouseEvent& event)
 	p02 = point2;
 
 	// Reset Flags
-	shouldUpdatePoint1 = false;
-	shouldUpdatePoint2 = false;
+	shouldUpdatePoint1Only = false;
+	shouldUpdatePoint2Only = false;
 	shouldCheckPanOrZoom = false;
 
 	int clickTolerance = 5;
 
 	// Mouse is clicked on or beyond Point1
 	if (xDown < point1 + clickTolerance)
-		shouldUpdatePoint1 = true;
+		shouldUpdatePoint1Only = true;
 
 	// Mouse is clicked in between points
 	if (xDown >= point1 + clickTolerance && xDown <= point2 - clickTolerance)
@@ -263,13 +326,13 @@ void ScrollPad::mouseDown(const juce::MouseEvent& event)
 
 	// Mouse is clicked on or beyond Point2
 	if (xDown > point2 - clickTolerance)
-		shouldUpdatePoint2 = true;
+		shouldUpdatePoint2Only = true;
 }
 
 // Mouse Drag Callback
 void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 {
-	//auto bounds = getLocalBounds();
+	auto bounds = getLocalBounds();
 
 	// Immediate Mouse Position
 	x1 = event.getPosition().getX();
@@ -279,7 +342,7 @@ void ScrollPad::mouseDrag(const juce::MouseEvent& event)
 
 	repaint();
 
-	sendBroadcast("SCROLLBAR", "");
+	//sendBroadcast("SCROLLBAR", "");
 }
 
 // Mouse Double-Click Callback
@@ -289,7 +352,7 @@ void ScrollPad::mouseDoubleClick(const juce::MouseEvent& event)
 
 	repaint();
 
-	sendBroadcast("SCROLLBAR","");
+	//sendBroadcast("SCROLLBAR","");
 }
 
 // Take Width and Derive Zoom Factor
@@ -297,6 +360,8 @@ void ScrollPad::calculateZoomFactor()
 {
 	currentWidth = point2 - point1;
 	currentZoomFactor = juce::jmap((float)currentWidth, (float)minWidth, (float)maxWidth, minZoomFactor, maxZoomFactor);
+
+	sendBroadcast("SCROLLBAR", "");
 }
 
 // Returns Current Center Position
@@ -327,4 +392,42 @@ void ScrollPad::sendBroadcast(juce::String parameterName, juce::String parameter
 	auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
 
 	sendActionMessage(message);
+
+}
+
+
+
+void ScrollPad::sliderValueChanged(juce::Slider* slider)
+{
+	/* If the mouse is over or dragging, the change is coming from user action and will be updated later.
+	The intention here is to catch on-load or updated initializations */
+	if (!isMouseButtonDown())
+	{
+		point1 = convertSliderToPixelValue (point1Slider.getValue() );
+		point2 = convertSliderToPixelValue( point2Slider.getValue() );
+
+		forceNewPointValues(point1, point2);
+	}
+
+	sendBroadcast("SCROLLBAR", "");
+}
+
+float ScrollPad::convertPixelToSliderValue(float pixelValue)
+{
+	auto bounds = getLocalBounds();
+
+	float sliderValue = 0.f;
+	sliderValue = 100 * ( pixelValue / bounds.getWidth());
+
+	return sliderValue;
+}
+
+float ScrollPad::convertSliderToPixelValue(float sliderValue)
+{
+	auto bounds = getLocalBounds();
+
+	float pixelValue = 0.f;
+	pixelValue = ( (sliderValue / 100.f ) * bounds.getWidth() );
+
+	return pixelValue;
 }

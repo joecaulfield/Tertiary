@@ -22,33 +22,25 @@ Oscilloscope::Oscilloscope(TertiaryAudioProcessor& p) : audioProcessor(p),
                                                         highScope(p.apvts, p.highLFO, sliderScroll)
 {
 
-	using namespace Params;             // Create a Local Reference to Parameter Mapping
-	const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
-
-
-    auto p1 = audioProcessor.getScopePoint1Param()->get();
-    auto p2 = audioProcessor.getScopePoint2Param()->get();
-
-	sliderScroll.initializePoints(p1, p2);
-	
-    addAndMakeVisible(lowScope);
-    addAndMakeVisible(midScope);
-    addAndMakeVisible(highScope);
-    
     lowScope.setName("LOW");
     midScope.setName("MID");
     highScope.setName("HIGH");
-
-	addAndMakeVisible(sliderScroll);
-    
-	addMouseListener(this, true);
-
-	sliderScroll.addMouseListener(this, true);
 
     // Set Scope Channels as Listeners to the Scroll Slider
     sliderScroll.addActionListener(&lowScope);
     sliderScroll.addActionListener(&midScope);
     sliderScroll.addActionListener(&highScope);
+
+
+    addAndMakeVisible(sliderScroll);
+
+    addAndMakeVisible(lowScope);
+    addAndMakeVisible(midScope);
+    addAndMakeVisible(highScope);
+    
+
+	addMouseListener(this, true);
+
 }
 
 /* Destructor */
@@ -69,16 +61,16 @@ void Oscilloscope::resized()
     sliderScroll.setTopLeftPosition(getWidth()/2-sliderScroll.getWidth()/2, getBottom()-25);
 
     /* Initialize the pan/zoom points for the scroll bar... a little rusty on this! */
-	int x = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
+	//int x = sliderScroll.getLocalBounds().getCentreX() - (float)sliderScroll.getMaxWidth() / 2.f;
 
-    auto p1a = audioProcessor.getScopePoint1Param()->get();
-    auto p2a = audioProcessor.getScopePoint2Param()->get();
+    //auto p1a = audioProcessor.getScopePoint1Param()->get();
+    //auto p2a = audioProcessor.getScopePoint2Param()->get();
 
-	float p1 = p1a / 100.f * (float)sliderScroll.getMaxWidth();
-	float p2 = p2a / 100.f * (float)sliderScroll.getMaxWidth();
+	//float p1 = p1a / 100.f * (float)sliderScroll.getMaxWidth();
+	//float p2 = p2a / 100.f * (float)sliderScroll.getMaxWidth();
 
 	/* Update ScrollPad with Loaded Points */
-	sliderScroll.initializePoints(x + p1, x + p2);
+	//sliderScroll.initializePoints(x + p1, x + p2);
 
 }
 
@@ -270,16 +262,16 @@ void Oscilloscope::paintOverChildren(juce::Graphics& g)
 // ========================================================
 void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 {
-	float maxWidth = (float)sliderScroll.getMaxWidth();
+	//float maxWidth = (float)sliderScroll.getMaxWidth();
 
     // Store the current pan & zoom settings in memory
-	float p1 = (float)(sliderScroll.getPoint1()) / (float)maxWidth;
-	float p2 = (float)(sliderScroll.getPoint2()) / (float)maxWidth;
+	//float p1 = (float)(sliderScroll.getPoint1()) / (float)maxWidth;
+	//float p2 = (float)(sliderScroll.getPoint2()) / (float)maxWidth;
 
     // Store the current pan & zoom settings in memory
 
-    audioProcessor.getScopePoint1Param()->setValueNotifyingHost(p1);
-    audioProcessor.getScopePoint1Param()->setValueNotifyingHost(p2);
+    //audioProcessor.getScopePoint1Param()->setValueNotifyingHost(p1);
+    //audioProcessor.getScopePoint2Param()->setValueNotifyingHost(p2);
 }
 
 /* Move the cursor while it is being dragged */
@@ -287,6 +279,6 @@ void Oscilloscope::mouseUp(const juce::MouseEvent& event)
 void Oscilloscope::mouseDrag(const juce::MouseEvent& event)
 {
 	/* Force the display to continually update as the pan and zoom changes */
-	if (sliderScroll.isMouseOverOrDragging())
-		updateLfoDisplay = true;
+	//if (sliderScroll.isMouseOverOrDragging())
+	//	updateLfoDisplay = true;
 }

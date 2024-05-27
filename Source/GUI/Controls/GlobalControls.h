@@ -36,10 +36,6 @@ struct GlobalControls : juce::Component,
 	InputOutputGain inputGain{ audioProcessor};
 	InputOutputGain outputGain{ audioProcessor };
     
-    BandControl lowBandControls{apvts};
-    BandControl midBandControls{apvts};
-    BandControl highBandControls{apvts};
-    
     // Pass Children up to PluginEditor
     BandControl& getLowControl() {return lowBandControls; };
     BandControl& getMidControl() {return midBandControls; };
@@ -53,6 +49,10 @@ struct GlobalControls : juce::Component,
     void sendBroadcast(juce::String parameterName, juce::String parameterValue);
 
 private:
+
+    BandControl lowBandControls{ apvts };
+    BandControl midBandControls{ apvts };
+    BandControl highBandControls{ apvts };
 
     bool setDebug{ false };
 

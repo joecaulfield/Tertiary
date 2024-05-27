@@ -401,6 +401,59 @@ void BandControl::sendBroadcast(juce::String parameterName, juce::String paramet
     auto message = bandName + delimiter + parameterName.paddedLeft('x', 10) + delimiter + parameterValue.paddedLeft('x', 10);
 
     sendActionMessage(message);
+}
 
-    //DBG("BROADCAST - " + message);
+void BandControl::broadcastInitialParameters()
+{
+    juce::String paramName = "";
+    juce::String paramValue = "";
+
+    paramName = "SYNC";
+    paramValue = mToggleSync.mToggleButton.getToggleStateValue().toString();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "INVERT";
+    paramValue = mToggleInvert.mToggleButton.getToggleStateValue().toString();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "RATE";
+    paramValue = (juce::String)mSliderRate.slider.getValue();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "RHYTHM";
+    paramValue = (juce::String)mDropRhythm.getSelectedItemIndex();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "WAVESHAPE";
+    paramValue = (juce::String)mDropWaveshape.getSelectedItemIndex();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "PHASE";
+    paramValue = (juce::String)mSliderPhase.slider.getValue();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "SKEW";
+    paramValue = (juce::String)mSliderSkew.slider.getValue();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "DEPTH";
+    paramValue = (juce::String)mSliderDepth.slider.getValue();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "GAIN";
+    paramValue = (juce::String)mSliderBandGain.slider.getValue();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "BYPASS";
+    paramValue = mToggleBypass.mToggleButton.getToggleStateValue().toString();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "SOLO";
+    paramValue = mToggleSolo.mToggleButton.getToggleStateValue().toString();
+    sendBroadcast(paramName, paramValue);
+
+    paramName = "MUTE";
+    paramValue = mToggleMute.mToggleButton.getToggleStateValue().toString();
+    sendBroadcast(paramName, paramValue);
+
 }

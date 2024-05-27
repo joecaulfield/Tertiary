@@ -10,35 +10,52 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     addAndMakeVisible(topBanner);
     topBanner.addMouseListener(this, true);
     
-	/* Container class for all parameter controls */
-	addAndMakeVisible(globalControls);
-
-    /* Time-Domain Display */
-    addAndMakeVisible(wrapperOscilloscope);
-    
-	/* Frequency-Domain & Crossover Display */
-    addAndMakeVisible(wrapperFrequency);
-
-
 	/* Sets window size */
     float scale = 1.f;
     setSize(750*scale, 515*scale);
 
-    
-    // Add Action Listener
+    // Scope Channels listens to Band Controls
     globalControls.getLowControl().addActionListener    ( &wrapperOscilloscope.getOscilloscopeLow() );
     globalControls.getMidControl().addActionListener    ( &wrapperOscilloscope.getOscilloscopeMid() );
     globalControls.getHighControl().addActionListener   ( &wrapperOscilloscope.getOscilloscopeHigh() );
 
+    DBG("SCOPE CHANNELS ARE LISTENING");
+
+    // Band Controls listen to Scope Channels
+    wrapperOscilloscope.getOscilloscopeLow().addActionListener  ( &globalControls.getLowControl()    );
+    wrapperOscilloscope.getOscilloscopeMid().addActionListener  ( &globalControls.getMidControl()    );
+    wrapperOscilloscope.getOscilloscopeHigh().addActionListener ( &globalControls.getHighControl()   );
+
+    DBG("BAND CONTROLS ARE LISTENING");
+
+    // Frequency Response listens to Controls
     globalControls.getLowControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
     globalControls.getMidControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
     globalControls.getHighControl().addActionListener   ( &wrapperFrequency.getFrequencyResponse() );
     
-    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeLow());
-    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeMid());
-    globalControls.addActionListener(&wrapperOscilloscope.getOscilloscopeHigh());
+    // Scope Channels listen to Global Controls
+    //globalControls.addActionListener    ( &wrapperOscilloscope.getOscilloscopeLow()     );
+    //globalControls.addActionListener    ( &wrapperOscilloscope.getOscilloscopeMid()     );
+    //globalControls.addActionListener    ( &wrapperOscilloscope.getOscilloscopeHigh()    );
 
-    globalControls.addActionListener(&wrapperFrequency.getFrequencyResponse());
+    globalControls.getLowControl().broadcastInitialParameters();
+    globalControls.getMidControl().broadcastInitialParameters();
+    globalControls.getHighControl().broadcastInitialParameters();
+
+
+    // Frequency Response listens to Global Controls
+    globalControls.addActionListener    (&wrapperFrequency.getFrequencyResponse()   );
+
+    /* Container class for all parameter controls */
+    addAndMakeVisible(globalControls);
+
+    /* Time-Domain Display */
+    addAndMakeVisible(wrapperOscilloscope);
+
+    /* Frequency-Domain & Crossover Display */
+    addAndMakeVisible(wrapperFrequency);
+
+
 }
 
 //==============================================================================

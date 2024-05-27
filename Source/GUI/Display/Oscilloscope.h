@@ -48,7 +48,7 @@ struct Oscilloscope :	juce::Component
 	TertiaryAudioProcessor& audioProcessor;
 	ScrollLookAndFeel scrollLookAndFeel;
 
-	ScrollPad sliderScroll;
+    ScrollPad sliderScroll{ audioProcessor };
 
 	bool updateLfoDisplay{ true };
 

@@ -13,10 +13,12 @@
 #include "../../PluginProcessor.h"
 #include "../../Utility/AllColors.h"
 #include "ScrollPad.h"
+#include "../../GUI/Controls/BandControls.h"
 
 struct ScopeChannel :   juce::Component,
                         juce::AudioProcessorValueTreeState::Listener,
-                        juce::ActionListener
+                        juce::ActionListener,
+                        juce::ActionBroadcaster
 {
     ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, ScrollPad& sliderScroll);
     ~ScopeChannel();

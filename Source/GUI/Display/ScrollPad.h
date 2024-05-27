@@ -11,7 +11,9 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "../../PluginProcessor.h"
 #include "../../Utility/AllColors.h"
+#include "../../DSP/Params.h"
 
 struct ScrollPad :	juce::Component,
 					juce::Slider::Listener,
@@ -19,7 +21,7 @@ struct ScrollPad :	juce::Component,
 {
 public:
 
-	ScrollPad();
+	ScrollPad(TertiaryAudioProcessor& p);
 	~ScrollPad();
 
 	void mouseDown(const juce::MouseEvent& event) override;
@@ -29,13 +31,11 @@ public:
 	void paint(juce::Graphics& g) override;
 	void resized() override;
 
-	juce::Slider slider;
-
-	void sliderValueChanged(juce::Slider* slider) override {};
+	void sliderValueChanged(juce::Slider* slider) override;
 
 	void calculateZoomFactor();
 
-	void initializePoints(float newP1 = 0.f, float newP2 = 0.f);
+	void forceNewPointValues(float newP1 = 0.f, float newP2 = 0.f);
 	void updatePoints(int x1, int y1);
 	void makeDefaultPoints();
 
@@ -52,12 +52,18 @@ public:
 
 	//void setZoom(float zoom);
 
+	TertiaryAudioProcessor& audioProcessor;
 
 	void sendBroadcast(juce::String parameterName, juce::String parameterValue);
+
+
 
 private:
 	float point1;	// Value & Position of Left Thumb
 	float point2;	// Value & Position of Right Thumb
+
+	float centerScaled; // Value returned to ScopeChannel
+
 	float p01, p02;
 
 	bool leftHit{ false }, rightHit{ false }, midHit{ false };
@@ -65,7 +71,7 @@ private:
 	float xDown, x0, x1;		// Determines Mouse Movement, X-Direction
 	float yDown, y0, y1;		// Determines Mouse Movement, Y-Direction
 
-	bool shouldUpdatePoint1, shouldUpdatePoint2, shouldCheckPanOrZoom;
+	bool shouldUpdatePoint1Only, shouldUpdatePoint2Only, shouldCheckPanOrZoom;
 
 	int currentCenter{ 0 };
 	int minWidth{ 80 };
@@ -82,4 +88,10 @@ private:
 	int zoomScale{ 1 };
 	float zoomIncrement = 10;
 
+	float convertSliderToPixelValue(float sliderValue);
+	float convertPixelToSliderValue(float pixelValue);
+
+	juce::Slider point1Slider, point2Slider;
+	using sliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+	std::unique_ptr<sliderAttachment> point1Attachment, point2Attachment;
 };

@@ -18,6 +18,7 @@
 
 struct BandControl :    juce::Component,
                         juce::Button::Listener,
+                        juce::ActionListener,
                         juce::ActionBroadcaster
                         /*juce::MouseListener,*/
                         
@@ -29,6 +30,7 @@ struct BandControl :    juce::Component,
     
     void resized() override;
     void buttonClicked(juce::Button* button) override;
+    void actionListenerCallback(const juce::String& message) override {};
 
     //void mouseEnter(const juce::MouseEvent& event) override {};
     //void mouseExit(const juce::MouseEvent& event) override {};
@@ -40,6 +42,8 @@ struct BandControl :    juce::Component,
     //void setBsmRead() {mBsmChanged = false;}
     
     void sendBroadcast(juce::String parameterName, juce::String parameterValue);
+
+    void broadcastInitialParameters();
 
     /* Called by GlobalControls for Positioning */
     juce::Rectangle<int> getWaveBounds() {return mDropWaveshape.getBoundsInParent(); }

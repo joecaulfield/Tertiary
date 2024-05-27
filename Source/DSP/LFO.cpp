@@ -59,7 +59,6 @@ void LFO::getProcessorParams()
 void LFO::setWaveRate(float rate)
 {
     mRate = rate;
-    DBG("RATE\t" << rate);
 }
 
 void LFO::setRelativePhase(float phase)

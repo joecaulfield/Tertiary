@@ -13,7 +13,8 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
     
-    mSampleRate = lfo.getSampleRate();
+    //mSampleRate = lfo.getSampleRate();
+    mSampleRate = apvts.processor.getSampleRate();
     mHostBpm = lfo.getHostBPM();
 
     localLFO.initializeLFO(mSampleRate);
@@ -21,19 +22,24 @@ ScopeChannel::ScopeChannel(juce::AudioProcessorValueTreeState& apvts, LFO& lfo, 
     if (mSampleRate == 0)
         mSampleRate = 48000;
 
-    if (mHostBpm == 0)
+    if (mHostBpm == 0 || mHostBpm == 1)
         mHostBpm = 120;
 
     localLFO.setDsp(false);
     
-    localLFO.setWaveRate            (lfo.getWaveRate());
-    localLFO.setRelativePhase       (lfo.getRelativePhase());
-    localLFO.setWaveMultiplier      (lfo.getWaveMultiplier());
-    localLFO.setSyncedToHost        (lfo.isSyncedToHost());
-    localLFO.setWaveSkew            (lfo.getWaveSkew());
-    localLFO.setWaveDepth           (lfo.getWaveDepth());
-    localLFO.setWaveInvert          (lfo.getWaveInvert());
-    localLFO.setWaveform            (lfo.getWaveform());
+    //sendActionMessage("REQUEST_PARAMS_" + getName());
+    //DBG("SC SENDING REQUEST FOR PARAMS");
+
+    //localLFO.setWaveRate            (lfo.getWaveRate());
+    //localLFO.setRelativePhase       (lfo.getRelativePhase());
+    //localLFO.setWaveMultiplier      (lfo.getWaveMultiplier());
+    //localLFO.setSyncedToHost        (lfo.isSyncedToHost());
+    //localLFO.setWaveSkew            (lfo.getWaveSkew());
+    //localLFO.setWaveDepth           (lfo.getWaveDepth());
+    //localLFO.setWaveInvert          (lfo.getWaveInvert());
+    //localLFO.setWaveform            (lfo.getWaveform());
+
+    
 
     // Listen for changes to scrollbar
     apvts.addParameterListener(params.at(Names::Scope_Point1), this);
@@ -204,7 +210,11 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
     {
         scrollZoom = sliderScroll.getScrollZoom();
         scrollCenter = sliderScroll.getScrollCenter();
-        shouldUpdateScope = true;
+        //shouldUpdateScope = true;
+
+        generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
+        redrawScope();
+        repaint();
     }
 
     if (paramName == "FOCUS")
@@ -214,7 +224,11 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
         else
             isBandFocused = false;
 
-        shouldUpdateScope = true;
+        //shouldUpdateScope = true;
+
+        generateLFOPathForDrawing(lfoPath, lfoFill, waveTable, localLFO);
+        redrawScope();
+        repaint();
     }
 
 
@@ -222,10 +236,11 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
     {
         /* Parameters have changed, so recalculate them in the local LFO */
         localLFO.updateLFO(mSampleRate, mHostBpm);
-
         redrawScope();
         repaint();
     }
+
+
 
     
 }
@@ -512,4 +527,10 @@ void ScopeChannel::updateBandBypass()
 void ScopeChannel::resized()
 {
     //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
+
+    while (scrollZoom == 0 && scrollCenter == 0)
+    {
+        scrollZoom = sliderScroll.getScrollZoom();
+        scrollCenter = sliderScroll.getScrollCenter();
+    }
 }

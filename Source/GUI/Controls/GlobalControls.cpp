@@ -31,6 +31,11 @@ GlobalControls::GlobalControls(TertiaryAudioProcessor& p)
     midBandControls.addMouseListener(this, true);
     highBandControls.addMouseListener(this, true);
 
+    // Replace custom 'Mode' functionality with native 'Name'
+    lowBandControls.setName("LOW");
+    midBandControls.setName("MID");
+    highBandControls.setName("HIGH");
+
     lowBandControls.setMode("LOW");
     midBandControls.setMode("MID");
     highBandControls.setMode("HIGH");
@@ -144,7 +149,7 @@ void GlobalControls::paintBandLabels(juce::Graphics& g)
     auto controlLabelsFontTypeface = FontEditor::ControlLabels::getTypeface();
     auto controlLabelsFontSize = 23.f;
     auto controlLabelsFontStyle = juce::Font::FontStyleFlags::bold;
-    auto controlLabelsFontColor = juce::Colour(0xff29242e);
+    auto controlLabelsFontColor = juce::Colours::white.withAlpha(0.65f);
     //auto controlLabelsFontTransparency = FontEditor::ControlLabels::getFontTransparency();
     
     g.setColour(controlLabelsFontColor);
@@ -154,7 +159,7 @@ void GlobalControls::paintBandLabels(juce::Graphics& g)
                                     controlLabelsFontStyle);
     
     int x = border3.getX();
-    int y = bounds.getBottom() - 28;
+    int y = bounds.getBottom() - 33;
     int width = border3.getWidth();
     int height = 30;
     

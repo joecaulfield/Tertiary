@@ -186,6 +186,9 @@ void TertiaryAudioProcessor::addParameterListeners()
     apvts.addParameterListener(params.at(Names::Rate_High_LFO), this);
     apvts.addParameterListener(params.at(Names::Multiplier_High_LFO), this);
     apvts.addParameterListener(params.at(Names::Relative_Phase_High_LFO), this);
+
+    //apvts.addParameterListener(params.at(Names::Scope_Point1), this);
+    //apvts.addParameterListener(params.at(Names::Scope_Point2), this);
 }
 
 /* Recalls previously saved settings */
@@ -1171,4 +1174,5 @@ void TertiaryAudioProcessor::parameterChanged(const juce::String& parameterID, f
     {
         parameterChangedLfoHigh = true;
     }
+
 }
