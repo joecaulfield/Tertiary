@@ -8,47 +8,23 @@
 
 namespace BinaryData
 {
+    extern const char*   About_CompanyLogo_png;
+    const int            About_CompanyLogo_pngSize = 19084;
+
+    extern const char*   About_PluginTitle1_png;
+    const int            About_PluginTitle1_pngSize = 15750;
+
     extern const char*   CompanyLogo_png;
     const int            CompanyLogo_pngSize = 1626302;
-
-    extern const char*   Mult0_png;
-    const int            Mult0_pngSize = 339;
-
-    extern const char*   Mult1_png;
-    const int            Mult1_pngSize = 315;
-
-    extern const char*   Mult2_png;
-    const int            Mult2_pngSize = 456;
-
-    extern const char*   Mult3_png;
-    const int            Mult3_pngSize = 419;
-
-    extern const char*   Mult4_png;
-    const int            Mult4_pngSize = 530;
-
-    extern const char*   Mult5_png;
-    const int            Mult5_pngSize = 504;
-
-    extern const char*   TitleHeader_png;
-    const int            TitleHeader_pngSize = 21643;
-
-    extern const char*   TitleWaveShape_png;
-    const int            TitleWaveShape_pngSize = 12024;
-
-    extern const char*   TitleWaveTiming_png;
-    const int            TitleWaveTiming_pngSize = 11807;
-
-    extern const char*   TitleCrossover_png;
-    const int            TitleCrossover_pngSize = 9410;
-
-    extern const char*   TitleGainControls_png;
-    const int            TitleGainControls_pngSize = 8161;
 
     extern const char*   FaderKnob_png;
     const int            FaderKnob_pngSize = 1566;
 
+    extern const char*   TopBanner_Black_png;
+    const int            TopBanner_Black_pngSize = 40163;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 13;
+    const int namedResourceListSize = 5;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

@@ -30,21 +30,21 @@ private:
 
     juce::TextButton mButtonClose;
 
-    juce::Image imageTitleHeader;
+    juce::Image imagePluginTitle;
     juce::Image imageCompanyTitle;
 
-    float targetTitleWidth{ 800.f };
-    float targetTitleHeight{ 50.f };
+    float targetTitleWidth{ 350.f };
+    float targetTitleHeight{ 60.f };
 
-    float currentTitleWidth{ 100.f };
-    float currentTitleHeight{ 100.f };
+    //float currentTitleWidth{ 100.f };
+    //float currentTitleHeight{ 100.f };
+
+    float targetCompanyWidth{ 400.f };
+    float targetCompanyHeight{ 50.f };
 
 
-    float targetCompanyHeight{ 40.f };
-    float targetCompanyWidth{ 330.f };
-
-    float currentCompanyWidth{ 100.f };
-    float currentCompanyHeight{ 100.f };
+    //float currentCompanyWidth{ 100.f };
+    //float currentCompanyHeight{ 100.f };
 
     juce::HyperlinkButton mButtonWebsiteLink;
 

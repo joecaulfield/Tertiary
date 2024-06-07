@@ -3663,19 +3663,11 @@
     <ClInclude Include="..\..\JuceLibraryCode\JucePluginDefines.h"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Assets\About_CompanyLogo.png"/>
+    <None Include="..\..\Assets\About_PluginTitle1.png"/>
     <None Include="..\..\Assets\CompanyLogo.png"/>
-    <None Include="..\..\Assets\Mult0.png"/>
-    <None Include="..\..\Assets\Mult1.png"/>
-    <None Include="..\..\Assets\Mult2.png"/>
-    <None Include="..\..\Assets\Mult3.png"/>
-    <None Include="..\..\Assets\Mult4.png"/>
-    <None Include="..\..\Assets\Mult5.png"/>
-    <None Include="..\..\Assets\TitleHeader.png"/>
-    <None Include="..\..\Assets\TitleWaveShape.png"/>
-    <None Include="..\..\Assets\TitleWaveTiming.png"/>
-    <None Include="..\..\Assets\TitleCrossover.png"/>
-    <None Include="..\..\Assets\TitleGainControls.png"/>
     <None Include="..\..\Assets\FaderKnob.png"/>
+    <None Include="..\..\Assets\TopBanner_Black.png"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_devices\native\oboe\src\common\README.md"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_devices\native\oboe\src\flowgraph\resampler\README.md"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_devices\native\oboe\CMakeLists.txt"/>

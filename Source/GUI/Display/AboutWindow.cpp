@@ -28,8 +28,8 @@ AboutWindow::AboutWindow()
     mButtonClose.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::black.withAlpha(0.f));
     mButtonClose.setButtonText("X");
 
-    imageTitleHeader = juce::ImageCache::getFromMemory(BinaryData::TitleHeader_png, BinaryData::TitleHeader_pngSize);
-    imageCompanyTitle = juce::ImageCache::getFromMemory(BinaryData::CompanyLogo_png, BinaryData::CompanyLogo_pngSize);
+    imagePluginTitle = juce::ImageCache::getFromMemory(BinaryData::About_PluginTitle1_png, BinaryData::About_PluginTitle1_pngSize);
+    imageCompanyTitle = juce::ImageCache::getFromMemory(BinaryData::About_CompanyLogo_png, BinaryData::About_CompanyLogo_pngSize);
 
     mButtonWebsiteLink.setButtonText("WonderlandAudio.com");
     mButtonWebsiteLink.setURL(juce::URL("http://www.wonderlandaudio.com"));
@@ -49,37 +49,11 @@ void AboutWindow::paint(juce::Graphics& g)
 
     auto bounds = getLocalBounds();
 
-    // Draw Company Title
-    // ======================================================================
-    currentCompanyWidth = imageCompanyTitle.getWidth();
-    currentCompanyHeight = imageCompanyTitle.getHeight();
-
-    while (currentCompanyHeight > targetCompanyHeight)
-    {
-        currentCompanyHeight = imageCompanyTitle.getHeight() * 0.9f;
-        currentCompanyWidth = imageCompanyTitle.getWidth() * 0.9f;
-
-        imageCompanyTitle = imageCompanyTitle.rescaled(currentCompanyWidth, currentCompanyHeight, juce::Graphics::highResamplingQuality);
-    }
-
-    juce::Rectangle<float> companyBounds{ bounds.getCentreX() - targetCompanyWidth / 2, 5, (float)targetCompanyWidth, (float)targetCompanyHeight };
+    juce::Rectangle<float> companyBounds{ bounds.getCentreX() - targetCompanyWidth / 2, 25, (float)targetCompanyWidth, (float)targetCompanyHeight };
     g.drawImage(imageCompanyTitle, companyBounds);
 
-    // Draw Plugin Title
-    // ======================================================================
-    currentTitleWidth = imageTitleHeader.getWidth();
-    currentTitleHeight = imageTitleHeader.getHeight();
-
-    while (currentTitleHeight > targetTitleHeight)
-    {
-        currentTitleWidth = imageTitleHeader.getWidth() * 0.75f;
-        currentTitleHeight = imageTitleHeader.getHeight() * 0.75f;
-
-        imageTitleHeader = imageTitleHeader.rescaled(currentTitleWidth, currentTitleHeight, juce::Graphics::highResamplingQuality);
-    }
-
     juce::Rectangle<float> titleBounds{ bounds.getCentreX() - targetTitleWidth / 2, companyBounds.getBottom() + 5, (float)targetTitleWidth, (float)targetTitleHeight };
-    g.drawImage(imageTitleHeader, titleBounds);
+    g.drawImage(imagePluginTitle, titleBounds);
 
     // Draw Plugin-Details
     // ======================================================================
@@ -130,7 +104,6 @@ void AboutWindow::resized()
     mButtonClose.setBounds(bounds.getRight() - 30, 5, 25, 25);
 
     mButtonWebsiteLink.setBounds(bounds.getX(), bounds.getBottom() - 50, bounds.getWidth(), 30);
-
 }
 
 juce::String AboutWindow::formatBuildDateTime()

@@ -6521,43 +6521,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Assets\About_CompanyLogo.png">
+      <Filter>Tertiary\Assets</Filter>
+    </None>
+    <None Include="..\..\Assets\About_PluginTitle1.png">
+      <Filter>Tertiary\Assets</Filter>
+    </None>
     <None Include="..\..\Assets\CompanyLogo.png">
       <Filter>Tertiary\Assets</Filter>
     </None>
-    <None Include="..\..\Assets\Mult0.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\Mult1.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\Mult2.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\Mult3.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\Mult4.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\Mult5.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\TitleHeader.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\TitleWaveShape.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\TitleWaveTiming.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\TitleCrossover.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
-    <None Include="..\..\Assets\TitleGainControls.png">
-      <Filter>Tertiary\Assets</Filter>
-    </None>
     <None Include="..\..\Assets\FaderKnob.png">
+      <Filter>Tertiary\Assets</Filter>
+    </None>
+    <None Include="..\..\Assets\TopBanner_Black.png">
       <Filter>Tertiary\Assets</Filter>
     </None>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_audio_devices\native\oboe\src\common\README.md">
