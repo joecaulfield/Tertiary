@@ -25,12 +25,12 @@ public:
     void setDaysLeft(int trialDaysLeft) {mDaysLeft = trialDaysLeft;}
     
     //void buttonClicked(juce::Button* button) override {};
-    void mouseDoubleClick (const juce::MouseEvent &event) override {};
+    void mouseDoubleClick (const juce::MouseEvent &event) override;
     
 private:
     
     void buildTopBanner(juce::Graphics& g);
-    void buildTrialTitle(juce::Graphics& g);
+    //void buildTrialTitle(juce::Graphics& g);
     
     /* Graphics Asset, Top-Center Plugin-Name "Tertiary" */
     juce::Image imageTitleHeader;

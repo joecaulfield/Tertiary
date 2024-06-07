@@ -8,6 +8,12 @@
               pluginVST3Category="Dynamics,Modulation" pluginAAXCategory="0,2,32"
               version="0.3">
   <MAINGROUP id="gAXMC9" name="Tertiary">
+    <GROUP id="{710F6666-D42E-4C66-6590-82A4E308FE2D}" name="Archive">
+      <FILE id="nDUGY3" name="ActivatorWindow.cpp" compile="1" resource="0"
+            file="Source/ActivatorWindow.cpp"/>
+      <FILE id="GvnwsO" name="ActivatorWindow.h" compile="0" resource="0"
+            file="Source/ActivatorWindow.h"/>
+    </GROUP>
     <GROUP id="{ABEC2833-63D0-CBF4-FF09-9C90DF55A106}" name="DSP">
       <FILE id="J9Bg6U" name="LFO.cpp" compile="1" resource="0" file="Source/DSP/LFO.cpp"/>
       <FILE id="JhGam3" name="LFO.h" compile="0" resource="0" file="Source/DSP/LFO.h"/>
@@ -30,6 +36,8 @@
               file="Source/GUI/Controls/GlobalControls.h"/>
       </GROUP>
       <GROUP id="{76A8763A-6712-BF7B-D604-A362203AC5EF}" name="Display">
+        <FILE id="yisY3o" name="AboutWindow.cpp" compile="1" resource="0" file="Source/GUI/Display/AboutWindow.cpp"/>
+        <FILE id="rW9zhd" name="AboutWindow.h" compile="0" resource="0" file="Source/GUI/Display/AboutWindow.h"/>
         <FILE id="RKExbF" name="FreqLabel.cpp" compile="1" resource="0" file="Source/GUI/Display/FreqLabel.cpp"/>
         <FILE id="PZBJpj" name="FreqLabel.h" compile="0" resource="0" file="Source/GUI/Display/FreqLabel.h"/>
         <FILE id="OTuavb" name="Cursor.cpp" compile="1" resource="0" file="Source/GUI/Display/Cursor.cpp"/>
@@ -72,10 +80,6 @@
       </GROUP>
     </GROUP>
     <GROUP id="{2998FF50-7A04-CF09-34EE-98E94AB511BB}" name="Source">
-      <FILE id="nDUGY3" name="ActivatorWindow.cpp" compile="1" resource="0"
-            file="Source/ActivatorWindow.cpp"/>
-      <FILE id="GvnwsO" name="ActivatorWindow.h" compile="0" resource="0"
-            file="Source/ActivatorWindow.h"/>
       <FILE id="cRi3XZ" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="Ta0Y4C" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>

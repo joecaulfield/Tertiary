@@ -129,10 +129,6 @@ void ScopeChannel::paint(juce::Graphics& g)
 // ========================================================
 void ScopeChannel::actionListenerCallback(const juce::String& message)
 {
-
-
-    //WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
-
     auto paramName = message.replaceSection(0, 10, "");
     paramName = paramName.replaceSection(10, 25, "");
     paramName = paramName.removeCharacters("x");
@@ -141,6 +137,8 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
     paramValue = paramValue.removeCharacters("x");
 
     bool shouldUpdateScope = false;
+
+    DBG("SCOPE " << paramName);
 
     if (paramName == "WAVESHAPE")
     {
@@ -219,10 +217,12 @@ void ScopeChannel::actionListenerCallback(const juce::String& message)
 
     if (paramName == "FOCUS")
     {
+        isBandFocused = false;
+
         if (paramValue == getName())
             isBandFocused = true;
-        else
-            isBandFocused = false;
+        //else
+        //    isBandFocused = false;
 
         //shouldUpdateScope = true;
 
@@ -365,7 +365,7 @@ void ScopeChannel::paintWaveform(juce::Graphics& g)
     /* Stroke */
     g.setColour(isBandBypassed ? makeOutlineColor(getBypassBaseColor()): strokeColor);
     g.setOpacity(isBandFocused ? 1.f : 0.75f);
-    g.strokePath(lfoPath, isBandFocused? juce::PathStrokeType(3.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) :
+    g.strokePath(lfoPath, isBandFocused?    juce::PathStrokeType(2.25f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded) :
                                             juce::PathStrokeType(2.f, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded));
 }
 

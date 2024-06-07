@@ -15,13 +15,14 @@
 #include "GUI/Display/WindowWrapperOscilloscope.h"
 #include "GUI/Display/TopBanner.h"
 #include "Utility/UtilityFunctions.h"
+#include "GUI/Display/AboutWindow.h"
 
 //#include "ActivatorWindow.h"
 
 //==============================================================================
 /**
 */
-class TertiaryAudioProcessorEditor  : public juce::AudioProcessorEditor, juce::Timer, juce::Button::Listener//, juce::MouseListener
+class TertiaryAudioProcessorEditor  : public juce::AudioProcessorEditor, juce::Timer, juce::Button::Listener, juce::MouseListener
 {
 public:
     
@@ -56,6 +57,8 @@ private:
     /* Company & Plugin Title Banner */
     //void buildTopBanner(juce::Graphics& g);
     TopBanner topBanner;
+
+    AboutWindow aboutWindow;
     
     /* Header displayed in top corner */
 	juce::Label companyTitle;

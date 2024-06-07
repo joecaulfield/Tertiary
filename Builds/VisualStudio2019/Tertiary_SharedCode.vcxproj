@@ -139,11 +139,13 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\ActivatorWindow.cpp"/>
     <ClCompile Include="..\..\Source\DSP\LFO.cpp"/>
     <ClCompile Include="..\..\Source\DSP\Params.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\InputOutputGain.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\BandControls.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Controls\GlobalControls.cpp"/>
+    <ClCompile Include="..\..\Source\GUI\Display\AboutWindow.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\FreqLabel.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\Cursor.cpp"/>
     <ClCompile Include="..\..\Source\GUI\Display\OptionsMenu.cpp"/>
@@ -157,7 +159,6 @@
     <ClCompile Include="..\..\Source\Utility\AllColors.cpp"/>
     <ClCompile Include="..\..\Source\Utility\MyLookAndFeel.cpp"/>
     <ClCompile Include="..\..\Source\Utility\UtilityFunctions.cpp"/>
-    <ClCompile Include="..\..\Source\ActivatorWindow.cpp"/>
     <ClCompile Include="..\..\Source\PluginEditor.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
     <ClCompile Include="..\..\Source\WLDebugger.cpp"/>
@@ -2604,12 +2605,14 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\ActivatorWindow.h"/>
     <ClInclude Include="..\..\Source\DSP\LFO.h"/>
     <ClInclude Include="..\..\Source\DSP\Params.h"/>
     <ClInclude Include="..\..\Source\DSP\LockFreeQueue.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\InputOutputGain.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\BandControls.h"/>
     <ClInclude Include="..\..\Source\GUI\Controls\GlobalControls.h"/>
+    <ClInclude Include="..\..\Source\GUI\Display\AboutWindow.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\FreqLabel.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\Cursor.h"/>
     <ClInclude Include="..\..\Source\GUI\Display\OptionsMenu.h"/>
@@ -2623,7 +2626,6 @@
     <ClInclude Include="..\..\Source\Utility\AllColors.h"/>
     <ClInclude Include="..\..\Source\Utility\MyLookAndFeel.h"/>
     <ClInclude Include="..\..\Source\Utility\UtilityFunctions.h"/>
-    <ClInclude Include="..\..\Source\ActivatorWindow.h"/>
     <ClInclude Include="..\..\Source\PluginEditor.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>
     <ClInclude Include="..\..\Source\WLDebugger.h"/>

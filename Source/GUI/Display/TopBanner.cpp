@@ -30,8 +30,8 @@ void TopBanner::paint(juce::Graphics& g)
 
     buildTopBanner(g);
     
-    if (mShowTrialTitle)
-        buildTrialTitle(g);
+    //if (mShowTrialTitle)
+    //    buildTrialTitle(g);
 }
 
 void TopBanner::resized()
@@ -84,35 +84,41 @@ void TopBanner::buildTopBanner(juce::Graphics& g)
 
 /* Shows that this product is in trial status and shows days left on the top banner */
 //==============================================================================
-void TopBanner::buildTrialTitle(juce::Graphics& g)
+//void TopBanner::buildTrialTitle(juce::Graphics& g)
+//{
+    //// SHOW TRIAL TITLE =======================
+    //auto trialLabelFontTypeface = FontEditor::ControlLabels::getTypeface();
+    //auto trialLabelFontSize = 24.f;
+    //auto trialLabelFontStyle = juce::Font::FontStyleFlags::bold;
+    //auto trialLabelFontColor = juce::Colour(0xff817e85);
+    //
+    //auto titleFont = juce::Font(    trialLabelFontTypeface,
+    //                                trialLabelFontSize,
+    //                                trialLabelFontStyle);
+    //
+    //g.setFont(titleFont);
+    //g.setColour(trialLabelFontColor);
+    //
+    //juce::String stringTrial = "TRIAL: " + (juce::String)mDaysLeft + " DAYS LEFT";
+    //juce::Rectangle<int> trialTitleBounds = {10,5, 200, 30};
+    //g.drawFittedText(stringTrial, trialTitleBounds, juce::Justification::centredLeft, 2);
+    //
+    //auto trialSubtextLabelFontTypeface = FontEditor::ControlLabels::getTypeface();
+    //auto trialSubtextLabelFontSize = 13.f;
+    //auto trialSubtextLabelFontStyle = juce::Font::FontStyleFlags::bold;
+    //
+    //auto titleSubtextFont = juce::Font(     trialSubtextLabelFontTypeface,
+    //                                        trialSubtextLabelFontSize,
+    //                                        trialSubtextLabelFontStyle);
+    //
+    //g.setFont(titleSubtextFont);
+    //juce::String stringTrialSubtext = "DOUBLE-CLICK TO ACTIVATE";
+    //juce::Rectangle<int> trialSubTextBounds = {10,27,200,25};
+    //g.drawFittedText(stringTrialSubtext, trialSubTextBounds, juce::Justification::centredLeft,1);
+//}
+
+
+void TopBanner::mouseDoubleClick(const juce::MouseEvent& event)
 {
-    // SHOW TRIAL TITLE =======================
-    auto trialLabelFontTypeface = FontEditor::ControlLabels::getTypeface();
-    auto trialLabelFontSize = 24.f;
-    auto trialLabelFontStyle = juce::Font::FontStyleFlags::bold;
-    auto trialLabelFontColor = juce::Colour(0xff817e85);
-    
-    auto titleFont = juce::Font(    trialLabelFontTypeface,
-                                    trialLabelFontSize,
-                                    trialLabelFontStyle);
-    
-    g.setFont(titleFont);
-    g.setColour(trialLabelFontColor);
-    
-    juce::String stringTrial = "TRIAL: " + (juce::String)mDaysLeft + " DAYS LEFT";
-    juce::Rectangle<int> trialTitleBounds = {10,5, 200, 30};
-    g.drawFittedText(stringTrial, trialTitleBounds, juce::Justification::centredLeft, 2);
-    
-    auto trialSubtextLabelFontTypeface = FontEditor::ControlLabels::getTypeface();
-    auto trialSubtextLabelFontSize = 13.f;
-    auto trialSubtextLabelFontStyle = juce::Font::FontStyleFlags::bold;
-    
-    auto titleSubtextFont = juce::Font(     trialSubtextLabelFontTypeface,
-                                            trialSubtextLabelFontSize,
-                                            trialSubtextLabelFontStyle);
-    
-    g.setFont(titleSubtextFont);
-    juce::String stringTrialSubtext = "DOUBLE-CLICK TO ACTIVATE";
-    juce::Rectangle<int> trialSubTextBounds = {10,27,200,25};
-    g.drawFittedText(stringTrialSubtext, trialSubTextBounds, juce::Justification::centredLeft,1);
+
 }

@@ -19,14 +19,10 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     globalControls.getMidControl().addActionListener    ( &wrapperOscilloscope.getOscilloscopeMid() );
     globalControls.getHighControl().addActionListener   ( &wrapperOscilloscope.getOscilloscopeHigh() );
 
-    DBG("SCOPE CHANNELS ARE LISTENING");
-
     // Band Controls listen to Scope Channels
     wrapperOscilloscope.getOscilloscopeLow().addActionListener  ( &globalControls.getLowControl()    );
     wrapperOscilloscope.getOscilloscopeMid().addActionListener  ( &globalControls.getMidControl()    );
     wrapperOscilloscope.getOscilloscopeHigh().addActionListener ( &globalControls.getHighControl()   );
-
-    DBG("BAND CONTROLS ARE LISTENING");
 
     // Frequency Response listens to Controls
     globalControls.getLowControl().addActionListener    ( &wrapperFrequency.getFrequencyResponse() );
@@ -46,6 +42,10 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     // Frequency Response listens to Global Controls
     globalControls.addActionListener    (&wrapperFrequency.getFrequencyResponse()   );
 
+    globalControls.addActionListener   (&wrapperOscilloscope.getOscilloscopeLow()   );
+    globalControls.addActionListener   (&wrapperOscilloscope.getOscilloscopeMid()   );
+    globalControls.addActionListener   (&wrapperOscilloscope.getOscilloscopeHigh()  );
+
     /* Container class for all parameter controls */
     addAndMakeVisible(globalControls);
 
@@ -55,7 +55,8 @@ TertiaryAudioProcessorEditor::TertiaryAudioProcessorEditor (TertiaryAudioProcess
     /* Frequency-Domain & Crossover Display */
     addAndMakeVisible(wrapperFrequency);
 
-
+    addAndMakeVisible(aboutWindow);
+    aboutWindow.setVisible(false);
 }
 
 //==============================================================================
@@ -78,6 +79,16 @@ void TertiaryAudioProcessorEditor::resized()
 	using namespace juce;
 
     buildFlexboxLayout();
+
+    auto bounds = getLocalBounds();
+
+    auto aboutWidth = 400;
+    auto aboutHeight = 300;
+    auto aboutX = bounds.getCentreX() - aboutWidth / 2;
+    auto aboutY = bounds.getCentreY() - aboutHeight / 2;
+
+    aboutWindow.setBounds(aboutX, aboutY, aboutWidth, aboutHeight);
+    //aboutWindow.toFront(false);
 }
 
 /* Builds the UI layout */
@@ -117,5 +128,17 @@ void TertiaryAudioProcessorEditor::buildFlexboxLayout()
 /* Temporary Double-Click Callback*/
 void TertiaryAudioProcessorEditor::mouseDoubleClick(const juce::MouseEvent& event)
 {
+    if (topBanner.isMouseOver())
+    {
+        if (!aboutWindow.isVisible())
+        {
+            aboutWindow.setVisible(true);
+            //aboutWindow.toFront(false);
+        }
+        else
+            aboutWindow.setVisible(false);
+
+    }
+
 
 }

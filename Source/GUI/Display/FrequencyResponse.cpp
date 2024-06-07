@@ -56,6 +56,10 @@ FrequencyResponse::FrequencyResponse(   TertiaryAudioProcessor& p, juce::AudioPr
     newCursorLM.setName("LOW_CURSOR");
     newCursorMH.setName("HIGH_CURSOR");
 
+    newCursorLowGain.setName("LOW_GAIN_CURSOR");
+    newCursorMidGain.setName("MID_GAIN_CURSOR");
+    newCursorHighGain.setName("HIGH_GAIN_CURSOR");
+
     updateResponse();
 }
 
@@ -812,7 +816,7 @@ void FrequencyResponse::mouseMove(const juce::MouseEvent& event)
     //if (setDebug)
     //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
 
-    //checkCursorFocus(event);
+    checkCursorFocus(event);
 }
 
 /* Called when mouse enters parent or any child components */
@@ -883,6 +887,7 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
     // =============================================================
     if (newCursorLowGain.getBounds().contains(mousePoint))
     {
+        //sliderLowGain.setBounds(xM, sliderTop, 5, (sliderBot - sliderTop));
         sliderLowGain.setBounds(newCursorLowGain.getX() + xM, sliderTop, 5, (sliderBot - sliderTop));
         newCursorLowGain.setFocus(true);
     }
@@ -923,10 +928,6 @@ void FrequencyResponse::checkCursorFocus(const juce::MouseEvent& event)
 // ===========================================================================================
 void FrequencyResponse::actionListenerCallback(const juce::String& message)
 {
-
-    //if (setDebug)
-    //    WLDebugger::getInstance().printMessage(mNameSpace, __func__, "");
-
     auto bandName = message.replaceSection(5, 30, "");
     bandName = bandName.removeCharacters("x");
 
@@ -936,6 +937,8 @@ void FrequencyResponse::actionListenerCallback(const juce::String& message)
 
     juce::String paramValue = message.replaceSection(0, 25, "");
     paramValue = paramValue.removeCharacters("x");
+
+    DBG("FREQ " << paramName);
 
     if (paramName == "GAIN") 
     {

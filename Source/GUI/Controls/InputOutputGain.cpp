@@ -68,7 +68,7 @@ void InputOutputGain::paint(juce::Graphics& g)
 
 	g.drawImage(grill, grillBounds);
 
-	g.setColour(juce::Colours::white); /* Migrate to All Colors */
+	g.setColour(juce::Colours::white.withAlpha(0.65f));
 	g.setFont(13);
 	g.drawFittedText(valueString, labelBounds.toNearestInt(), juce::Justification::centred, 1);
 
@@ -122,7 +122,8 @@ void InputOutputGain::timerCallback()
 
 	getLevels();
 
-	repaint(1,1,getWidth()-2,getHeight()-2);
+	//repaint(1,1,getWidth()-2,getHeight()-2);
+	repaint(grillBounds.toNearestInt());
 }
 
 void InputOutputGain::getLevels()
@@ -250,4 +251,5 @@ void InputOutputGain::sliderValueChanged(juce::Slider* slider)
 	//	WLDebugger::getInstance().printMessage(mNameSpace, __func__, getName());
 
 	sliderValue = slider->getValue();
+	repaint();
 }

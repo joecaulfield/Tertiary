@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Tertiary\Archive">
+      <UniqueIdentifier>{243F4B48-3018-9AC3-07AA-83F4BC83ABA6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Tertiary\DSP">
       <UniqueIdentifier>{A9D67538-214B-8022-4987-1F40E17BE63A}</UniqueIdentifier>
     </Filter>
@@ -658,6 +661,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\ActivatorWindow.cpp">
+      <Filter>Tertiary\Archive</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\DSP\LFO.cpp">
       <Filter>Tertiary\DSP</Filter>
     </ClCompile>
@@ -672,6 +678,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\GUI\Controls\GlobalControls.cpp">
       <Filter>Tertiary\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GUI\Display\AboutWindow.cpp">
+      <Filter>Tertiary\GUI\Display</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GUI\Display\FreqLabel.cpp">
       <Filter>Tertiary\GUI\Display</Filter>
@@ -711,9 +720,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Utility\UtilityFunctions.cpp">
       <Filter>Tertiary\GUI\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ActivatorWindow.cpp">
-      <Filter>Tertiary\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PluginEditor.cpp">
       <Filter>Tertiary\Source</Filter>
@@ -3345,6 +3351,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\ActivatorWindow.h">
+      <Filter>Tertiary\Archive</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\DSP\LFO.h">
       <Filter>Tertiary\DSP</Filter>
     </ClInclude>
@@ -3362,6 +3371,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Controls\GlobalControls.h">
       <Filter>Tertiary\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GUI\Display\AboutWindow.h">
+      <Filter>Tertiary\GUI\Display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GUI\Display\FreqLabel.h">
       <Filter>Tertiary\GUI\Display</Filter>
@@ -3401,9 +3413,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Utility\UtilityFunctions.h">
       <Filter>Tertiary\GUI\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ActivatorWindow.h">
-      <Filter>Tertiary\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginEditor.h">
       <Filter>Tertiary\Source</Filter>

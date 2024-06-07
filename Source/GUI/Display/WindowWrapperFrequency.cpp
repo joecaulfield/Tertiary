@@ -240,8 +240,8 @@ void WindowWrapperFrequency::buildOptionsMenuParameters()
     using namespace Params;             // Create a Local Reference to Parameter Mapping
     const auto& params = GetParams();   // Create a Local Reference to Parameter Mapping
 
-    optionsMenu.addOptionToList(    "Showz FFT",
-                                    "Showz FFT",
+    optionsMenu.addOptionToList(    "Show FFT",
+                                    "Show FFT",
                                     audioProcessor.apvts,
                                     params.at(Names::Show_FFT));
 
